@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import LogoReme from '../assets/logo-reme.png';
 
 export const LoginView: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -39,13 +40,13 @@ export const LoginView: React.FC = () => {
       {/* Columna Izquierda - Branding */}
       <div className="lg:w-1/2 w-full bg-blue-900 flex flex-col items-center justify-center p-12 text-center order-2 lg:order-1">
         <div className="max-w-md w-full flex flex-col items-center justify-center animate-in fade-in zoom-in duration-700 pt-12 lg:pt-0">
-          {/* Logo Placeholder */}
-          <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-2xl mb-8">
-            <span className="text-blue-900 font-black text-2xl tracking-tighter leading-none">
-              IP<br/><span className="text-sm">AIP</span>
-            </span>
-          </div>
-          <h1 className="text-4xl text-white font-bold mb-4 tracking-tight">Transformando<br/>Panamá</h1>
+          {/* Logo */}
+          <img 
+            src={LogoReme} 
+            alt="Logo Reme" 
+            className="w-60 h-auto mb-8 drop-shadow-xl"
+          />
+          <h1 className="text-4xl text-white font-bold mb-4 tracking-tight">Metas enlaces<br/>Regional de los Santos</h1>
           <p className="text-blue-200 text-lg font-light max-w-sm">
             Sistema Gerencial Integral para el Monitoreo y Evaluación de Metas Institucionales.
           </p>
@@ -110,20 +111,6 @@ export const LoginView: React.FC = () => {
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
-            </div>
-
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  disabled={isLoading} 
-                  className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50" 
-                />
-                <span className="text-slate-600 font-medium">Recordarme</span>
-              </label>
-              <a href="#" className="font-semibold text-blue-600 hover:text-blue-800 transition-colors">
-                ¿Olvidaste tu contraseña?
-              </a>
             </div>
 
             {/* Botón de Submit bloqueado visualmente durante la petición */}

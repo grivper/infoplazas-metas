@@ -177,7 +177,6 @@ export const syncKpaxUnificadoToSupabase = async (
     try {
       await moverAHistorial(disp);
       await limpiarMotivoFalla(disp.numero_serie);
-      console.log(`[KPAX] Movido a historial: ${disp.numero_serie}`);
     } catch (e) {
       console.error(`[KPAX] Error moviendo ${disp.numero_serie}:`, e);
     }
@@ -213,8 +212,6 @@ export const syncKpaxUnificadoToSupabase = async (
     console.error('Error sincronizando KPAX:', error);
     throw error;
   }
-
-  console.log(`[KPAX] Sincronizados ${records.length}, resueltos ${paraMoverAHistorial.length}`);
 
   return {
     syncCount: records.length,

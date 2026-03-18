@@ -41,8 +41,6 @@ export class InfoplazaLookup {
     
     const searchNumber = extractInfoplazaNumber(searchValue);
     const searchNormalized = normalize(searchValue);
-    
-    console.log(`Buscando Infoplaza -> Input: "${searchValue}" | Extracted Number: "${searchNumber}"`);
 
     // 1. Nivel 1: Cruce Numérico Estricto (Mandatorio por arquitectura)
     // Si el CSV tiene un número, buscamos en el catálogo el mismo número extraído del nombre

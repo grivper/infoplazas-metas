@@ -3,6 +3,7 @@ import { AlertTriangle, CheckCircle, FileText } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { RadarDeviceCard } from './RadarDeviceCard';
 import { fetchReporteDispositivos, updateMotivoFalla } from '../services/kpaxUnificadoDb';
+import { RemeLoader } from '@/components/ui/reme-loader';
 import type { KpaxUnificado } from '../types/kpaxUnificado';
 
 /**
@@ -47,7 +48,7 @@ export const ReporteView: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-500" />
+        <RemeLoader size={32} />
       </div>
     );
   }

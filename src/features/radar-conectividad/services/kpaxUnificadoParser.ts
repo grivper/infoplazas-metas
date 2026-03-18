@@ -158,7 +158,6 @@ export const parseArchivo68 = (
     parsed.push(dispositivo);
   }
 
-  console.log(`[Parser 68] Parseados ${parsed.length} dispositivos`);
   return parsed;
 };
 

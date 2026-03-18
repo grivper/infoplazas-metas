@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from './lib/supabase';
 import { useIdleTimeout } from './hooks/useIdleTimeout';
+import { RemeLoader } from '@/components/ui/reme-loader';
 
 // Vistas de Autenticación y Dashboard
 import { LoginView } from './views/LoginView';
@@ -46,12 +47,12 @@ const App: React.FC = () => {
   });
 
   if (isLoading) {
-    // Loading state muy simple para evitar parpadeos
+    // Loading state con spinner
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="w-12 h-12 bg-blue-200 rounded-full mb-4"></div>
-          <div className="text-slate-400 font-medium">Verificando sesión segura...</div>
+        <div className="flex flex-col items-center">
+          <RemeLoader size={48} />
+          <div className="text-slate-400 font-medium mt-4">Verificando sesión segura...</div>
         </div>
       </div>
     );

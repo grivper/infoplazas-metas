@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MetaCard, type MetaItem } from '@/components/MetaCard';
 import { getDatosDashboard } from '@/services/dashboardDb';
-import { Loader2 } from 'lucide-react';
+import { RemeLoader } from '@/components/ui/reme-loader';
 
 /**
  * Vista de Dashboard Principal: Portal Gerencial de Metas
@@ -34,7 +34,7 @@ export const DashboardView: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+        <RemeLoader size={32} />
       </div>
     );
   }
