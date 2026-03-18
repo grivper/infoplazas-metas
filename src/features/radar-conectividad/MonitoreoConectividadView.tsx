@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Activity, History, Server } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,20 +14,18 @@ const MonitoreoConectividadView: React.FC = () => {
   const [historial, setHistorial] = useState<HistorialFalla[]>([]);
   const [activeTab, setActiveTab] = useState<'kpax' | 'agentes' | 'historial'>('kpax');
 
-  // Cargar historial de fallas
-  const loadHistorial = useCallback(async () => {
-    try {
-      const historialData = await fetchHistorialFallas();
-      setHistorial(historialData);
-    } catch (e) { console.error("Error cargando historial:", e); }
-  }, []);
-
   // Cargar datos según tab activa
   useEffect(() => {
     if (activeTab === 'historial') {
-      loadHistorial();
+      //-IIFE para evitar setState directo en effect
+      (async () => {
+        try {
+          const historialData = await fetchHistorialFallas();
+          setHistorial(historialData);
+        } catch (e) { console.error("Error cargando historial:", e); }
+      })();
     }
-  }, [activeTab, loadHistorial]);
+  }, [activeTab]);
 
   // Renderizado de contenido según pestaña
   const renderContenido = () => {

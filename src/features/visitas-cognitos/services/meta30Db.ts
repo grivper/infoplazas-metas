@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { fetchInfoplazasEnlaceMap, type InfoplazaEnlace } from '@/lib/infoplazas';
+import { fetchInfoplazasEnlaceMap, type InfoplazaEnlace } from '@/features/auditoria/services/infoplazasService';
 
 /**
  * Interfaz para el registro de sincronización de Meta 30%.

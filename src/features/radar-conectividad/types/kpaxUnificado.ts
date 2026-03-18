@@ -27,7 +27,7 @@ export interface KpaxUnificado {
   created_at?: string;
   updated_at?: string;
   // Relación con infoplaza (viene del JOIN de Supabase)
-  catalogo_infoplazas?: { nombre: string } | { nombre: string }[] | null;
+  catalogo_infoplazas?: { nombre: string } | null;
 }
 
 /**

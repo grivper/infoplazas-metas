@@ -112,7 +112,7 @@ export const ReporteView: React.FC = () => {
               <RadarDeviceCard
                 key={disp.numero_serie}
                 dispositivo={disp}
-                infoplazaNombre={(disp as any).catalogo_infoplazas?.nombre}
+                infoplazaNombre={disp.catalogo_infoplazas?.nombre ?? 'Sin infoplaza'}
                 onMotivoChange={handleMotivoChange}
               />
             ))}

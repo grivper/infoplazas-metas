@@ -69,12 +69,19 @@ export const generateInfoplazaCode = (nombre: string): string => {
 };
 
 /**
- * Obtiene el mapeo de código de infoplaza -> { enlace, dia }
+ * Mapeo de código de infoplaza -> { enlace, dia }.
  */
 export interface InfoplazaEnlace {
   codigo: string;
   enlace: string;
   dia: string;
+}
+
+/** Tipo para el resultado de la query join de itinerario_enlaces. */
+interface ItinerarioEnlaceRow {
+  enlace_nombre: string | null;
+  dia_semana: string | null;
+  catalogo_infoplazas: { codigo: string } | null;
 }
 
 export const fetchInfoplazasEnlaceMap = async (): Promise<Record<string, InfoplazaEnlace>> => {
@@ -95,7 +102,7 @@ export const fetchInfoplazasEnlaceMap = async (): Promise<Record<string, Infopla
 
   const map: Record<string, InfoplazaEnlace> = {};
   
-  data?.forEach((item: any) => {
+  (data as unknown as ItinerarioEnlaceRow[] | null)?.forEach((item) => {
     const codigoCompleto = item.catalogo_infoplazas?.codigo;
     if (codigoCompleto) {
       // Extraer número del código (ej: "132-pese" -> "132")

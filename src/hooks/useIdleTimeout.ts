@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 
 // 30 minutos por defecto (en milisegundos)
@@ -12,28 +12,22 @@ const DEFAULT_TIMEOUT = 30 * 60 * 1000;
 export const useIdleTimeout = (onTimeout: () => void, timeoutMs: number = DEFAULT_TIMEOUT) => {
   const timeoutId = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const handleIdle = async () => {
+  const handleIdle = useCallback(async () => {
     // Cerramos la sesión en Supabase y ejecutamos el callback (redirección)
     await supabase.auth.signOut();
     onTimeout();
-  };
+  }, [onTimeout]);
 
-  const resetTimeout = () => {
+  const resetTimeout = useCallback(() => {
     if (timeoutId.current) {
       clearTimeout(timeoutId.current);
     }
     timeoutId.current = setTimeout(handleIdle, timeoutMs);
-  };
+  }, [handleIdle, timeoutMs]);
 
   useEffect(() => {
     // Eventos generales que indican actividad del usuario
-    const events = [
-      'mousemove',
-      'mousedown',
-      'keydown',
-      'scroll',
-      'touchstart'
-    ];
+    const events = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart'];
 
     // Registramos los listeners para reiniciar el contador
     events.forEach((event) => {
@@ -52,5 +46,5 @@ export const useIdleTimeout = (onTimeout: () => void, timeoutMs: number = DEFAUL
         window.removeEventListener(event, resetTimeout);
       });
     };
-  }, [timeoutMs, onTimeout]);
+  }, [resetTimeout]);
 };

@@ -108,8 +108,16 @@ export const CognitoView: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    cargarDatos();
-  }, [cargarDatos]);
+    // IIFE para evitar setState directo en effect
+    (async () => {
+      try {
+        const registros = await fetchCognitoRegistros();
+        setData(registros as CognitoRegistro[]);
+      } catch (dbErr) {
+        console.error('Error al sincronizar con Supabase:', dbErr);
+      }
+    })();
+  }, []);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
