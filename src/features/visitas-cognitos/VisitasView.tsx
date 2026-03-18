@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RemeLoader } from '@/components/ui/reme-loader';
-import { RenderCuatrimestre, buildChartData, buildTableRows, buildKpis } from './components/VisitasChartUtils';
+import { RenderCuatrimestre } from './components/VisitasChartUtils';
+import { buildChartData } from './services/buildChartData';
+import { buildTableRows } from './services/buildTableRows';
+import { buildKpis } from './services/buildKpis';
 import { getDatosVisitas } from './services/meta30Db';
 import type { DatosVistaVisitas } from './services/meta30Db';
+import { UNIVERSO } from '@/lib/constants';
+import { SHEET_VISITAS } from '@/lib/constants';
 
-const UNIVERSO = 106;
 const CUATRIMESTRES = {
   C1: ['Enero', 'Febrero', 'Marzo', 'Abril'],
   C2: ['Mayo', 'Junio', 'Julio', 'Agosto'],
@@ -16,12 +20,11 @@ export const VisitasView: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [datos, setDatos] = useState<DatosVistaVisitas | null>(null);
   const [añoActual] = useState(() => new Date().getFullYear());
-  const SHEET_NAME = 'VisitasRegLS';
 
   useEffect(() => {
     const cargarDatos = async () => {
       setLoading(true);
-      const result = await getDatosVisitas(SHEET_NAME, añoActual);
+      const result = await getDatosVisitas(SHEET_VISITAS, añoActual);
       setDatos(result);
       setLoading(false);
     };

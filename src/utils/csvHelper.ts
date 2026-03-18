@@ -9,7 +9,7 @@ export const decodeCSVFile = async (file: File): Promise<string> => {
     // Intentamos UTF-8 primero (fatal: true hace que lance error si hay bytes inválidos)
     const decoder = new TextDecoder('utf-8', { fatal: true });
     return decoder.decode(buffer);
-  } catch (e) {
+  } catch {
     console.warn('Fallo decodificación UTF-8, intentando Windows-1252 (Excel Latam)...');
     // Fallback a Windows-1252 para archivos de Excel antiguos en español
     const fallbackDecoder = new TextDecoder('windows-1252');

@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { fetchInfoplazasEnlaceMap, type InfoplazaEnlace } from '@/lib/infoplazas';
 
 /**
  * Interfaz para el registro de sincronización de Meta 30%.
@@ -113,7 +114,7 @@ export interface DatosVistaVisitas {
   // Para KPIs: cumplimiento por mes (cuántas IP cumplieron >=30% vs meta)
   cumplimientoNacional: Record<string, number>;
   // Para tabla: porcentaje por IP por mes
-  visitasPorInfoplaza: Record<string, { nombre: string; meses: Record<string, number | null> }>;
+  visitasPorInfoplaza: Record<string, { nombre: string; meses: Record<string, number | null>; enlace: string; dia: string }>;
   // KPIs globales
   promedioNacional: number;
   ipMetaCumplida: number; // >= 100%
@@ -129,9 +130,12 @@ export interface DatosVistaVisitas {
  * - visitasPorInfoplaza: agrupa por número de Infoplaza con Porcentaje por Mes
  * - KPIs globales calculados del último mes con datos
  */
-export const transformarDatosMeta30 = (data: RegistroMeta30[]): DatosVistaVisitas => {
+export const transformarDatosMeta30 = (
+  data: RegistroMeta30[], 
+  enlaceMap: Record<string, InfoplazaEnlace> = {}
+): DatosVistaVisitas => {
   // Agrupar por número de Infoplaza y Mes
-  const visitasPorInfoplaza: Record<string, { nombre: string; meses: Record<string, number | null> }> = {};
+  const visitasPorInfoplaza: Record<string, { nombre: string; meses: Record<string, number | null>; enlace: string; dia: string }> = {};
   const cumplimientoPorMes: Record<string, number> = {};
 
   const mesesOrdenados = [
@@ -157,9 +161,17 @@ export const transformarDatosMeta30 = (data: RegistroMeta30[]): DatosVistaVisita
     // Porcentaje puede venir como string o número
     const porcentajeNum = typeof Porcentaje === 'string' ? parseFloat(Porcentaje) : Porcentaje;
 
+    // Obtener info de enlace
+    const enlaceInfo = enlaceMap[numeroInfoplaza] || { enlace: 'Sin asignar', dia: '' };
+
     // Guardar porcentaje por Infoplaza (usar número extraído para comparaciones)
     if (!visitasPorInfoplaza[numeroInfoplaza]) {
-      visitasPorInfoplaza[numeroInfoplaza] = { nombre: Infoplaza, meses: {} };
+      visitasPorInfoplaza[numeroInfoplaza] = { 
+        nombre: Infoplaza, 
+        meses: {},
+        enlace: enlaceInfo.enlace,
+        dia: enlaceInfo.dia
+      };
     }
     // Porcentaje del mes (si hay visitas)
     if (Total > 0) {
@@ -237,7 +249,11 @@ export const transformarDatosMeta30 = (data: RegistroMeta30[]): DatosVistaVisita
 export const getDatosVisitas = async (sheetName: string, año?: number): Promise<DatosVistaVisitas | null> => {
   const añoActual = año || new Date().getFullYear();
   
-  const sync = await getLastMeta30Sync(sheetName);
+  // Obtener mapeo de infoplaza -> enlace en paralelo
+  const [sync, enlaceMap] = await Promise.all([
+    getLastMeta30Sync(sheetName),
+    fetchInfoplazasEnlaceMap()
+  ]);
   
   if (!sync || !sync.data || sync.data.length === 0) {
     return null;
@@ -256,5 +272,5 @@ export const getDatosVisitas = async (sheetName: string, año?: number): Promise
     return null;
   }
 
-  return transformarDatosMeta30(registrosFiltrados);
+  return transformarDatosMeta30(registrosFiltrados, enlaceMap);
 };

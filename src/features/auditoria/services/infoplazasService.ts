@@ -67,3 +67,46 @@ export const generateInfoplazaCode = (nombre: string): string => {
     .replace(/[^a-z0-9]+/g, '-')     // Reemplaza no-alfanuméricos por guiones
     .replace(/^-+|-+$/g, '');       // Limpia guiones al inicio/fin
 };
+
+/**
+ * Obtiene el mapeo de código de infoplaza -> { enlace, dia }
+ */
+export interface InfoplazaEnlace {
+  codigo: string;
+  enlace: string;
+  dia: string;
+}
+
+export const fetchInfoplazasEnlaceMap = async (): Promise<Record<string, InfoplazaEnlace>> => {
+  const { data, error } = await supabase
+    .from('itinerario_enlaces')
+    .select(`
+      enlace_nombre,
+      dia_semana,
+      catalogo_infoplazas!inner(
+        codigo
+      )
+    `);
+
+  if (error) {
+    console.error('Error al obtener mapeo infoplaza-enlace:', error);
+    throw error;
+  }
+
+  const map: Record<string, InfoplazaEnlace> = {};
+  
+  data?.forEach((item: any) => {
+    const codigoCompleto = item.catalogo_infoplazas?.codigo;
+    if (codigoCompleto) {
+      // Extraer número del código (ej: "132-pese" -> "132")
+      const numero = codigoCompleto.split('-')[0];
+      map[numero] = {
+        codigo: codigoCompleto,
+        enlace: item.enlace_nombre || 'Sin asignar',
+        dia: item.dia_semana || ''
+      };
+    }
+  });
+
+  return map;
+};
