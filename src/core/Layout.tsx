@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Users, ClipboardCheck, Network, LayoutDashboard, MapPin, Activity, LogOut } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import LogoReme from '../assets/logo-reme.png';
 
 const Layout: React.FC = () => {
   const location = useLocation();
@@ -62,8 +63,8 @@ const Layout: React.FC = () => {
       {/* Sidebar */}
       <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col transition-all duration-300">
         <div className="h-16 flex items-center px-6 border-b border-slate-800">
-          <LayoutDashboard className="w-6 h-6 text-indigo-400 mr-2" />
-          <span className="text-lg font-bold text-white tracking-wide">AML Pro Metas</span>
+          <img src={LogoReme} alt="Metas Enlace" className="w-10 h-10 mr-3" />
+          <span className="text-lg font-bold text-white tracking-wide">Metas Enlace</span>
         </div>
         
         <nav className="flex-1 px-4 py-6 space-y-1">

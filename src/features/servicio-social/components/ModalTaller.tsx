@@ -82,13 +82,11 @@ export const ModalTaller: React.FC<ModalTallerProps> = ({ children, onSuccess })
     }
   };
 
-  // Format estudiante for display - shows name + cedula + university/infoplaza
+  // Format estudiante for display - shows only name + cedula
   const formatEstudiante = (r: Reclutamiento) => {
     const nombre = r.nombre_estudiante || 'Sin nombre';
     const cedula = r.cedula ? `(${r.cedula})` : '';
-    const universidad = r.nombre_universidad || '';
-    const infoplaza = r.nombre_infoplaza || '';
-    return `${nombre} ${cedula} - ${universidad || infoplaza}`;
+    return `${nombre} ${cedula}`;
   };
 
   return (
