@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Activity, History, Server } from 'lucide-react';
+import { Activity, History, Server, TrendingUp } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -9,10 +9,11 @@ import {
 } from './services/radarSupabaseDb';
 import { RadarKpaxView } from './components/RadarKpaxView';
 import { ReporteView } from './components/ReporteView';
+import { RadarEvolucionView } from './components/RadarEvolucionView';
 
 const MonitoreoConectividadView: React.FC = () => {
   const [historial, setHistorial] = useState<HistorialFalla[]>([]);
-  const [activeTab, setActiveTab] = useState<'kpax' | 'agentes' | 'historial'>('kpax');
+  const [activeTab, setActiveTab] = useState<'kpax' | 'agentes' | 'historial' | 'evolucion'>('kpax');
 
   // Cargar datos según tab activa
   useEffect(() => {
@@ -37,6 +38,11 @@ const MonitoreoConectividadView: React.FC = () => {
     // Tab Reporte (dispositivos críticos sin motivo)
     if (activeTab === 'agentes') {
       return <ReporteView />;
+    }
+
+    // Tab Evolución
+    if (activeTab === 'evolucion') {
+      return <RadarEvolucionView />;
     }
 
     // Tab Historial
@@ -175,6 +181,15 @@ const MonitoreoConectividadView: React.FC = () => {
           >
             <History className="w-4 h-4 inline mr-2" />
             Historial
+          </button>
+          <button
+            onClick={() => setActiveTab('evolucion')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              activeTab === 'evolucion' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <TrendingUp className="w-4 h-4 inline mr-2" />
+            Evolución
           </button>
         </div>
       </div>
