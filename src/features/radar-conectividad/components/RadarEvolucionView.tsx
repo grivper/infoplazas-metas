@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Calendar, TrendingUp, TrendingDown, Users, AlertTriangle } from 'lucide-react';
+import { Save, Calendar, TrendingUp, Users, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,9 @@ import {
   formatMes,
   type RadarMensualSnapshot,
 } from '../services/radarSnapshotsDb';
+
+// Tiempo en ms para ocultar mensaje de feedback
+const FEEDBACK_DURATION_MS = 3000;
 
 /**
  * Vista de Evolución Mensual del Radar
@@ -26,20 +29,21 @@ export const RadarEvolucionView: React.FC = () => {
 
   // Cargar datos
   const cargarDatos = async () => {
-    const [snapshotsData, ultimo, promedio] = await Promise.all([
-      fetchSnapshots(),
-      fetchUltimoSnapshot(),
-      calcularPromedioAnual(),
-    ]);
+    try {
+      const [snapshotsData, ultimo, promedio, anterior] = await Promise.all([
+        fetchSnapshots(),
+        fetchUltimoSnapshot(),
+        calcularPromedioAnual(),
+        // Snapshot anterior se carga en paralelo
+        fetchUltimoSnapshot().then(u => u ? fetchSnapshotAnterior(u.mes) : null)
+      ]);
 
-    setSnapshots(snapshotsData);
-    setSnapshotActual(ultimo);
-    setPromedioAnual(promedio);
-
-    // Cargar snapshot anterior para comparativa
-    if (ultimo) {
-      const anterior = await fetchSnapshotAnterior(ultimo.mes);
+      setSnapshots(snapshotsData);
+      setSnapshotActual(ultimo);
+      setPromedioAnual(promedio);
       setSnapshotAnterior(anterior);
+    } catch (e) {
+      console.error('Error cargando datos:', e);
     }
   };
 
@@ -57,7 +61,7 @@ export const RadarEvolucionView: React.FC = () => {
       setMensaje('Snapshot guardado correctamente');
       await cargarDatos();
       
-      setTimeout(() => setMensaje(null), 3000);
+      setTimeout(() => setMensaje(null), FEEDBACK_DURATION_MS);
     } catch (e) {
       setMensaje('Error al guardar snapshot');
     } finally {
