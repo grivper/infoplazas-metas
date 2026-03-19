@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Metas Enlace - Regional Los Santos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "surface-container-highest": "#dadddf",
+                "on-background": "#2c2f30",
+                "on-secondary-fixed-variant": "#a00052",
+                "on-primary-container": "#00176b",
+                "secondary-fixed-dim": "#ffacc4",
+                "on-primary": "#f2f1ff",
+                "primary-container": "#879aff",
+                "tertiary-container": "#45f2b9",
+                "secondary": "#b4005d",
+                "inverse-on-surface": "#9b9d9e",
+                "secondary-fixed": "#ffc1d1",
+                "surface-dim": "#d1d5d7",
+                "error": "#b41340",
+                "surface-tint": "#2a4bd9",
+                "outline-variant": "#abadae",
+                "surface-container": "#e6e8ea",
+                "on-surface": "#2c2f30",
+                "surface-container-high": "#e0e3e4",
+                "secondary-dim": "#9f0051",
+                "on-error-container": "#510017",
+                "surface-container-lowest": "#ffffff",
+                "on-secondary": "#ffeff1",
+                "outline": "#757778",
+                "on-primary-fixed-variant": "#001e82",
+                "tertiary-dim": "#005b42",
+                "tertiary": "#00694c",
+                "secondary-container": "#ffc1d1",
+                "surface-container-low": "#eff1f2",
+                "on-primary-fixed": "#000000",
+                "on-tertiary-fixed-variant": "#006046",
+                "on-secondary-container": "#8f0048",
+                "primary": "#2a4bd9",
+                "primary-dim": "#173dcd",
+                "on-surface-variant": "#595c5d",
+                "on-tertiary": "#c7ffe4",
+                "tertiary-fixed-dim": "#2de3ac",
+                "error-dim": "#a70138",
+                "tertiary-fixed": "#45f2b9",
+                "on-tertiary-container": "#00563e",
+                "on-error": "#ffefef",
+                "primary-fixed-dim": "#748bff",
+                "inverse-primary": "#7087ff",
+                "surface-bright": "#f5f6f7",
+                "surface-variant": "#dadddf",
+                "primary-fixed": "#879aff",
+                "inverse-surface": "#0c0f10",
+                "surface": "#f5f6f7",
+                "error-container": "#f74b6d",
+                "on-tertiary-fixed": "#00412e",
+                "on-secondary-fixed": "#6c0035",
+                "background": "#f5f6f7"
+              },
+              fontFamily: {
+                "headline": ["Plus Jakarta Sans"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+        }
+        .donut-gradient-blue { background: conic-gradient(from 0deg, #2a4bd9 0% 20%, #eff1f2 20% 100%); }
+        .donut-gradient-pink { background: conic-gradient(from 0deg, #b4005d 0% 31%, #eff1f2 31% 100%); }
+        .donut-gradient-orange { background: conic-gradient(from 0deg, #f59e0b 0% 13%, #eff1f2 13% 100%); }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- Sidebar Navigation -->
+<aside class="bg-slate-900 dark:bg-black h-screen w-64 fixed left-0 top-0 overflow-y-auto shadow-2xl z-50 flex flex-col py-6 tonal-transition">
+<div class="px-6 mb-10">
+<h1 class="text-2xl font-black text-white tracking-tight font-headline">Metas Enlace</h1>
+<p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-1">Institutional Portal</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-white bg-blue-600/10 rounded-lg mx-2 border-r-4 border-blue-600 group" href="#">
+<span class="material-symbols-outlined text-blue-500" data-icon="dashboard">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors duration-200 mx-2 hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="volunteer_activism">volunteer_activism</span>
+<span class="text-sm font-medium">Servicio Social</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors duration-200 mx-2 hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="event_repeat">event_repeat</span>
+<span class="text-sm font-medium">Visitas e Incidencias</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors duration-200 mx-2 hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="text-sm font-medium">Mesas de Transformación</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors duration-200 mx-2 hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="route">route</span>
+<span class="text-sm font-medium">Cumplimiento de Rutas</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors duration-200 mx-2 hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="radar">radar</span>
+<span class="text-sm font-medium">Radar de Conectividad</span>
+</a>
+</nav>
+<div class="mt-auto px-6 py-4 border-t border-slate-800/50 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-800 overflow-hidden">
+<img alt="User Avatar" data-alt="Portrait of a professional man in a suit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPSmtj-ODqmgo4iKwgp7pIm2tG5tn0XFLFEXvOy2jxhcgPbS5vFnh3_OYPIdS1ZUfv46ozbD3fE1JGkKszU7Z6qizHH1hoy-7JMvujQbWqBiegjsD9hIKXiE-rxHph_ZVByryg-Z1IqKhja-W7T0o3NwtKDLNq-v94J54ZGb53rPa_EM7BJpC4xWNi0fGib9YXM2dHZM-g9AdJKiGHSfr2HiIwS_MPRqY-YKXRHRQup_j7IYQFyYNfu-YL94zGCH6H5qDBx-8fl5RS"/>
+</div>
+<div>
+<p class="text-sm font-bold text-white">García, J.</p>
+<p class="text-[10px] text-slate-500 font-semibold uppercase">Regional Director</p>
+</div>
+</div>
+</aside>
+<!-- Main Stage -->
+<main class="ml-64 min-h-screen relative">
+<!-- Top App Bar -->
+<header class="bg-slate-50/80 dark:bg-slate-900/80 backdrop-blur-xl flex justify-between items-center px-8 py-4 w-full sticky top-0 z-40 shadow-sm docked full-width no-border bg-slate-100/50">
+<div>
+<h2 class="text-lg font-bold text-slate-900 dark:text-white font-headline">Sistema de Gestión de Metas - Regional Los Santos</h2>
+<p class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Panel de Control Gerencial</p>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-8 space-y-8">
+<!-- Achievement Number Header -->
+<div class="flex items-end justify-between">
+<div>
+<h3 class="text-3xl font-black font-headline text-on-surface tracking-tight">Estado General de Metas</h3>
+<p class="text-on-surface-variant font-medium mt-1">Resumen ejecutivo del cumplimiento regional acumulado.</p>
+</div>
+<div class="flex gap-2">
+<button class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-bold text-sm flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">download</span>
+                        Exportar Reporte
+                    </button>
+</div>
+</div>
+<!-- Dashboard Grid (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Card 1: Servicio Social -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_12px_40px_rgba(44,47,48,0.06)] relative overflow-hidden group hover:translate-y-[-4px] transition-all duration-300">
+<div class="absolute top-0 left-0 w-full h-1.5 bg-primary"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="w-24 h-24 rounded-full donut-gradient-blue p-3 flex items-center justify-center relative">
+<div class="bg-surface-container-lowest w-full h-full rounded-full flex items-center justify-center shadow-inner">
+<span class="text-xl font-extrabold font-headline text-primary">20%</span>
+</div>
+</div>
+<div class="text-right">
+<div class="flex items-center justify-end gap-2 text-primary mb-1">
+<h4 class="font-bold text-on-surface">Servicio Social</h4>
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Global Status</span>
+</div>
+</div>
+<div class="grid grid-cols-4 gap-4 mb-6">
+<div class="text-center">
+<p class="text-lg font-black font-headline text-primary">4</p>
+<p class="text-[10px] font-semibold text-outline">/5</p>
+</div>
+<div class="text-center">
+<p class="text-lg font-black font-headline text-on-surface">1</p>
+<p class="text-[10px] font-semibold text-outline">/6</p>
+</div>
+<div class="text-center">
+<p class="text-lg font-black font-headline text-on-surface">0</p>
+<p class="text-[10px] font-semibold text-outline">/140</p>
+</div>
+<div class="text-center">
+<p class="text-lg font-black font-headline text-on-surface">0</p>
+<p class="text-[10px] font-semibold text-outline">/600</p>
+</div>
+</div>
+<div class="flex justify-end">
+<a class="text-xs font-bold text-primary flex items-center gap-1 hover:gap-2 transition-all" href="#">
+                            Ver más <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Card 2: Cumplimiento del 30% -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_12px_40px_rgba(44,47,48,0.06)] relative overflow-hidden hover:translate-y-[-4px] transition-all duration-300">
+<div class="absolute top-0 left-0 w-full h-1.5 bg-secondary"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="w-24 h-24 rounded-full donut-gradient-pink p-3 flex items-center justify-center">
+<div class="bg-surface-container-lowest w-full h-full rounded-full flex items-center justify-center shadow-inner">
+<span class="text-xl font-extrabold font-headline text-secondary">31%</span>
+</div>
+</div>
+<div class="text-right">
+<div class="flex items-center justify-end gap-2 text-secondary mb-1">
+<h4 class="font-bold text-on-surface">Cumplimiento del 30%</h4>
+<span class="material-symbols-outlined text-xl">timer</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Efficiency Metric</span>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center bg-surface-container-low p-3 rounded-lg">
+<span class="text-xs font-bold text-on-surface">Total Registros</span>
+<span class="text-lg font-black font-headline text-secondary">277</span>
+</div>
+<div class="flex gap-4">
+<div class="flex-1 bg-surface-container-low p-3 rounded-lg text-center">
+<p class="text-[10px] font-bold uppercase text-outline mb-1">Pendientes</p>
+<p class="text-lg font-black font-headline text-on-surface">0</p>
+</div>
+<div class="flex-1 bg-surface-container-low p-3 rounded-lg text-center">
+<p class="text-[10px] font-bold uppercase text-outline mb-1">Rechazados</p>
+<p class="text-lg font-black font-headline text-on-surface">0</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3: Mesa de Transformación -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_12px_40px_rgba(44,47,48,0.06)] relative overflow-hidden hover:translate-y-[-4px] transition-all duration-300">
+<div class="absolute top-0 left-0 w-full h-1.5 bg-amber-500"></div>
+<div class="flex justify-between items-start mb-6">
+<div class="w-24 h-24 rounded-full donut-gradient-orange p-3 flex items-center justify-center">
+<div class="bg-surface-container-lowest w-full h-full rounded-full flex items-center justify-center shadow-inner">
+<span class="text-xl font-extrabold font-headline text-amber-600">13%</span>
+</div>
+</div>
+<div class="text-right">
+<div class="flex items-center justify-end gap-2 text-amber-600 mb-1">
+<h4 class="font-bold text-on-surface">Mesa de Transformación</h4>
+<span class="material-symbols-outlined text-xl">handshake</span>
+</div>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Strategic Collaboration</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-amber-50 rounded-xl p-4 border border-amber-100">
+<p class="text-xs font-bold text-amber-700 mb-1">Activas</p>
+<p class="text-2xl font-black font-headline text-amber-900">2</p>
+</div>
+<div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+<p class="text-xs font-bold text-slate-500 mb-1">Finalizadas</p>
+<p class="text-2xl font-black font-headline text-slate-900">0</p>
+</div>
+</div>
+</div>
+<!-- Card 4: Cumplimiento de Rutas (Wide) -->
+<div class="bg-surface-container-lowest rounded-xl p-8 shadow-[0_12px_40px_rgba(44,47,48,0.06)] relative overflow-hidden md:col-span-2 group hover:translate-y-[-4px] transition-all duration-300">
+<div class="absolute top-0 left-0 w-full h-1.5 bg-tertiary"></div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+<div class="flex-1 space-y-6">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+</div>
+<div>
+<h4 class="text-xl font-extrabold font-headline text-on-surface">Cumplimiento de Rutas</h4>
+<p class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">Regional Logistics Performance</p>
+</div>
+</div>
+<div class="relative pt-1">
+<div class="flex items-center justify-between mb-2">
+<div>
+<span class="text-xs font-bold inline-block py-1 px-3 uppercase rounded-full text-tertiary bg-tertiary/10">
+                                            Excediendo Meta
+                                        </span>
+</div>
+<div class="text-right">
+<span class="text-3xl font-black font-headline text-tertiary">97%</span>
+</div>
+</div>
+<div class="overflow-hidden h-4 mb-4 text-xs flex rounded-full bg-surface-container-highest">
+<div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-tertiary relative" style="width:97%">
+<div class="absolute top-0 right-0 w-2 h-full bg-white/20"></div>
+</div>
+</div>
+</div><div class="mt-8 space-y-4 pt-6 border-t border-surface-container">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-4">Desglose por Responsable</p>
+<div class="space-y-3">
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center">
+<span class="text-xs font-bold text-on-surface">Guillermo Rivera</span>
+<span class="text-xs font-black text-tertiary">82%</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 82%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center">
+<span class="text-xs font-bold text-on-surface">Rogelio Cruz</span>
+<span class="text-xs font-black text-tertiary">91%</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 91%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center">
+<span class="text-xs font-bold text-on-surface">José Ruiz</span>
+<span class="text-xs font-black text-tertiary">75%</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 75%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 5: KPAX -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_12px_40px_rgba(44,47,48,0.06)] relative overflow-hidden hover:translate-y-[-4px] transition-all duration-300">
+<div class="absolute top-0 left-0 w-full h-1.5 bg-secondary-dim"></div>
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-full bg-secondary-dim/10 flex items-center justify-center text-secondary-dim">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dns</span>
+</div>
+<h4 class="font-bold text-lg text-on-surface">KPAX</h4>
+</div>
+<div class="mb-6">
+<div class="flex justify-between mb-2">
+<span class="text-[10px] font-bold text-on-surface-variant uppercase">Connectivity Index</span>
+<span class="text-lg font-black font-headline text-secondary-dim">39%</span>
+</div>
+<div class="w-full bg-surface-container-highest h-3 rounded-full overflow-hidden">
+<div class="bg-secondary-dim h-full rounded-full" style="width: 39%"></div>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-end p-3 rounded-xl bg-slate-50 border border-slate-100">
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase">Uptime Score</p>
+<p class="text-lg font-black font-headline text-slate-900">88.4</p>
+</div>
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+</div>
+<div class="flex justify-between items-end p-3 rounded-xl bg-slate-50 border border-slate-100">
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase">Latency</p>
+<p class="text-lg font-black font-headline text-slate-900">24ms</p>
+</div>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">trending_down</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

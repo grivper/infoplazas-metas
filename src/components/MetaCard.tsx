@@ -12,6 +12,7 @@ export interface MetaMetrica {
   valor: number;
   meta: number;
   unidad?: string;
+  peso?: number; // Peso en porcentaje para promedio ponderado (0-100)
 }
 
 /**
@@ -25,6 +26,42 @@ export interface MetaItem {
   metricas: MetaMetrica[];
   color: string;
   link: string;
+  historial?: HistorialSnapshot[]; // Para seguimiento histórico (Meta 30%)
+  regiones?: RegionData[]; // Para Mesas de Transformación
+  enlaces?: EnlaceData[]; // Para Cumplimiento de Rutas
+}
+
+/**
+ * Datos por región para Meta 3
+ */
+export interface RegionData {
+  region: string;
+  completadas: number;
+  total: number;
+  avance: number; // 0-100
+  peso: number; // 0-1
+}
+
+/**
+ * Datos por enlace para Meta 4
+ */
+export interface EnlaceData {
+  enlace: string;
+  programadas: number;
+  visitadas: number;
+  cumplimiento: number; // 0-100
+}
+
+/**
+ * Snapshot histórico para gráficos de evolución
+ */
+export interface HistorialSnapshot {
+  fecha: string;
+  mes_nombre: string;
+  ip_sobre_30: number;
+  meta_acumulada: number;
+  meta_base?: number;
+  progreso_pct: number;
 }
 
 interface MetaCardProps {

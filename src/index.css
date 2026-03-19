@@ -3,66 +3,102 @@
 @tailwind utilities;
 
 @layer base {
+  /* Design System "Polished Luminary" */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 242.2 47.4% 51.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
+    /* Fundation Colors */
+    --background: #f5f6f7;
+    --foreground: #2c2f30;
+    
+    /* Surface Hierarchy */
+    --surface-container-lowest: #ffffff;
+    --surface-container-low: #eff1f2;
+    --surface-container: #e6e8ea;
+    --surface-container-high: #e0e3e4;
+    --surface-container-highest: #dadddf;
+    
+    /* Primary - Deep Blue */
+    --primary: #2a4bd9;
+    --primary-dim: #173dcd;
+    --primary-fixed: #879aff;
+    --on-primary: #f2f1ff;
+    --on-primary-fixed: #000000;
+    
+    /* Secondary - Magenta */
+    --secondary: #b4005d;
+    --secondary-dim: #9f0051;
+    --secondary-fixed: #ffc1d1;
+    --on-secondary: #ffeff1;
+    
+    /* Tertiary - Emerald */
+    --tertiary: #00694c;
+    --tertiary-dim: #005b42;
+    --tertiary-fixed: #45f2b9;
+    --on-tertiary: #c7ffe4;
+    
+    /* Utility Colors */
+    --error: #b41340;
+    --on-error: #ffefef;
+    --outline: #757778;
+    --outline-variant: #abadae;
+    --inverse-surface: #0c0f10;
+    --inverse-on-surface: #9b9d9e;
+    
+    /* Override Shadcn */
+    --card: #ffffff;
+    --card-foreground: #2c2f30;
+    --popover: #ffffff;
+    --popover-foreground: #2c2f30;
+    --muted: #eff1f2;
+    --muted-foreground: #595c5d;
+    --accent: #eff1f2;
+    --accent-foreground: #2c2f30;
+    --destructive: #b41340;
+    --destructive-foreground: #ffefef;
+    --border: #dadddf;
+    --input: #dadddf;
+    --ring: #2a4bd9;
+    --radius: 0.75rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: #0c0f10;
+    --foreground: #f5f6f7;
+    --surface-container-lowest: #1a1d1e;
+    --surface-container-low: #242728;
+    --surface-container: #2c2f30;
+    --surface-container-high: #363a3c;
+    --surface-container-highest: #414548;
+    --primary: #879aff;
+    --primary-dim: #748bff;
+    --on-primary: #00176b;
+    --secondary: #ffc1d1;
+    --secondary-dim: #ffacc4;
+    --on-secondary: #6c0035;
+    --tertiary: #45f2b9;
+    --tertiary-dim: #2de3ac;
+    --on-tertiary: #00412e;
+    --card: #1a1d1e;
+    --card-foreground: #f5f6f7;
+    --muted: #242728;
+    --muted-foreground: #9b9d9e;
+    --border: #414548;
+    --input: #414548;
+  }
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+  /* Tipografía Editorial */
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+  /* Clase para headlines (Plus Jakarta Sans) */
+  .font-headline {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+  /* Material Symbols */
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }
 }
 
@@ -70,7 +106,25 @@
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
+}
+
+/* Glass Effect para elementos flotantes */
+@layer utilities {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
   }
+}
+
+/* Donut Charts - Gradientes del template */
+.donut-gradient-blue { 
+  background: conic-gradient(from 0deg, #2a4bd9 0% 20%, #eff1f2 20% 100%); 
+}
+
+.donut-gradient-pink { 
+  background: conic-gradient(from 0deg, #b4005d 0% 31%, #eff1f2 31% 100%); 
+}
+
+.donut-gradient-orange { 
+  background: conic-gradient(from 0deg, #f59e0b 0% 13%, #eff1f2 13% 100%); 
 }

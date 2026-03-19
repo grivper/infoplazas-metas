@@ -21,6 +21,7 @@ interface KPIData {
   icon: React.ElementType;
   progress: number;
   color: string;
+  peso: number; // Peso en % para el promedio ponderado
 }
 
 interface Workflow {
@@ -119,6 +120,7 @@ export const ServicioSocialView: React.FC = () => {
           icon: Building2,
           progress: Math.min((alianzasCount / 5) * 100, 100), // Meta: 5 universidades
           color: 'bg-blue-500',
+          peso: 40,
         },
         {
           title: 'Estudiantes Reclutados',
@@ -126,6 +128,7 @@ export const ServicioSocialView: React.FC = () => {
           icon: Users,
           progress: Math.min((estudiantesTotal / 60) * 100, 100), // Meta: 60 estudiantes
           color: 'bg-emerald-500',
+          peso: 30,
         },
         {
           title: 'Talleres Impartidos',
@@ -133,6 +136,7 @@ export const ServicioSocialView: React.FC = () => {
           icon: BookOpen,
           progress: Math.min((talleresCount / 30) * 100, 100), // Meta: 30 talleres
           color: 'bg-amber-500',
+          peso: 15,
         },
         {
           title: 'Usuarios Capacitados',
@@ -140,6 +144,7 @@ export const ServicioSocialView: React.FC = () => {
           icon: GraduationCap,
           progress: Math.min((usuariosCapacitados / 1000) * 100, 100), // Meta: 1000 usuarios
           color: 'bg-purple-500',
+          peso: 15,
         },
       ]);
 
@@ -233,8 +238,13 @@ export const ServicioSocialView: React.FC = () => {
                 <CardTitle className="text-sm font-medium text-slate-500">
                   {kpi.title}
                 </CardTitle>
-                <div className={`p-2 rounded-lg ${kpi.color} bg-opacity-10`}>
-                  <kpi.icon className={`h-4 w-4 ${kpi.color.replace('bg-', 'text-')}`} />
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded ${kpi.color.replace('bg-', 'bg-')} bg-opacity-20`}>
+                    {kpi.peso}%
+                  </span>
+                  <div className={`p-2 rounded-lg ${kpi.color} bg-opacity-10`}>
+                    <kpi.icon className={`h-4 w-4 ${kpi.color.replace('bg-', 'text-')}`} />
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>

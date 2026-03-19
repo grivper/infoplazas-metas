@@ -33,10 +33,10 @@ const Layout: React.FC = () => {
   const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
     { name: 'Servicio Social', href: '/servicio-social', icon: Users },
-    { name: 'Visitas e Incidencias', href: '/visitas-incidencias', icon: ClipboardCheck },
+    { name: 'Cumplimiento 30%', href: '/visitas-incidencias', icon: ClipboardCheck },
     { name: 'Mesas de Transformación', href: '/mesas', icon: Network },
     { name: 'Cumplimiento de Rutas', href: '/auditoria', icon: MapPin },
-    { name: 'Radar de Conectividad', href: '/radar', icon: Activity },
+    { name: 'Radar Kpax', href: '/radar', icon: Activity },
   ];
 
   // Función para determinar si está activo

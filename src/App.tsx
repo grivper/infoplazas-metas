@@ -8,8 +8,8 @@ import { RemeLoader } from '@/components/ui/reme-loader';
 import { LoginView } from './views/LoginView';
 import { DashboardView } from './views/DashboardView';
 
-// Layout Principal Elegante
-import Layout from './core/Layout';
+// Layout Principal estilo "Polished Luminary"
+import LayoutBento from './core/LayoutBento';
 
 // Módulos (Features) - Screaming Architecture
 import ServicioSocialView from './features/servicio-social/ServicioSocialView';
@@ -69,7 +69,7 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route path="/" element={<LayoutBento />}>
           <Route index element={<DashboardView />} />
           <Route path="servicio-social" element={<ServicioSocialView />} />
           <Route path="visitas-incidencias" element={<VisitasIncidencias />} />
