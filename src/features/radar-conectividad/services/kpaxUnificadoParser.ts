@@ -118,8 +118,3 @@ export const parseArchivo68 = (
 
   return parsed;
 };
-
-/**
- * Alias para mantener compatibilidad
- */
-export const parseKpax68 = parseArchivo68;
