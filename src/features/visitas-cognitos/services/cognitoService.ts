@@ -89,17 +89,4 @@ export const fetchCognitoRegistros = async () => {
   return data;
 };
 
-/**
- * Elimina todos los registros de un mes específico (opcional, para re-subidas).
- */
-export const deleteCognitoByMes = async (mes: number) => {
-  const { error } = await supabase
-    .from('cognito_registros')
-    .delete()
-    .eq('mes', mes);
 
-  if (error) {
-    console.error('Error al eliminar registros por mes:', error);
-    throw error;
-  }
-};

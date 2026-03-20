@@ -15,60 +15,6 @@ export interface Meta30Sincronizacion {
 }
 
 /**
- * Guarda los datos de Meta 30 sincronizados desde Google Sheets.
- * Si ya existe un registro para esa hoja, lo actualiza; si no, crea uno nuevo.
- * 
- * @param sheetName Nombre de la hoja en Google Sheets
- * @param data Array de registros provenientes de la hoja
- */
-export const saveMeta30Sync = async (
-  sheetName: string, 
-  data: Record<string, unknown>[]
-): Promise<{ success: boolean; error: Error | null }> => {
-  try {
-    // Primero verificamos si ya existe un registro para esta hoja
-    const { data: existing, error: fetchError } = await supabase
-      .from('meta_30_sincronizacion')
-      .select('id')
-      .eq('sheet_name', sheetName)
-      .maybeSingle();
-
-    if (fetchError) {
-      console.error('Error al buscar registro existente:', fetchError);
-      throw fetchError;
-    }
-
-    const payload = {
-      sheet_name: sheetName,
-      data: data,
-      fecha_sincronizacion: new Date().toISOString(),
-    };
-
-    if (existing) {
-      // Actualizar registro existente
-      const { error: updateError } = await supabase
-        .from('meta_30_sincronizacion')
-        .update(payload)
-        .eq('id', existing.id);
-
-      if (updateError) throw updateError;
-    } else {
-      // Crear nuevo registro
-      const { error: insertError } = await supabase
-        .from('meta_30_sincronizacion')
-        .insert(payload);
-
-      if (insertError) throw insertError;
-    }
-
-    return { success: true, error: null };
-  } catch (err) {
-    console.error('Error en saveMeta30Sync:', err);
-    return { success: false, error: err as Error };
-  }
-};
-
-/**
  * Obtiene el último registro de sincronización para una hoja específica.
  */
 export const getLastMeta30Sync = async (sheetName: string): Promise<Meta30Sincronizacion | null> => {

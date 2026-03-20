@@ -23,7 +23,8 @@ export interface Reclutamiento {
 }
 
 /**
- * Obtiene todos los reclutamientos con join a universidades e infoplazas
+ * Obtiene todos los reclutamientos con join a universidades e infoplazas.
+ * Optimizado: hace máximo 3 queries (no N+1).
  */
 export const getReclutamientos = async (): Promise<Reclutamiento[]> => {
   const { data, error } = await supabase
@@ -36,45 +37,31 @@ export const getReclutamientos = async (): Promise<Reclutamiento[]> => {
     return [];
   }
 
-  // Si hay datos, intentamos obtener los nombres relacionados
-  if (data && data.length > 0) {
-    const reclutamientos = await Promise.all(
-      data.map(async (r) => {
-        let nombreUniversidad = '';
-        let nombreInfoplaza = '';
+  if (!data || data.length === 0) return [];
 
-        // Obtener nombre de universidad
-        if (r.universidad_id) {
-          const { data: uni } = await supabase
-            .from('alianzas_universidades')
-            .select('nombre_universidad')
-            .eq('id', r.universidad_id)
-            .single();
-          nombreUniversidad = uni?.nombre_universidad || '';
-        }
+  // Recolectar IDs únicos para evitar N+1 queries
+  const uniIds = [...new Set(data.map(r => r.universidad_id).filter(Boolean))];
+  const ipIds = [...new Set(data.map(r => r.infoplaza_id).filter(Boolean))];
 
-        // Obtener nombre de infoplaza
-        if (r.infoplaza_id) {
-          const { data: info } = await supabase
-            .from('catalogo_infoplazas')
-            .select('nombre')
-            .eq('id', r.infoplaza_id)
-            .single();
-          nombreInfoplaza = info?.nombre || '';
-        }
+  // Queries bulk en paralelo
+  const [uniData, ipData] = await Promise.all([
+    uniIds.length > 0
+      ? supabase.from('alianzas_universidades').select('id,nombre_universidad').in('id', uniIds)
+      : { data: [] },
+    ipIds.length > 0
+      ? supabase.from('catalogo_infoplazas').select('id,nombre').in('id', ipIds)
+      : { data: [] },
+  ]);
 
-        return {
-          ...r,
-          nombre_universidad: nombreUniversidad,
-          nombre_infoplaza: nombreInfoplaza,
-        };
-      })
-    );
+  // Mapear por ID para lookup O(1)
+  const uniMap = new Map((uniData.data || []).map(u => [u.id, u.nombre_universidad]));
+  const ipMap = new Map((ipData.data || []).map(i => [i.id, i.nombre]));
 
-    return reclutamientos;
-  }
-
-  return data || [];
+  return data.map(r => ({
+    ...r,
+    nombre_universidad: r.universidad_id ? uniMap.get(r.universidad_id) || '' : '',
+    nombre_infoplaza: r.infoplaza_id ? ipMap.get(r.infoplaza_id) || '' : '',
+  }));
 };
 
 /**
@@ -105,22 +92,6 @@ export const createReclutamiento = async (
   }
 
   return { success: true };
-};
-
-/**
- * Obtiene el conteo de reclutamientos
- */
-export const getReclutamientosCount = async (): Promise<number> => {
-  const { count, error } = await supabase
-    .from('reclutamiento_estudiantes')
-    .select('*', { count: 'exact', head: true });
-
-  if (error) {
-    console.error('Error al contar reclutamientos:', error);
-    return 0;
-  }
-
-  return count || 0;
 };
 
 /**
