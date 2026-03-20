@@ -183,7 +183,7 @@ export const syncKpaxUnificadoToSupabase = async (
   }
 
   // 4. Upsert normal de los dispositivos del CSV
-  // NOTA: estado es GENERATED STORED en la tabla, PostgreSQL lo calcula automáticamente
+  // NOTA: estado es GENERATED STORED en la tabla, PostgreSQL lo calcula automáticamente con umbral 96h
   const records = dispositivos.map(d => ({
     numero_serie: d.numero_serie,
     fabricante: d.fabricante || null,
