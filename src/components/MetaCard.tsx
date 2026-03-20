@@ -44,12 +44,32 @@ export interface RegionData {
 
 /**
  * Datos por enlace para Meta 4
+ * Nuevo formato con las 4 métricas:
+ * 1. Meta Mínima = ⌈IPs × 0.95⌉
+ * 2. % Cumplimiento Mensual = IPs visitadas / Total IPs × 100
+ * 3. Brecha = Meta mínima - Visitadas
+ * 4. Tasa Éxito YTD = MesesOK / MesesEval × 100
  */
 export interface EnlaceData {
   enlace: string;
-  programadas: number;
-  visitadas: number;
-  cumplimiento: number; // 0-100
+  totalIp: number;
+  metaMinima: number;
+  mesActual: {
+    visitadas: number;
+    cumplimiento: number;
+    brecha: number;
+    nombreMes: string;
+  };
+  tasaExitoYtd: number;
+  mesesCumplidos: number;
+  mesesEvaluados: number;
+  historial: {
+    mes: string;
+    visitadas: number;
+    metaMinima: number;
+    cumplimiento: number;
+    cumple: boolean;
+  }[];
 }
 
 /**

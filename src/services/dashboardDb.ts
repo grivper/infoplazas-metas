@@ -218,21 +218,59 @@ export const getMeta3Mesas = async (): Promise<MetaItem> => {
   };
 };
 
+/**
+ * Datos de un enlace para la Meta 4.
+ * Incluye todas las métricas: Meta Mínima, Cumplimiento Mensual, Brecha, Tasa Éxito YTD.
+ */
+export interface EnlaceRutaData {
+  enlace: string;
+  totalIp: number;          // Total IPs en el itinerario
+  metaMinima: number;        // ⌈IPs × 0.95⌉
+  mesActual: {
+    visitadas: number;       // IPs únicas visitadas este mes
+    cumplimiento: number;    // % Cumplimiento
+    brecha: number;          // Meta mínima - visitadas
+    nombreMes: string;       // "Marzo"
+  };
+  tasaExitoYtd: number;      // % de meses que cumplió (mesesOK / mesesEval × 100)
+  mesesCumplidos: number;    // Cantidad de meses OK
+  mesesEvaluados: number;    // Cantidad de meses evaluados
+  historial: {
+    mes: string;
+    visitadas: number;
+    metaMinima: number;
+    cumplimiento: number;
+    cumple: boolean;
+  }[];
+}
+
 // ============================================
 // Meta 4: Cumplimiento de Rutas (Auditoría)
-// Calcula el % de visitas que coinciden con el itinerario de cada enlace
-// Cumplimiento = IPs únicas visitadas / IPs programadas × 100
+// Aplica las 4 fórmulas:
+// 1. Meta Mínima = ⌈IPs × 0.95⌉
+// 2. % Cumplimiento = (IPs visitadas / Total IPs) × 100
+// 3. Brecha = Meta mínima - Visitadas
+// 4. Tasa Éxito YTD = (MesesOK / MesesEval) × 100
 // ============================================
 export const getMeta4Rutas = async (): Promise<MetaItem> => {
+  const mesActualNum = new Date().getMonth() + 1; // 1-12
+
+  // Meses del año ordenados
+  const mesesOrdenados = [
+    'Enero', 'Febrero', 'Marzo', 'Abril',
+    'Mayo', 'Junio', 'Julio', 'Agosto',
+    'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
+
   // 1. Obtener itinerarios (rutas planificadas por enlace)
   const { data: itinerarios } = await supabase
     .from('itinerario_enlaces')
     .select('enlace_nombre, infoplaza_id');
 
-  // 2. Obtener visitas de Cognito (solo IPs únicas)
+  // 2. Obtener visitas de Cognito con mes
   const { data: cognito } = await supabase
     .from('cognito_registros')
-    .select('enlace_original, infoplaza_id');
+    .select('enlace_original, infoplaza_id, mes');
 
   if (!itinerarios || !cognito) {
     return {
@@ -253,36 +291,97 @@ export const getMeta4Rutas = async (): Promise<MetaItem> => {
     progMap.get(i.enlace_nombre)!.add(i.infoplaza_id);
   });
 
-  // 4. Agrupar IPs visitadas por enlace (solo enlaces con itinerario)
+  // 4. Agrupar IPs visitadas por enlace y por mes (IPs únicas)
   const enlacesEnItinerario = new Set(progMap.keys());
-  const visitMap = new Map<string, Set<string>>();
-  
+  // visitMap[enlace][mes] = Set de IPs únicas
+  const visitMap = new Map<string, Map<number, Set<string>>>();
+
   cognito.forEach((c) => {
-    if (c.enlace_original && enlacesEnItinerario.has(c.enlace_original) && c.infoplaza_id) {
-      if (!visitMap.has(c.enlace_original)) visitMap.set(c.enlace_original, new Set());
-      visitMap.get(c.enlace_original)!.add(c.infoplaza_id);
+    if (c.enlace_original && enlacesEnItinerario.has(c.enlace_original) && c.infoplaza_id && c.mes) {
+      if (!visitMap.has(c.enlace_original)) {
+        visitMap.set(c.enlace_original, new Map());
+      }
+      const mesMap = visitMap.get(c.enlace_original)!;
+      if (!mesMap.has(c.mes)) {
+        mesMap.set(c.mes, new Set());
+      }
+      mesMap.get(c.mes)!.add(c.infoplaza_id);
     }
   });
 
-  // 5. Calcular cumplimiento anual por enlace
-  const datosEnlaces: { enlace: string; programadas: number; visitadas: number; cumplimiento: number }[] = [];
-  
+  // 5. Calcular métricas por enlace
+  const datosEnlaces: EnlaceRutaData[] = [];
+
   progMap.forEach((progSet, enlace) => {
-    const visitSet = visitMap.get(enlace) || new Set();
-    // Solo contar IPs visitadas que estaban programadas
-    const programadas = progSet.size;
-    const visitadas = [...progSet].filter(ip => visitSet.has(ip)).length;
-    const cumplimiento = programadas > 0 ? Math.round((visitadas / programadas) * 100) : 0;
-    datosEnlaces.push({ enlace, programadas, visitadas, cumplimiento });
+    const totalIp = progSet.size;
+    const metaMinima = Math.ceil(totalIp * 0.95); // ⌈IPs × 0.95⌉
+    const mesMap = visitMap.get(enlace) || new Map();
+
+    // Historial por mes
+    const historial: EnlaceRutaData['historial'] = [];
+    let mesesCumplidos = 0;
+    let mesesEvaluados = 0;
+    let visitadasMesActual = 0;
+
+    for (let i = 0; i < 12; i++) {
+      const mesNum = i + 1;
+      const mesNombre = mesesOrdenados[i];
+
+      // Solo evaluar meses hasta el actual
+      if (mesNum > mesActualNum) break;
+
+      // Filtrar solo año actual
+      const ipsVisitadasMes = [...(mesMap.get(mesNum) || [])].filter(ip => progSet.has(ip));
+      const visitadas = ipsVisitadasMes.length;
+      const cumplimiento = totalIp > 0 ? Math.round((visitadas / totalIp) * 100) : 0;
+      const cumple = visitadas >= metaMinima;
+
+      historial.push({
+        mes: mesNombre.substring(0, 3), // "Ene", "Feb", etc.
+        visitadas,
+        metaMinima,
+        cumplimiento,
+        cumple,
+      });
+
+      mesesEvaluados++;
+      if (cumple) mesesCumplidos++;
+
+      // Guardar datos del mes actual
+      if (mesNum === mesActualNum) {
+        visitadasMesActual = visitadas;
+      }
+    }
+
+    const brecha = metaMinima - visitadasMesActual;
+    const tasaExitoYtd = mesesEvaluados > 0
+      ? Math.round((mesesCumplidos / mesesEvaluados) * 100)
+      : 0;
+
+    datosEnlaces.push({
+      enlace,
+      totalIp,
+      metaMinima,
+      mesActual: {
+        visitadas: visitadasMesActual,
+        cumplimiento: totalIp > 0 ? Math.round((visitadasMesActual / totalIp) * 100) : 0,
+        brecha,
+        nombreMes: mesesOrdenados[mesActualNum - 1],
+      },
+      tasaExitoYtd,
+      mesesCumplidos,
+      mesesEvaluados,
+      historial,
+    });
   });
 
-  // 6. Calcular promedio simple global
+  // 6. Calcular promedio de tasa de éxito YTD global
   const promedioGlobal = datosEnlaces.length > 0
-    ? Math.round(datosEnlaces.reduce((sum, e) => sum + e.cumplimiento, 0) / datosEnlaces.length)
+    ? Math.round(datosEnlaces.reduce((sum, e) => sum + e.tasaExitoYtd, 0) / datosEnlaces.length)
     : 0;
 
   const metricas: MetaMetrica[] = [
-    { label: 'Cumplimiento global', valor: promedioGlobal, meta: 100, unidad: '%' },
+    { label: 'Tasa Éxito YTD', valor: promedioGlobal, meta: 100, unidad: '%' },
   ];
 
   return {
