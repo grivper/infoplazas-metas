@@ -45,41 +45,67 @@ export const matchInfoplaza = (
 };
 
 /**
- * Calcula el estado basado en la inactividad
- * - Si contiene "mes", "semana", o "días" (j) → crítico
- * - Si solo horas → crítico si >= 24h
+ * Umbral de inactividad crítica: 4 días = 96 horas
+ */
+export const UMBRAL_CRITICO_HORAS = 96;
+
+/**
+ * Convierte un string de inactividad a horas totales
+ * Formatos soportados:
+ *   - "3mes, 9j, 19h"  →  meses + días + horas
+ *   - "1j, 18h"         →  días + horas
+ *   - "18h"              →  solo horas
+ *   - "3mes"             →  solo meses
+ *   - "5j"               →  solo días
+ *   - "0m 3j 99h"        →  minutos + días + horas
+ * 
+ * Conversiones:
+ *   - 1 mes ≈ 30 días (720 horas)
+ *   - 1 día = 24 horas
+ *   - 1 hora = 1 hora
+ *   - 1 minuto = 1/60 hora (se ignora para el cálculo)
+ */
+export const parseInactividadToHours = (inactividad: string | null): number => {
+  if (!inactividad) return 0;
+
+  const lower = inactividad.toLowerCase().trim();
+  let totalHoras = 0;
+
+  // Extraer meses (formato: "3mes" o "3 mes")
+  const mesesMatch = lower.match(/(\d+)\s*mes/i);
+  if (mesesMatch) {
+    totalHoras += parseInt(mesesMatch[1]) * 24 * 30; // 1 mes = 30 días
+  }
+
+  // Extraer días (formato: "9j", "9j," "9 j", "9 días", "9d")
+  // Incluye "j" (francés), "d" (días), "días", "dias", "days", "day"
+  const diasMatch = lower.match(/(\d+)\s*(?:j|d(?:í|i)?s|days?|day)/i);
+  if (diasMatch) {
+    totalHoras += parseInt(diasMatch[1]) * 24; // 1 día = 24 horas
+  }
+
+  // Extraer horas (formato: "19h" o "19 h")
+  const horasMatch = lower.match(/(\d+)\s*h(?!;)/);
+  if (horasMatch) {
+    totalHoras += parseInt(horasMatch[1]);
+  }
+
+  return totalHoras;
+};
+
+/**
+ * Calcula el estado basado en la inactividad total en horas
+ * Crítico si >= 96 horas (4 días)
  */
 export const calculateEstado = (
   inactividadImpresora: string | null,
   inactividadAgente: string | null
 ): 'online' | 'critico' => {
-  const checkInactividadLocal = (inact: string | null): boolean => {
-    if (!inact) return false;
-    const lower = inact.toLowerCase();
-    
-    // Contiene unidades grandes = crítico inmediatamente
-    if (lower.includes('mes') || lower.includes('semana') || 
-        lower.includes('j,') || lower.includes('j ') || lower.endsWith('j') ||
-        lower.includes('días') || lower.includes('dias') || lower.includes('days') ||
-        lower.includes('day')) {
-      return true;
-    }
-    
-    // Verificar si tiene solo horas
-    if (lower.includes('h')) {
-      // Extraer horas y verificar si >= 24
-      const match = lower.match(/(\d+)h/);
-      if (match) {
-        const horas = parseInt(match[1]);
-        return horas >= 24;
-      }
-    }
-    
-    return false;
-  };
+  const horasImpresora = parseInactividadToHours(inactividadImpresora);
+  const horasAgente = parseInactividadToHours(inactividadAgente);
 
-  // Crítico si cualquiera de las dos inactividades indica mucho tiempo
-  if (checkInactividadLocal(inactividadImpresora) || checkInactividadLocal(inactividadAgente)) {
+  // Crítico si ALGUNA de las dos inactividades supera el umbral
+  if (horasImpresora >= UMBRAL_CRITICO_HORAS || horasAgente >= UMBRAL_CRITICO_HORAS) {
     return 'critico';
   }
 
