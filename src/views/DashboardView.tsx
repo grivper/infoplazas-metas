@@ -6,7 +6,8 @@ import {
   MapPin, 
   Activity,
   Download,
-  ArrowRight
+  ArrowRight,
+  TrendingUp
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RemeLoader } from '@/components/ui/reme-loader';
@@ -32,14 +33,19 @@ const DonutChart: React.FC<{ percentage: number; color: string; size?: 'sm' | 'm
   const hexColor = colorMap[color] || colorMap.primary;
   
   const sizeClasses = {
-    sm: 'w-16 h-16 p-2',
-    md: 'w-24 h-24 p-3',
-    lg: 'w-28 h-28 p-4'
+    sm: 'w-16 h-16',
+    md: 'w-24 h-24',
+    lg: 'w-28 h-28'
+  };
+  const innerSizes = {
+    sm: 'w-10 h-10',
+    md: 'w-16 h-16',
+    lg: 'w-20 h-20'
   };
   const textSizes = {
-    sm: 'text-lg',
-    md: 'text-xl',
-    lg: 'text-2xl'
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-base'
   };
   
   return (
@@ -47,7 +53,7 @@ const DonutChart: React.FC<{ percentage: number; color: string; size?: 'sm' | 'm
       className={`${sizeClasses[size]} rounded-full flex items-center justify-center`}
       style={{ background: `conic-gradient(${hexColor} 0% ${percentage}%, #e8eaed ${percentage}% 100%)` }}
     >
-      <div className="bg-white w-full h-full rounded-full flex items-center justify-center shadow-sm">
+      <div className={`bg-white ${innerSizes[size]} rounded-full flex items-center justify-center shadow-sm`}>
         <span className={`font-extrabold font-headline ${textSizes[size]}`} style={{ color: hexColor }}>
           {percentage}%
         </span>
@@ -459,6 +465,11 @@ export const DashboardView: React.FC = () => {
                 );
               })}
             </div>
+            <div className="flex justify-end mt-4">
+              <Link className="text-xs font-bold flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#00694c' }} to="/visitas-incidencias">
+                Ver más <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         )}
 
@@ -511,6 +522,11 @@ export const DashboardView: React.FC = () => {
                 );
               })}
             </div>
+            <div className="flex justify-end mt-4">
+              <Link className="text-xs font-bold flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#f59e0b' }} to="/mesas">
+                Ver más <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
           </div>
         )}
 
@@ -528,23 +544,35 @@ export const DashboardView: React.FC = () => {
                   Meta 5
                 </span>
               </div>
-              <DonutChart percentage={meta5.progreso} color="secondary" />
+              <DonutChart percentage={meta5.metricas[3]?.valor || meta5.progreso} color="secondary" />
             </div>
             <div className="space-y-2">
               <div className="flex justify-between items-end p-3 rounded-xl bg-slate-50 border border-slate-100">
                 <div>
                   <p className="text-sm font-medium text-slate-500">Equipos Online</p>
-                  <p className="text-2xl font-black text-slate-900">{meta5.metricas[0]?.valor || meta5.progreso}</p>
+                  <p className="text-2xl font-black text-slate-900">{meta5.metricas[0]?.valor}</p>
                 </div>
                 <Activity className="w-5 h-5" style={{ color: '#00694c' }} />
               </div>
               <div className="flex justify-between items-end p-3 rounded-xl bg-slate-50 border border-slate-100">
                 <div>
+                  <p className="text-sm font-medium text-slate-500">Conectividad del Mes</p>
+                  <p className="text-2xl font-black text-slate-900">{meta5.metricas[1]?.valor}%</p>
+                </div>
+                <TrendingUp className="w-5 h-5" style={{ color: '#00694c' }} />
+              </div>
+              <div className="flex justify-between items-end p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <div>
                   <p className="text-sm font-medium text-slate-500">Equipos Críticos</p>
-                  <p className="text-2xl font-black text-slate-900">{meta5.metricas[1]?.valor || 0}</p>
+                  <p className="text-2xl font-black text-slate-900">{meta5.metricas[2]?.valor || 0}</p>
                 </div>
                 <MapPin className="w-5 h-5" style={{ color: '#b4005d' }} />
               </div>
+            </div>
+            <div className="flex justify-end mt-4">
+              <Link className="text-xs font-bold flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#9f0051' }} to="/radar">
+                Ver más <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
         )}
