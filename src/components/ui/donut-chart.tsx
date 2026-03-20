@@ -1,67 +1,58 @@
 import React from 'react';
 
-/**
- * Props para DonutChart
- */
 interface DonutChartProps {
   percentage: number;
-  size?: number;
-  strokeWidth?: number;
-  color?: 'primary' | 'secondary' | 'tertiary' | 'warning' | 'error';
-  className?: string;
+  color: 'primary' | 'secondary' | 'orange' | 'green';
+  size?: 'sm' | 'md' | 'lg';
 }
 
-/**
- * Mapeo de colores a valores CSS
- */
-const colorMap = {
+const colorMap: Record<string, { stroke: string; bg: string }> = {
   primary: { stroke: '#2a4bd9', bg: '#eff1f2' },
   secondary: { stroke: '#b4005d', bg: '#eff1f2' },
-  tertiary: { stroke: '#00694c', bg: '#eff1f2' },
-  warning: { stroke: '#f59e0b', bg: '#eff1f2' },
-  error: { stroke: '#ef4444', bg: '#eff1f2' },
+  orange: { stroke: '#f59e0b', bg: '#eff1f2' },
+  green: { stroke: '#00694c', bg: '#eff1f2' },
+};
+
+const sizeConfig = {
+  sm: { size: 64, strokeWidth: 6 },
+  md: { size: 96, strokeWidth: 8 },
+  lg: { size: 112, strokeWidth: 10 },
 };
 
 /**
  * DonutChart - Gráfico circular estilo donut
- * Usa CSS puro con conic-gradient (no requiere librería)
+ * Soporta colores: primary, secondary, orange, green
+ * Soporta tamaños: sm (64px), md (96px), lg (112px)
  */
 export const DonutChart: React.FC<DonutChartProps> = ({
   percentage,
-  size = 96,
-  strokeWidth = 8,
-  color = 'primary',
-  className = '',
+  color,
+  size = 'md',
 }) => {
-  const colors = colorMap[color];
-  const radius = (size - strokeWidth) / 2;
+  const colors = colorMap[color] || colorMap.primary;
+  const { size: svgSize, strokeWidth } = sizeConfig[size];
+  const radius = (svgSize - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div 
-      className={`relative inline-flex items-center justify-center ${className}`}
-      style={{ width: size, height: size }}
-    >
-      {/* SVG Donut */}
+    <div className="relative inline-flex items-center justify-center">
       <svg
-        width={size}
-        height={size}
+        width={svgSize}
+        height={svgSize}
         className="transform -rotate-90"
       >
-        {/* Background circle */}
         <circle
-          cx={size / 2}
-          cy={size / 2}
+          cx={svgSize / 2}
+          cy={svgSize / 2}
           r={radius}
           fill="none"
           stroke={colors.bg}
           strokeWidth={strokeWidth}
         />
-        {/* Progress circle */}
         <circle
-          cx={size / 2}
-          cy={size / 2}
+          cx={svgSize / 2}
+          cy={svgSize / 2}
           r={radius}
           fill="none"
           stroke={colors.stroke}
@@ -72,9 +63,14 @@ export const DonutChart: React.FC<DonutChartProps> = ({
           className="transition-all duration-500 ease-out"
         />
       </svg>
-      
-      {/* Center content slot - se puede usar con children */}
-      <div className="absolute inset-0 flex items-center justify-center" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span 
+          className={`font-extrabold font-headline ${size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-base' : 'text-sm'}`}
+          style={{ color: colors.stroke }}
+        >
+          {percentage}%
+        </span>
+      </div>
     </div>
   );
 };
