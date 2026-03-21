@@ -45,7 +45,35 @@ export const getMesAnterior = (): string => {
 };
 
 /**
- * Calcula métricas actuales del radar
+ * Parsea una fecha YYYY-MM-DD de forma segura evitando bugs de zona horaria.
+ * IMPORTANTE: Cuando JavaScript hace new Date("2026-03-01"), lo interpreta como
+ * UTC midnight. En zonas UTC-X (como Panama EST UTC-5), eso cae en el día anterior.
+ * Esta función asegura que la fecha se maneje en hora local.
+ * 
+ * @param yyyyMmDd String en formato "2026-03-01"
+ * @returns Date en hora local (mediodía para evitar edge cases de medianoche)
+ */
+export const parseFechaLocal = (yyyyMmDd: string): Date => {
+  const [year, month, day] = yyyyMmDd.split('-').map(Number);
+  // Usar mediodía para evitar que UTC midnight caiga en otro día
+  return new Date(year, month - 1, day, 12, 0, 0);
+};
+
+/**
+ * Obtiene el mes siguiente a uno dado (YYYY-MM-01)
+ */
+export const getMesSiguiente = (yyyyMmDd: string): string => {
+  const fecha = parseFechaLocal(yyyyMmDd);
+  fecha.setMonth(fecha.getMonth() + 1);
+  return `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-01`;
+};
+
+/**
+ * Calcula métricas actuales del radar de conectividad.
+ * Cuenta dispositivos online/criticos, tasa de disponibilidad
+ * y fallas del mes actual.
+ * 
+ * @returns Promise<RadarMetricas> con todos los contadores
  */
 export const calcularMetricasActuales = async (): Promise<RadarMetricas> => {
   // Obtener todos los dispositivos
@@ -70,20 +98,19 @@ export const calcularMetricasActuales = async (): Promise<RadarMetricas> => {
 
   // Contar fallas del mes actual
   const mesActual = getMesActual();
-  const mesSiguiente = new Date(mesActual);
-  mesSiguiente.setMonth(mesSiguiente.getMonth() + 1);
+  const mesSiguiente = getMesSiguiente(mesActual);
 
   const { count: nuevasFallas } = await supabase
     .from('radar_historial_fallas')
     .select('*', { count: 'exact', head: true })
     .gte('fecha_registro', mesActual)
-    .lt('fecha_registro', mesSiguiente.toISOString().split('T')[0]);
+    .lt('fecha_registro', mesSiguiente);
 
   const { count: fallasResueltas } = await supabase
     .from('radar_historial_fallas')
     .select('*', { count: 'exact', head: true })
     .gte('fecha_arqueo', mesActual)
-    .lt('fecha_arqueo', mesSiguiente.toISOString().split('T')[0])
+    .lt('fecha_arqueo', mesSiguiente)
     .eq('activo', false);
 
   return {
@@ -119,9 +146,6 @@ export const guardarSnapshot = async (): Promise<RadarMensualSnapshot | null> =>
     return null;
   }
 
-  // Recargar todos los snapshots para actualizar la vista
-  await fetchSnapshots();
-  
   return data as RadarMensualSnapshot;
 };
 
@@ -144,7 +168,7 @@ export const fetchSnapshots = async (): Promise<RadarMensualSnapshot[]> => {
  * Obtiene el snapshot del mes anterior al dado
  */
 export const fetchSnapshotAnterior = async (mes: string): Promise<RadarMensualSnapshot | null> => {
-  const fecha = new Date(mes);
+  const fecha = parseFechaLocal(mes);
   fecha.setMonth(fecha.getMonth() - 1);
   const mesAnterior = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-01`;
 
@@ -188,9 +212,15 @@ export const calcularPromedioAnual = async (): Promise<number> => {
 
 /**
  * Formatea el mes para mostrar (ej: "Ene 2024")
+ * IMPORTANTE: Parsear el string manualmente para evitar bugs de zona horaria.
+ * Si la fecha viene como "2026-03-01", es el primer día del mes en la zona local,
+ * no UTC midnight (que podría caer en otro día/mes en zonas UTC-X).
  */
 export const formatMes = (mes: string): string => {
-  const fecha = new Date(mes);
+  // Parsear manualmente: "2026-03-01" → usar hora local 12:00 para evitar
+  // que UTC midnight caiga en el día anterior en zonas UTC-X
+  const [year, month] = mes.split('-').map(Number);
+  const fecha = new Date(year, month - 1, 15, 12, 0, 0); // Día 15, mediodía local
   return fecha.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
 };
 

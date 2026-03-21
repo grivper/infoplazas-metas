@@ -1,79 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  ClipboardCheck, 
-  Network, 
-  MapPin, 
-  Radar,
-  LogOut,
-  Menu
-} from 'lucide-react';
+import { LogOut, Menu } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { navigation, isRouteActive } from './navigation';
+import { useUserProfile } from './hooks/useUserProfile';
 import LogoReme from '../assets/logo-reme.png';
 
 /**
- * Layout principal estilo "Polished Luminary"
- * - Sidebar oscura fija
- * - Main stage con contenido luminoso
- * - Tipografía editorial (Plus Jakarta Sans para headlines)
+ * Layout principal con sidebar oscura fija y contenido luminoso
  */
 const LayoutBento: React.FC = () => {
   const location = useLocation();
-  const [userName, setUserName] = useState<string>('');
+  const { userName, userRole } = useUserProfile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  // Obtener nombre del usuario desde la tabla profiles
-  useEffect(() => {
-    const getUserProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.id) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('display_name')
-          .eq('id', user.id)
-          .single();
-        
-        if (profile?.display_name) {
-          setUserName(profile.display_name);
-        } else if (user.email) {
-          setUserName(user.email);
-        }
-      }
-    };
-    getUserProfile();
-  }, []);
-
-  const navigation = [
-    { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-    { name: 'Servicio Social', href: '/servicio-social', icon: Users },
-    { name: 'Cumplimiento 30%', href: '/visitas-incidencias', icon: ClipboardCheck },
-    { name: 'Mesas de Transformación', href: '/mesas', icon: Network },
-    { name: 'Cumplimiento de Rutas', href: '/auditoria', icon: MapPin },
-    { name: 'Radar Kpax', href: '/radar', icon: Radar },
-  ];
-
-  // Función para determinar si está activo
-  const isActive = (href: string) => {
-    if (href === '/') {
-      return location.pathname === '/';
-    }
-    return location.pathname.startsWith(href);
-  };
-
-  // Obtener iniciales para el avatar
-  const getInitials = (name: string) => {
-    const parts = name.split(' ');
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
-    return name.substring(0, 2).toUpperCase();
-  };
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar oscura - estilo "void" */}
+      {/* Sidebar oscura */}
       <aside className="bg-slate-900 h-screen w-64 fixed left-0 top-0 overflow-y-auto z-50 flex flex-col py-6 shadow-2xl transition-transform duration-300 lg:translate-x-0 -translate-x-full">
         {/* Logo */}
         <div className="px-6 mb-10">
@@ -81,7 +24,6 @@ const LayoutBento: React.FC = () => {
             <img src={LogoReme} alt="Metas Enlace" className="w-10 h-10" />
             <div>
               <h1 className="text-xl font-black text-white tracking-tight font-headline">Metas Enlace</h1>
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Institutional Portal</p>
             </div>
           </div>
         </div>
@@ -89,7 +31,7 @@ const LayoutBento: React.FC = () => {
         {/* Navegación */}
         <nav className="flex-1 space-y-1 px-2">
           {navigation.map((item) => {
-            const active = isActive(item.href);
+            const active = isRouteActive(location.pathname, item.href);
             return (
               <Link
                 key={item.name}
@@ -113,16 +55,21 @@ const LayoutBento: React.FC = () => {
         
         {/* User section */}
         <div className="mt-auto px-4 py-4 border-t border-slate-800/50">
-          <div className="flex items-center justify-between group">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-slate-800 overflow-hidden flex items-center justify-center text-white font-bold">
-                {userName ? getInitials(userName) : 'U'}
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white truncate max-w-[120px]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3 ml-[15px]">
+              <div className="flex flex-col">
+                <p className="text-sm font-bold text-white truncate max-w-[150px] leading-tight">
                   {userName || 'Cargando...'}
                 </p>
-                <p className="text-[10px] text-slate-500 font-semibold uppercase">Regional Director</p>
+                {userRole && (
+                  <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide w-fit mt-0.5 ${
+                    userRole === 'admin' 
+                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                      : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                  }`}>
+                    {userRole === 'admin' ? 'Administrador' : 'Usuario'}
+                  </span>
+                )}
               </div>
             </div>
             
@@ -131,7 +78,7 @@ const LayoutBento: React.FC = () => {
               onClick={async () => {
                 await supabase.auth.signOut();
               }} 
-              className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+              className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
             >
               <LogOut className="w-5 h-5" />
             </button>
@@ -147,9 +94,9 @@ const LayoutBento: React.FC = () => {
         />
       )}
 
-      {/* Main Stage - Contenido luminoso */}
+      {/* Main Stage */}
       <main className="flex-1 lg:ml-64 min-h-screen relative">
-        {/* Top App Bar con glassmorphism */}
+        {/* Top App Bar */}
         <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-100/50">
           <div className="flex justify-between items-center px-6 lg:px-8 py-4">
             <div className="flex items-center gap-4">
