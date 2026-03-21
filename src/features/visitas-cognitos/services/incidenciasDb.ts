@@ -15,6 +15,7 @@ export interface Incidencia {
   estado_ticket: EstadoTicket;
   created_at: string;
   updated_at?: string;
+  seguimientos_count?: number;
 }
 
 /**
@@ -29,13 +30,16 @@ export interface Seguimiento {
 }
 
 /**
- * Obtiene todas las incidencias con el nombre de la Infoplaza
+ * Obtiene todas las incidencias con el nombre de la Infoplaza y conteo de seguimientos
  */
 export const getIncidencias = async (): Promise<Incidencia[]> => {
-  // Primero obtenemos las incidencias
+  // Obtener incidencias con conteo de seguimientos
   const { data: incidencias, error } = await supabase
     .from('incidencias_reportes')
-    .select('*')
+    .select(`
+      *,
+      incidencias_seguimientos(count)
+    `)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -61,10 +65,11 @@ export const getIncidencias = async (): Promise<Incidencia[]> => {
     (infoplazas || []).map(ip => [ip.id, ip.nombre])
   );
 
-  // Transformar datos para incluir el nombre de la Infoplaza
+  // Transformar datos para incluir el nombre de la Infoplaza y el conteo de seguimientos
   return incidencias.map(item => ({
     ...item,
     infoplaza_nombre: infoplazaMap.get(item.infoplaza_id) || 'Sin asignar',
+    seguimientos_count: item.incidencias_seguimientos?.[0]?.count || 0,
   }));
 };
 

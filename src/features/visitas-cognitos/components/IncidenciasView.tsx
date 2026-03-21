@@ -150,6 +150,7 @@ export const IncidenciasView: React.FC = () => {
                     <th className="px-6 py-3 font-medium">Categoría</th>
                     <th className="px-6 py-3 font-medium">Urgencia</th>
                     <th className="px-6 py-3 font-medium">Descripción</th>
+                    <th className="px-6 py-3 font-medium text-center">Seguimientos</th>
                     <th className="px-6 py-3 font-medium text-right">Estado</th>
                   </tr>
                 </thead>
@@ -175,17 +176,26 @@ export const IncidenciasView: React.FC = () => {
                       <td className="px-6 py-3 text-slate-600 max-w-xs truncate" title={inc.descripcion}>
                         {inc.descripcion}
                       </td>
+                      <td className="px-6 py-3">
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleVerDetalle(inc)}
+                            className="h-7 px-2 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            Ver
+                          </Button>
+                          {(inc.seguimientos_count ?? 0) > 0 ? (
+                            <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                              {(inc.seguimientos_count ?? 0)}
+                            </Badge>
+                          ) : null}
+                        </div>
+                      </td>
                       <td className="px-6 py-3 text-right">
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => handleVerDetalle(inc)}
-                          className="h-8 px-2 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
-                        >
-                          <Eye className="w-4 h-4 mr-1" />
-                          Ver
-                        </Button>
-                        <Badge className={`ml-2 text-xs font-medium capitalize ${getEstadoColor(inc.estado_ticket)}`}>
+                        <Badge className={`text-xs font-medium capitalize ${getEstadoColor(inc.estado_ticket)}`}>
                           {getEstadoLabel(inc.estado_ticket)}
                         </Badge>
                       </td>
