@@ -2,14 +2,14 @@ import React, { useState, useEffect, useMemo } from 'react';
 
 /**
  * Constantes de colores para las metas
- * Centraliza los colores para fácil mantenimiento
+ * Usa variables CSS de shadcn/ui para mantener consistencia con el design system
  */
 const COLORES = {
-  meta1: '#2a4bd9',  // azul - Servicio Social
-  meta3: '#f59e0b',  // naranja - Mesas de Transformación
-  meta5: '#9f0051',  // rosa - KPAX
-  success: '#00694c', // verde - conectividad
-  warning: '#b4005d', // rojo - crítico
+  meta1: 'var(--primary)',    // azul - Servicio Social
+  meta3: '#f59e0b',           // naranja - Mesas de Transformación (no hay token)
+  meta5: 'var(--secondary)',  // rosa - KPAX
+  success: '#00694c',        // verde - conectividad (no hay token)
+  warning: 'var(--secondary)', // rojo - crítico
 };
 import { 
   Users, 
@@ -42,8 +42,8 @@ export const DashboardView: React.FC = () => {
         const datos = await getDatosDashboard();
         setMetas(datos);
       } catch (err) {
-        console.error('Error:', err);
-        setError('Error al cargar');
+        // En producción usar sistema de toast en vez de console
+        setError('Error al cargar los datos');
       } finally {
         setLoading(false);
       }
@@ -116,7 +116,7 @@ export const DashboardView: React.FC = () => {
                   Meta 1
                 </span>
               </div>
-              <DonutChart percentage={meta1.progreso} color="primary" />
+              <DonutChart percentage={meta1.progreso} color="primary" aria-label={`Progreso de Servicio Social: ${meta1.progreso}%`} />
             </div>
             <div className="grid grid-cols-2 gap-3 mb-6">
               {meta1.metricas.slice(0, 4).map((m, idx) => {
@@ -141,7 +141,12 @@ export const DashboardView: React.FC = () => {
               })}
             </div>
             <div className="flex justify-end">
-              <Link className="text-xs font-bold flex items-center gap-1 hover:gap-2 transition-all" style={{ color: COLORES.meta1 }} to="/servicio-social">
+              <Link 
+                className="text-xs font-bold flex items-center gap-1 hover:gap-2 transition-all" 
+                style={{ color: COLORES.meta1 }} 
+                to="/servicio-social"
+                aria-label="Ver más detalles de Servicio Social"
+              >
                 Ver más <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -177,7 +182,7 @@ export const DashboardView: React.FC = () => {
                   Meta 3
                 </span>
               </div>
-              <DonutChart percentage={meta3.progreso} color="orange" />
+              <DonutChart percentage={meta3.progreso} color="orange" aria-label={`Progreso de Mesas de Transformación: ${meta3.progreso}%`} />
             </div>
             <div className="space-y-2">
               {meta3.regiones?.map((region) => {
@@ -199,7 +204,12 @@ export const DashboardView: React.FC = () => {
               })}
             </div>
             <div className="flex justify-end mt-4">
-              <Link className="text-xs font-bold flex items-center gap-1 hover:gap-2 transition-all" style={{ color: COLORES.meta3 }} to="/mesas">
+              <Link 
+                className="text-xs font-bold flex items-center gap-1 hover:gap-2 transition-all" 
+                style={{ color: COLORES.meta3 }} 
+                to="/mesas"
+                aria-label="Ver más detalles de Mesas de Transformación"
+              >
                 Ver más <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -220,24 +230,24 @@ export const DashboardView: React.FC = () => {
                   Meta 5
                 </span>
               </div>
-              <DonutChart percentage={meta5.metricas[3]?.valor || meta5.progreso} color="secondary" />
+              <DonutChart percentage={meta5.metricas[3]?.valor || meta5.progreso} color="secondary" aria-label={`Progreso de KPAX: ${meta5.progreso}%`} />
             </div>
             <div className="space-y-2">
-              <div className="flex justify-between items-end p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <div className="flex justify-between items-end p-3 rounded-xl bg-muted border border-slate-100">
                 <div>
                   <p className="text-sm font-medium text-slate-500">Equipos Online</p>
                   <p className="text-2xl font-black text-slate-900">{meta5.metricas[0]?.valor}</p>
                 </div>
                 <Activity className="w-5 h-5" style={{ color: COLORES.success }} />
               </div>
-              <div className="flex justify-between items-end p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <div className="flex justify-between items-end p-3 rounded-xl bg-muted border border-slate-100">
                 <div>
                   <p className="text-sm font-medium text-slate-500">Conectividad del Mes</p>
                   <p className="text-2xl font-black text-slate-900">{meta5.metricas[1]?.valor}%</p>
                 </div>
                 <TrendingUp className="w-5 h-5" style={{ color: COLORES.success }} />
               </div>
-              <div className="flex justify-between items-end p-3 rounded-xl bg-slate-50 border border-slate-100">
+              <div className="flex justify-between items-end p-3 rounded-xl bg-muted border border-slate-100">
                 <div>
                   <p className="text-sm font-medium text-slate-500">Equipos Críticos</p>
                   <p className="text-2xl font-black text-slate-900">{meta5.metricas[2]?.valor || 0}</p>
@@ -246,7 +256,12 @@ export const DashboardView: React.FC = () => {
               </div>
             </div>
             <div className="flex justify-end mt-4">
-              <Link className="text-xs font-bold flex items-center gap-1 hover:gap-2 transition-all" style={{ color: COLORES.meta5 }} to="/radar">
+              <Link 
+                className="text-xs font-bold flex items-center gap-1 hover:gap-2 transition-all" 
+                style={{ color: COLORES.meta5 }} 
+                to="/radar"
+                aria-label="Ver más detalles de KPAX"
+              >
                 Ver más <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
