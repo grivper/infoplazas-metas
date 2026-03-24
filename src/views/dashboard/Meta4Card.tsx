@@ -116,7 +116,7 @@ export const Meta4Card: React.FC<Meta4CardProps> = ({ enlaces }) => {
               <div className="p-2 bg-white/50 rounded">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-xs text-outline">Tasa Éxito YTD</p>
+                    <p className="text-xs text-outline">Cumplimiento Anual (Hasta Hoy)</p>
                     <p className="text-xl font-black" style={{ color: '#00694c' }}>
                       {tasaExitoYtd}%
                     </p>
@@ -135,7 +135,7 @@ export const Meta4Card: React.FC<Meta4CardProps> = ({ enlaces }) => {
               {/* Historial YTD */}
               {historial && historial.length > 0 && (
                 <div className="mt-3 pt-3 border-t border-gray-200">
-                  <p className="text-xs text-outline mb-2">Historial YTD</p>
+                  <p className="text-xs text-outline mb-2">Historial Mensual</p>
                   <div className="flex flex-wrap gap-2">
                     {historial.map((m, idx) => (
                       <div 
@@ -164,7 +164,7 @@ export const Meta4Card: React.FC<Meta4CardProps> = ({ enlaces }) => {
         })}
       </div>
       <div className="flex justify-end mt-4">
-        <Link className="text-xs font-bold flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#00694c' }} to="/visitas-incidencias">
+        <Link className="text-xs font-bold flex items-center gap-1 hover:gap-2 transition-all" style={{ color: '#00694c' }} to="/auditoria">
           Ver más <ArrowRight className="w-4 h-4" />
         </Link>
       </div>

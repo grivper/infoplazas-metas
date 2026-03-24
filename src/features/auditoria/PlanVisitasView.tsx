@@ -7,11 +7,7 @@ import {
   fetchAllItinerarios,
   deleteItinerariosByEnlace
 } from './services/itinerariosService';
-import { fetchAllInfoplazas } from './services/infoplazasService';
 import { getAllVisitasCognito } from './services/rutasDb';
-
-import { CatalogoUploader } from './components/CatalogoUploader';
-import { RutaUploader } from './components/RutaUploader';
 
 // --- Constantes ---
 const MESES: Record<number, string> = {
@@ -76,13 +72,6 @@ interface CognitoVisita {
 const PlanVisitasView: React.FC = () => {
   const [itinerarios, setItinerarios] = useState<ItinerarioEnlace[]>([]);
   const [mesEval, setMesEval] = useState(MES_ACTUAL);
-  const [catalogoCount, setCatalogoCount] = useState(0);
-
-  // Refresca catálogo master
-  const loadCatalogo = useCallback(async () => {
-    const data = await fetchAllInfoplazas();
-    setCatalogoCount(data.length);
-  }, []);
 
   // Carga rutas y calcula itinerario con cruce de cognito simultáneo
   const loadRutasYGaps = useCallback(async (mes: number) => {
@@ -186,11 +175,10 @@ const PlanVisitasView: React.FC = () => {
 
   useEffect(() => {
     const init = async () => {
-      await loadCatalogo();
       await loadRutasYGaps(mesEval);
     };
     init();
-  }, [mesEval, loadCatalogo, loadRutasYGaps]);
+  }, [mesEval, loadRutasYGaps]);
 
   const handleDeleteRutasDeEnlace = async (enlace: string) => {
     if(!confirm(`¿Eliminar de la Nube el Itinerario completo de ${enlace}?`)) return;
@@ -206,15 +194,11 @@ const PlanVisitasView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      {/* Cabecera Principal + Uploaders */}
+      {/* Cabecera Principal */}
       <div className="flex flex-row justify-between items-start w-full gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Catálogo y Evaluación de Itinerarios</h1>
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Evaluación de Itinerarios</h1>
           <p className="text-slate-500 mt-1">Cruce semaforizado en tiempo real contra registros de Cognito</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <CatalogoUploader onProcessComplete={loadCatalogo} badgeCount={catalogoCount} />
-          <RutaUploader onProcessComplete={() => loadRutasYGaps(mesEval)} badgeCount={totalPlanificadas} />
         </div>
       </div>
 

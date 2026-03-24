@@ -86,7 +86,7 @@ export const CatalogoUploader: React.FC<{ onProcessComplete: () => void, badgeCo
       <Button 
         size="sm"
         variant="outline" 
-        className="h-10 border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium shadow-sm transition-all"
+        className="h-10 border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-medium shadow-sm transition-all"
         onClick={() => fileInputRef.current?.click()} 
         disabled={loading}
       >
@@ -96,7 +96,7 @@ export const CatalogoUploader: React.FC<{ onProcessComplete: () => void, badgeCo
           <Database className="w-4 h-4 mr-2 text-emerald-600" />
         )}
         
-        {loading ? 'Sincronizando...' : 'Cargar Catálogo de Infoplazas'}
+        {loading ? 'Sincronizando...' : 'Cargar Catálogo'}
         
         {badgeCount !== undefined && badgeCount > 0 && !loading && (
           <Badge variant="secondary" className="ml-3 bg-emerald-100/80 text-emerald-700 hover:bg-emerald-100 border-none font-semibold px-2">

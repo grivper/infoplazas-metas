@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Calendar, TrendingUp, Users, AlertTriangle } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { StatCard } from '@/components/ui/bento-card';
 import {
   fetchSnapshots,
   fetchUltimoSnapshot,
@@ -108,90 +109,45 @@ export const RadarEvolucionView: React.FC = () => {
       {/* Resumen del último mes */}
       {snapshotActual ? (
         <div className="grid grid-cols-4 gap-4">
-          {/* Mes */}
-          <Card className="border-none shadow-sm overflow-hidden hover:shadow-md transition-all">
-            <div className="h-1 bg-slate-500" />
-            <CardContent className="pt-4 pb-4">
-              <p className="text-sm text-slate-600 font-semibold flex items-center">
-                <Calendar className="w-4 h-4 text-slate-500 mr-2" />
-                Mes
-              </p>
-              <p className="text-2xl font-bold text-slate-900 mt-1">{formatMes(snapshotActual.mes)}</p>
-            </CardContent>
-          </Card>
-
-          {/* Total */}
-          <Card className="border-none shadow-sm overflow-hidden hover:shadow-md transition-all">
-            <div className="h-1 bg-indigo-500" />
-            <CardContent className="pt-4 pb-4">
-              <p className="text-sm text-slate-600 font-semibold flex items-center">
-                <Users className="w-4 h-4 text-indigo-500 mr-2" />
-                Total Dispositivos
-              </p>
-              <p className="text-2xl font-bold text-slate-900 mt-1">{snapshotActual.total_dispositivos}</p>
-              {getDiferencia(snapshotActual.total_dispositivos, snapshotAnterior?.total_dispositivos) !== null && (
-                <p className="text-xs text-slate-400 mt-1">
-                  ({getDiferencia(snapshotActual.total_dispositivos, snapshotAnterior?.total_dispositivos)! > 0 ? '+' : ''}
-                  {getDiferencia(snapshotActual.total_dispositivos, snapshotAnterior?.total_dispositivos)} vs mes anterior)
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Activos */}
-          <Card className="border-none shadow-sm overflow-hidden hover:shadow-md transition-all">
-            <div className="h-1 bg-emerald-500" />
-            <CardContent className="pt-4 pb-4">
-              <p className="text-sm text-slate-600 font-semibold flex items-center">
-                <TrendingUp className="w-4 h-4 text-emerald-500 mr-2" />
-                Activos
-              </p>
-              <p className="text-2xl font-bold text-emerald-600 mt-1">{snapshotActual.online}</p>
-              {getDiferencia(snapshotActual.online, snapshotAnterior?.online) !== null && (
-                <p className={`text-xs mt-1 ${
-                  getDiferencia(snapshotActual.online, snapshotAnterior?.online)! > 0 
-                    ? 'text-emerald-500' 
-                    : 'text-rose-500'
-                }`}>
-                  ({getDiferencia(snapshotActual.online, snapshotAnterior?.online)! > 0 ? '+' : ''}
-                  {getDiferencia(snapshotActual.online, snapshotAnterior?.online)} vs mes anterior)
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Inactivos */}
-          <Card className="border-none shadow-sm overflow-hidden hover:shadow-md transition-all">
-            <div className="h-1 bg-rose-500" />
-            <CardContent className="pt-4 pb-4">
-              <p className="text-sm text-slate-600 font-semibold flex items-center">
-                <AlertTriangle className="w-4 h-4 text-rose-500 mr-2" />
-                Inactivos
-              </p>
-              <p className="text-2xl font-bold text-rose-600 mt-1">{snapshotActual.critico}</p>
-              {getDiferencia(snapshotActual.critico, snapshotAnterior?.critico) !== null && (
-                <p className={`text-xs mt-1 ${
-                  getDiferencia(snapshotActual.critico, snapshotAnterior?.critico)! < 0 
-                    ? 'text-emerald-500' 
-                    : 'text-rose-500'
-                }`}>
-                  ({getDiferencia(snapshotActual.critico, snapshotAnterior?.critico)! > 0 ? '+' : ''}
-                  {getDiferencia(snapshotActual.critico, snapshotAnterior?.critico)} vs mes anterior)
-                </p>
-              )}
-            </CardContent>
-          </Card>
+          <StatCard 
+            title="Mes" 
+            value={formatMes(snapshotActual.mes)}
+            icon={<Calendar className="w-4 h-4" />}
+            color="slate" 
+          />
+          <StatCard 
+            title="Total Dispositivos" 
+            value={snapshotActual.total_dispositivos}
+            description={getDiferencia(snapshotActual.total_dispositivos, snapshotAnterior?.total_dispositivos) !== null ? 
+              `(${getDiferencia(snapshotActual.total_dispositivos, snapshotAnterior?.total_dispositivos)! > 0 ? '+' : ''}${getDiferencia(snapshotActual.total_dispositivos, snapshotAnterior?.total_dispositivos)} vs mes anterior)` : undefined}
+            icon={<Users className="w-4 h-4" />}
+            color="indigo" 
+          />
+          <StatCard 
+            title="Activos" 
+            value={snapshotActual.online}
+            description={getDiferencia(snapshotActual.online, snapshotAnterior?.online) !== null ?
+              `(${getDiferencia(snapshotActual.online, snapshotAnterior?.online)! > 0 ? '+' : ''}${getDiferencia(snapshotActual.online, snapshotAnterior?.online)} vs mes anterior)` : undefined}
+            icon={<TrendingUp className="w-4 h-4" />}
+            color="emerald" 
+          />
+          <StatCard 
+            title="Inactivos" 
+            value={snapshotActual.critico}
+            description={getDiferencia(snapshotActual.critico, snapshotAnterior?.critico) !== null ?
+              `(${getDiferencia(snapshotActual.critico, snapshotAnterior?.critico)! > 0 ? '+' : ''}${getDiferencia(snapshotActual.critico, snapshotAnterior?.critico)} vs mes anterior)` : undefined}
+            icon={<AlertTriangle className="w-4 h-4" />}
+            color="rose" 
+          />
         </div>
       ) : (
-        <Card className="border-none shadow-sm">
-          <CardContent className="py-8 text-center">
-            <Calendar className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-            <p className="text-slate-600 font-medium">No hay snapshots registrados</p>
-            <p className="text-sm text-slate-400 mt-1">
-              Guarda el primer snapshot para comenzar el seguimiento
-            </p>
-          </CardContent>
-        </Card>
+        <div className="rounded-xl border-none shadow-sm bg-white py-8 text-center">
+          <Calendar className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+          <p className="text-slate-600 font-medium">No hay snapshots registrados</p>
+          <p className="text-sm text-slate-400 mt-1">
+            Guarda el primer snapshot para comenzar el seguimiento
+          </p>
+        </div>
       )}
 
       {/* Tabla de historial */}

@@ -4,7 +4,8 @@ import {
   ClipboardCheck, 
   Network, 
   MapPin, 
-  Radar 
+  Radar,
+  Settings 
 } from 'lucide-react';
 
 /**
@@ -18,6 +19,7 @@ export const navigation = [
   { name: 'Mesas de Transformación', href: '/mesas', icon: Network },
   { name: 'Cumplimiento de Rutas', href: '/auditoria', icon: MapPin },
   { name: 'Radar Kpax', href: '/radar', icon: Radar },
+  { name: 'Gestión de Infoplazas', href: '/auditoria/infoplazas', icon: Settings },
 ];
 
 /**
@@ -27,5 +29,9 @@ export const isRouteActive = (pathname: string, href: string): boolean => {
   if (href === '/') {
     return pathname === '/';
   }
-  return pathname.startsWith(href);
+  // Para rutas padre como /auditoria, NO activar si hay subrutas como /auditoria/infoplazas
+  if (pathname.startsWith(href + '/')) {
+    return false;
+  }
+  return pathname === href;
 };

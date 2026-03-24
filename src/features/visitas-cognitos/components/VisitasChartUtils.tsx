@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
 import { Badge } from '@/components/ui/badge';
+import { StatCard } from '@/components/ui/bento-card';
 import { Inc } from './IncCell';
 
 interface ChartData {
@@ -72,16 +73,13 @@ export function RenderCuatrimestre({ meses, chartData, rows, kpis, lastMonth, UN
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {kpis.map((kpi, idx) => (
-          <Card key={idx} className="border-none shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-500">{kpi.title}</CardTitle>
-              <div className={`w-2 h-2 rounded-full ${kpi.color}`} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{kpi.value}</div>
-              <p className="text-xs text-slate-400 mt-1">{kpi.desc}</p>
-            </CardContent>
-          </Card>
+          <StatCard 
+            key={idx} 
+            title={kpi.title} 
+            value={kpi.value} 
+            description={kpi.desc}
+            color={kpi.color as 'slate' | 'indigo' | 'violet' | 'blue' | 'emerald' | 'amber' | 'rose' | 'purple'}
+          />
         ))}
       </div>
 

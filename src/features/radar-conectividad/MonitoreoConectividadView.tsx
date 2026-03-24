@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, History, Server, TrendingUp } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { StatCard } from '@/components/ui/bento-card';
 
 import {
   fetchHistorialFallas,
@@ -49,27 +49,9 @@ const MonitoreoConectividadView: React.FC = () => {
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-3 gap-4">
-          <Card className="border-none shadow-sm bg-white">
-            <div className="h-1 bg-indigo-500" />
-            <CardContent className="pt-4 pb-4">
-              <p className="text-sm text-slate-600 font-semibold">Total Fallas Registradas</p>
-              <p className="text-2xl font-bold text-slate-900 mt-1">{historial.length}</p>
-            </CardContent>
-          </Card>
-          <Card className="border-none shadow-sm bg-white">
-            <div className="h-1 bg-rose-500" />
-            <CardContent className="pt-4 pb-4">
-              <p className="text-sm text-slate-600 font-semibold">Fallas Activas</p>
-              <p className="text-2xl font-bold text-slate-900 mt-1">{historial.filter(h => h.activo).length}</p>
-            </CardContent>
-          </Card>
-          <Card className="border-none shadow-sm bg-white">
-            <div className="h-1 bg-emerald-500" />
-            <CardContent className="pt-4 pb-4">
-              <p className="text-sm text-slate-600 font-semibold">Fallas Resueltas</p>
-              <p className="text-2xl font-bold text-slate-900 mt-1">{historial.filter(h => !h.activo).length}</p>
-            </CardContent>
-          </Card>
+          <StatCard title="Total Fallas Registradas" value={historial.length} color="indigo" />
+          <StatCard title="Fallas Activas" value={historial.filter(h => h.activo).length} color="rose" />
+          <StatCard title="Fallas Resueltas" value={historial.filter(h => !h.activo).length} color="emerald" />
         </div>
 
         {historial.length > 0 ? (

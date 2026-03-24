@@ -85,29 +85,3 @@ export const getAllVisitas = async (): Promise<VisitaCognito[]> => {
     request.onerror = () => { db.close(); reject(new Error('Error al leer datos')); };
   });
 };
-
-// --- Cuenta total de registros ---
-export const countVisitas = async (): Promise<number> => {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readonly');
-    const store = tx.objectStore(STORE_NAME);
-    const request = store.count();
-
-    request.onsuccess = () => { db.close(); resolve(request.result); };
-    request.onerror = () => { db.close(); reject(new Error('Error al contar')); };
-  });
-};
-
-// --- Limpia todos los registros (útil para testing) ---
-export const clearVisitas = async (): Promise<void> => {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, 'readwrite');
-    const store = tx.objectStore(STORE_NAME);
-    store.clear();
-
-    tx.oncomplete = () => { db.close(); resolve(); };
-    tx.onerror = () => { db.close(); reject(new Error('Error al limpiar')); };
-  });
-};

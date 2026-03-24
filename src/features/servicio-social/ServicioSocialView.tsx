@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, BookOpen, GraduationCap, Building2, Handshake, UserPlus } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { StatCardWithProgress } from '@/components/ui/bento-card';
 import { ModalAlianza } from './components/ModalAlianza';
 import { ModalReclutamiento } from './components/ModalReclutamiento';
 import { ModalTaller } from './components/ModalTaller';
@@ -20,7 +20,7 @@ interface KPIData {
   value: string | number;
   icon: React.ElementType;
   progress: number;
-  color: string;
+  color: 'blue' | 'emerald' | 'amber' | 'purple';
   peso: number; // Peso en % para el promedio ponderado
 }
 
@@ -119,7 +119,7 @@ export const ServicioSocialView: React.FC = () => {
           value: alianzasCount,
           icon: Building2,
           progress: Math.min((alianzasCount / 5) * 100, 100), // Meta: 5 universidades
-          color: 'bg-blue-500',
+          color: 'blue',
           peso: 40,
         },
         {
@@ -127,7 +127,7 @@ export const ServicioSocialView: React.FC = () => {
           value: estudiantesTotal,
           icon: Users,
           progress: Math.min((estudiantesTotal / 60) * 100, 100), // Meta: 60 estudiantes
-          color: 'bg-emerald-500',
+          color: 'emerald',
           peso: 30,
         },
         {
@@ -135,7 +135,7 @@ export const ServicioSocialView: React.FC = () => {
           value: talleresCount,
           icon: BookOpen,
           progress: Math.min((talleresCount / 30) * 100, 100), // Meta: 30 talleres
-          color: 'bg-amber-500',
+          color: 'amber',
           peso: 15,
         },
         {
@@ -143,7 +143,7 @@ export const ServicioSocialView: React.FC = () => {
           value: usuariosCapacitados,
           icon: GraduationCap,
           progress: Math.min((usuariosCapacitados / 1000) * 100, 100), // Meta: 1000 usuarios
-          color: 'bg-purple-500',
+          color: 'purple',
           peso: 15,
         },
       ]);
@@ -233,31 +233,15 @@ export const ServicioSocialView: React.FC = () => {
         <h2 className="text-xl font-semibold text-slate-800 mb-4">Progreso de Indicadores (KPIs)</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {kpiData.map((kpi, index) => (
-            <Card key={index} className="border-none shadow-sm h-full">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-slate-500">
-                  {kpi.title}
-                </CardTitle>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded ${kpi.color.replace('bg-', 'bg-')} bg-opacity-20`}>
-                    {kpi.peso}%
-                  </span>
-                  <div className={`p-2 rounded-lg ${kpi.color} bg-opacity-10`}>
-                    <kpi.icon className={`h-4 w-4 ${kpi.color.replace('bg-', 'text-')}`} />
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-slate-800">{kpi.value}</div>
-                <div className="w-full bg-slate-100 rounded-full h-1.5 mt-4">
-                  <div
-                    className={`${kpi.color} h-1.5 rounded-full`}
-                    style={{ width: `${kpi.progress}%` }}
-                  ></div>
-                </div>
-                <p className="text-xs text-slate-400 mt-2">{Number(kpi.progress).toFixed(2)}% de la meta anual</p>
-              </CardContent>
-            </Card>
+            <StatCardWithProgress 
+              key={index}
+              title={kpi.title}
+              value={kpi.value}
+              icon={React.createElement(kpi.icon, { className: 'h-4 w-4' })}
+              color={kpi.color}
+              progress={kpi.progress}
+              weight={kpi.peso}
+            />
           ))}
         </div>
       </section>

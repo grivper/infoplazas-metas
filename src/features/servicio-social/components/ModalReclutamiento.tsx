@@ -25,6 +25,7 @@ import { getAlianzas, type Alianza } from '../services/alianzasDb';
 interface Infoplaza {
   id: string;
   nombre: string;
+  codigo?: string;
 }
 
 interface ModalReclutamientoProps {
@@ -61,7 +62,7 @@ export const ModalReclutamiento: React.FC<ModalReclutamientoProps> = ({ children
       // Load universidades from alianzas
       const [unis, infos] = await Promise.all([
         getAlianzas(),
-        supabase.from('catalogo_infoplazas').select('id, nombre').order('nombre')
+        supabase.from('catalogo_infoplazas').select('id, nombre, codigo').or('cerrada.is.null,cerrada.eq.false').order('nombre')
       ]);
 
       setUniversidades(unis);
@@ -192,7 +193,7 @@ export const ModalReclutamiento: React.FC<ModalReclutamientoProps> = ({ children
               </SelectTrigger>
               <SelectContent>
                 {infoplazas.map((info) => (
-                  <SelectItem key={info.id} value={info.id}>
+                  <SelectItem key={info.id} value={info.id!}>
                     {info.nombre}
                   </SelectItem>
                 ))}

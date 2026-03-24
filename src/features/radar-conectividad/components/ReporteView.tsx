@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { AlertTriangle, CheckCircle, FileText } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { StatCard } from '@/components/ui/bento-card';
 import { RadarDeviceCard } from './RadarDeviceCard';
 import { fetchReporteDispositivos, updateMotivoFalla } from '../services/kpaxUnificadoDb';
 import { RemeLoader } from '@/components/ui/reme-loader';
@@ -57,38 +57,26 @@ export const ReporteView: React.FC = () => {
     <div className="space-y-6">
       {/* Header con stats */}
       <div className="grid grid-cols-3 gap-4">
-        <Card className="border-none shadow-sm bg-white">
-          <div className="h-1 bg-rose-500" />
-          <CardContent className="pt-4 pb-4">
-            <p className="text-sm text-slate-600 font-semibold flex items-center">
-              <AlertTriangle className="w-4 h-4 text-rose-500 mr-2" />
-              Pendientes de Atención
-            </p>
-            <p className="text-2xl font-bold text-slate-900 mt-1">{totalCriticos}</p>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-sm bg-white">
-          <div className="h-1 bg-amber-500" />
-          <CardContent className="pt-4 pb-4">
-            <p className="text-sm text-slate-600 font-semibold flex items-center">
-              <FileText className="w-4 h-4 text-amber-500 mr-2" />
-              Sin Motivo Registrado
-            </p>
-            <p className="text-2xl font-bold text-slate-900 mt-1">{totalCriticos}</p>
-            <p className="text-xs text-slate-400">Requieren clasificación</p>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-sm bg-white">
-          <div className="h-1 bg-emerald-500" />
-          <CardContent className="pt-4 pb-4">
-            <p className="text-sm text-slate-600 font-semibold flex items-center">
-              <CheckCircle className="w-4 h-4 text-emerald-500 mr-2" />
-              Listos para Gestionar
-            </p>
-            <p className="text-2xl font-bold text-slate-900 mt-1">0</p>
-            <p className="text-xs text-slate-400">Con motivo asignado</p>
-          </CardContent>
-        </Card>
+        <StatCard 
+          title="Pendientes de Atención" 
+          value={totalCriticos} 
+          icon={<AlertTriangle className="w-4 h-4" />}
+          color="rose" 
+        />
+        <StatCard 
+          title="Sin Motivo Registrado" 
+          value={totalCriticos} 
+          description="Requieren clasificación"
+          icon={<FileText className="w-4 h-4" />}
+          color="amber" 
+        />
+        <StatCard 
+          title="Listos para Gestionar" 
+          value={0} 
+          description="Con motivo asignado"
+          icon={<CheckCircle className="w-4 h-4" />}
+          color="emerald" 
+        />
       </div>
 
       {/* Lista de dispositivos pendientes */}

@@ -49,7 +49,7 @@ export const getReclutamientos = async (): Promise<Reclutamiento[]> => {
       ? supabase.from('alianzas_universidades').select('id,nombre_universidad').in('id', uniIds)
       : { data: [] },
     ipIds.length > 0
-      ? supabase.from('catalogo_infoplazas').select('id,nombre').in('id', ipIds)
+      ? supabase.from('catalogo_infoplazas').select('id,nombre,codigo').in('id', ipIds)
       : { data: [] },
   ]);
 

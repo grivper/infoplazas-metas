@@ -15,7 +15,7 @@ import LayoutBento from './core/LayoutBento';
 import ServicioSocialView from './features/servicio-social/ServicioSocialView';
 import VisitasIncidencias from './features/visitas-cognitos';
 import MesasTransformacion from './features/mesas';
-import AuditoriaTecnica from './features/auditoria';
+import PlanVisitasView, { GestionInfoplazasView } from './features/auditoria/index';
 import { MonitoreoConectividadView } from './features/radar-conectividad';
 
 const App: React.FC = () => {
@@ -74,7 +74,8 @@ const App: React.FC = () => {
           <Route path="servicio-social" element={<ServicioSocialView />} />
           <Route path="visitas-incidencias" element={<VisitasIncidencias />} />
           <Route path="mesas" element={<MesasTransformacion />} />
-          <Route path="auditoria" element={<AuditoriaTecnica />} />
+          <Route path="auditoria" element={<PlanVisitasView />} />
+          <Route path="auditoria/infoplazas" element={<GestionInfoplazasView />} />
           <Route path="radar" element={<MonitoreoConectividadView />} />
           
           {/* Redirección automática a Dashboard para cualquier ruta no reconocida */}

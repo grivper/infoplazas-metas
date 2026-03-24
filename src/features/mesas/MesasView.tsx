@@ -3,6 +3,7 @@ import { Plus, Edit2, Trash2, CheckCircle2, Clock, AlertCircle } from 'lucide-re
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { StatCard } from '@/components/ui/bento-card';
 import {
   getAllMesas, upsertMesa, deleteMesa, generarMesaId, getCatalogoInfoplazas,
   type MesaRecord, type InfoplazaCatalogo,
@@ -152,18 +153,12 @@ const MesasView: React.FC = () => {
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { title: 'Infoplazas Activas', value: `${infoplazasActivas} / 21`, color: 'bg-indigo-500' },
-          { title: 'Total Mesas', value: totalMesas, color: 'bg-violet-500' },
-          { title: 'En Progreso', value: enProgreso, color: 'bg-amber-500' },
-          { title: 'Completadas', value: completadas, color: 'bg-emerald-500' },
+          { title: 'Infoplazas Activas', value: `${infoplazasActivas} / 21`, color: 'indigo' as const },
+          { title: 'Total Mesas', value: totalMesas, color: 'violet' as const },
+          { title: 'En Progreso', value: enProgreso, color: 'amber' as const },
+          { title: 'Completadas', value: completadas, color: 'emerald' as const },
         ].map(k => (
-          <Card key={k.title} className="border-none shadow-sm overflow-hidden">
-            <div className={`h-1 ${k.color}`} />
-            <CardContent className="pt-4 pb-4">
-              <p className="text-xs text-slate-500 uppercase font-medium">{k.title}</p>
-              <p className="text-2xl font-bold text-slate-900 mt-1">{k.value}</p>
-            </CardContent>
-          </Card>
+          <StatCard key={k.title} title={k.title} value={k.value} color={k.color} />
         ))}
       </div>
 
