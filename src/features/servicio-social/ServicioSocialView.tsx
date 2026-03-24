@@ -68,7 +68,7 @@ export const ServicioSocialView: React.FC = () => {
 
     const metaAlianzas = 5;
     const metaEstudiantes = 60;
-    const metaTalleres = 600;
+    const metaTalleres = 140;
 
     return [
       {
@@ -134,7 +134,7 @@ export const ServicioSocialView: React.FC = () => {
           title: 'Talleres Impartidos',
           value: talleresCount,
           icon: BookOpen,
-          progress: Math.min((talleresCount / 30) * 100, 100), // Meta: 30 talleres
+          progress: Math.min((talleresCount / 140) * 100, 100), // Meta: 140 talleres
           color: 'amber',
           peso: 15,
         },

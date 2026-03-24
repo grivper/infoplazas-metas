@@ -176,11 +176,11 @@ export const ModalReclutamiento: React.FC<ModalReclutamientoProps> = ({ children
                 <SelectValue placeholder="Selecciona el año..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1er Año">1er Año</SelectItem>
-                <SelectItem value="2do Año">2do Año</SelectItem>
-                <SelectItem value="3er Año">3er Año</SelectItem>
-                <SelectItem value="4to Año">4to Año</SelectItem>
-                <SelectItem value="5to Año">5to Año</SelectItem>
+                <SelectItem value="1">1er Año</SelectItem>
+                <SelectItem value="2">2do Año</SelectItem>
+                <SelectItem value="3">3er Año</SelectItem>
+                <SelectItem value="4">4to Año</SelectItem>
+                <SelectItem value="5">5to Año</SelectItem>
               </SelectContent>
             </Select>
           </div>

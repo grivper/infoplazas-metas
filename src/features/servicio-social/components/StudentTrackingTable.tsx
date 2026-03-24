@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, CheckCircle } from 'lucide-react';
+import { Users, CheckCircle, X, RotateCcw } from 'lucide-react';
 
 interface StudentData {
   id: string;
@@ -62,7 +62,10 @@ export function StudentTrackingTable({ students, onCambiarEstado }: StudentTrack
                     <td className="px-4 py-3 text-slate-600">{student.universidad}</td>
                     <td className="px-4 py-3 text-slate-600">{student.infoplaza}</td>
                     <td className="px-4 py-3 text-slate-600">{student.carrera}</td>
-                    <td className="px-4 py-3 text-slate-600">{student.anio_cursa}</td>
+                    <td className="px-4 py-3 text-slate-600">
+                      {/* Extrae solo números del año (ej: "4to Año" → "4", "3er Año" → "3") */}
+                      {student.anio_cursa ? student.anio_cursa.replace(/[^0-9]/g, '') : '-'}
+                    </td>
                     <td className="px-4 py-3 text-slate-600">{student.talleres}</td>
                     <td className="px-4 py-3 text-slate-600">{student.fecha_inscripcion}</td>
                     <td className="px-4 py-3">
@@ -97,7 +100,7 @@ export function StudentTrackingTable({ students, onCambiarEstado }: StudentTrack
                               onClick={() => onCambiarEstado(student.id, 'cancelado')}
                               title="Cancelar/Retirar"
                             >
-                              ✕
+                              <X className="w-3 h-3" />
                             </Button>
                           </>
                         )}
@@ -110,7 +113,7 @@ export function StudentTrackingTable({ students, onCambiarEstado }: StudentTrack
                             onClick={() => onCambiarEstado(student.id, 'activo')}
                             title="Reactivar"
                           >
-                            ↩
+                            <RotateCcw className="w-3 h-3" />
                           </Button>
                         )}
                       </div>
