@@ -4,13 +4,11 @@ import {
   Network, 
   MapPin, 
   Activity,
-  Download,
   ArrowRight,
   TrendingUp
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RemeLoader } from '@/components/ui/reme-loader';
-import { Button } from '@/components/ui/button';
 import { DonutChart } from '@/components/ui/donut-chart';
 import { getDatosDashboard } from '@/services/dashboard';
 import type { MetaItem } from '@/components/MetaCard';
@@ -75,10 +73,14 @@ export const DashboardView: React.FC = () => {
             Resumen ejecutivo del cumplimiento regional acumulado.
           </p>
         </div>
-        <Button variant="outline" className="flex items-center gap-2 border-[#b4005d] text-[#b4005d] bg-pink-50 hover:bg-pink-100">
+        {/* TODO: Reactivar cuando esté implementado el generador de PDF */}
+        {/* <Button 
+          variant="outline" 
+          className="flex items-center gap-2 border-[#b4005d] text-[#b4005d] bg-pink-50 hover:bg-pink-100"
+        >
           <Download className="w-4 h-4" />
-          Exportar Reporte
-        </Button>
+          Exportar PDF
+        </Button> */}
       </div>
 
       {/* Fila 1: Servicio Social + Cumplimiento 30% */}
