@@ -4,7 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { createItinerarioEnlace, updateItinerarioEnlace, type Infoplaza, type ItinerarioEnlace } from '../services/infoplazasService';
+import { createItinerarioEnlace, updateItinerarioEnlace, type ItinerarioEnlace } from '../services/itinerarioService';
+import type { Infoplaza } from '../services/infoplazasService';
 
 interface ModalEditarRutaProps {
   open: boolean;

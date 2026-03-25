@@ -3,6 +3,7 @@ interface InfoplazaData {
   nombre: string;
   enlace: string;
   dia: string;
+  cerrada: boolean;
 }
 
 export interface TableRow {
@@ -11,6 +12,7 @@ export interface TableRow {
   ultimoValor: number | null;
   enlace: string;
   dia: string;
+  estado: 'abierta' | 'cerrada' | 'sin_asignar';
 }
 
 /**
@@ -38,12 +40,17 @@ export function buildTableRows(meses: string[], visitasMock: Record<string, Info
         
         return { mes, visitas: val, incremento };
       });
+      const estado: 'abierta' | 'cerrada' | 'sin_asignar' = ipData.cerrada 
+        ? 'cerrada' 
+        : (ipData.enlace === 'Sin asignar' ? 'sin_asignar' : 'abierta');
+      
       return { 
         name: ipData.nombre, 
         cells, 
         ultimoValor: ipData.meses[ultimoMes] ?? null,
         enlace: ipData.enlace,
-        dia: ipData.dia
+        dia: ipData.dia,
+        estado
       };
     })
     .sort((a, b) => {

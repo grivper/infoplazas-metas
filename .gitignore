@@ -10,3 +10,5 @@ Kpax-plantilla
 Mesas-plantilla
 src/secrets
 .vercel
+.claude/skills/exceljs
+skills-lock.json

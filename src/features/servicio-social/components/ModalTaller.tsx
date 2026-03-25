@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -11,15 +11,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { createTaller } from '../services/talleresDb';
 import { getReclutamientos, type Reclutamiento } from '../services/reclutamientoDb';
+import { Combobox } from '@/components/ui/combobox';
 
 interface ModalTallerProps {
   children?: React.ReactNode;
@@ -29,7 +23,7 @@ interface ModalTallerProps {
 /**
  * ModalTaller
  * Formulario para registrar la ejecución de un taller impartido por un estudiante.
- * Campos: Estudiante (Select), Cantidad de usuarios capacitados (Input number), Tema del taller (Input text).
+ * Campos: Estudiante (Combobox con búsqueda), Cantidad de usuarios capacitados (Input number), Tema del taller (Input text).
  */
 export const ModalTaller: React.FC<ModalTallerProps> = ({ children, onSuccess }) => {
   const [open, setOpen] = useState(false);
@@ -55,6 +49,11 @@ export const ModalTaller: React.FC<ModalTallerProps> = ({ children, onSuccess })
 
     cargarDatos();
   }, [open]);
+
+  // Filtrar solo estudiantes activos
+  const estudiantesActivos = useMemo(() => {
+    return estudiantes.filter(e => e.estado === 'activo');
+  }, [estudiantes]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +81,7 @@ export const ModalTaller: React.FC<ModalTallerProps> = ({ children, onSuccess })
     }
   };
 
-  // Format estudiante for display - shows only name + cedula
+  // Formatea el nombre y cédula del estudiante para mostrar en el combobox
   const formatEstudiante = (r: Reclutamiento) => {
     const nombre = r.nombre_estudiante || 'Sin nombre';
     const cedula = r.cedula ? `(${r.cedula})` : '';
@@ -90,7 +89,12 @@ export const ModalTaller: React.FC<ModalTallerProps> = ({ children, onSuccess })
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      setOpen(isOpen);
+      if (!isOpen) {
+        setEstudianteId('');
+      }
+    }}>
       <DialogTrigger asChild>
         {children || <Button variant="outline">Reportar Ejecución</Button>}
       </DialogTrigger>
@@ -104,23 +108,22 @@ export const ModalTaller: React.FC<ModalTallerProps> = ({ children, onSuccess })
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div className="space-y-2">
             <Label htmlFor="estudiante">Estudiante que Imparte</Label>
-            <Select value={estudianteId} onValueChange={setEstudianteId}>
-              <SelectTrigger id="estudiante" aria-label="Seleccionar estudiante">
-                <SelectValue placeholder="Seleccionar estudiante..." />
-              </SelectTrigger>
-              <SelectContent>
-                {estudiantes.map((r) => (
-                  <SelectItem key={r.id} value={r.id}>
-                    {formatEstudiante(r)}
-                  </SelectItem>
-                ))}
-                {estudiantes.length === 0 && (
-                  <div className="p-2 text-sm text-slate-500 text-center">
-                    No hay estudiantes registrados. Inscribe uno primero.
-                  </div>
-                )}
-              </SelectContent>
-            </Select>
+            <Combobox 
+              value={estudianteId} 
+              onValueChange={setEstudianteId}
+              placeholder="Buscar estudiante..."
+            >
+              {estudiantesActivos.map((r) => (
+                <button key={r.id} value={r.id}>
+                  {formatEstudiante(r)}
+                </button>
+              ))}
+              {estudiantesActivos.length === 0 && (
+                <button value="__empty__" disabled>
+                  No hay estudiantes activos registrados.
+                </button>
+              )}
+            </Combobox>
           </div>
           
           <div className="space-y-2">

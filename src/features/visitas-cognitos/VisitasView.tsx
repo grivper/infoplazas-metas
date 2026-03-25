@@ -7,8 +7,8 @@ import { buildTableRows } from './services/buildTableRows';
 import { buildKpis } from './services/buildKpis';
 import { getDatosVisitas } from './services/meta30Db';
 import type { DatosVistaVisitas } from './services/meta30Db';
-import { UNIVERSO } from '@/lib/constants';
-import { SHEET_VISITAS } from '@/lib/constants';
+import { supabase } from '@/lib/supabase';
+import { UNIVERSO as UNIVERSO_CONST, SHEET_VISITAS } from '@/lib/constants';
 
 const CUATRIMESTRES = {
   C1: ['Enero', 'Febrero', 'Marzo', 'Abril'],
@@ -16,16 +16,37 @@ const CUATRIMESTRES = {
   C3: ['Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
 };
 
+/**
+ * Vista de cumplimiento de visitas del 30% en infoplazas.
+ * Muestra tabs por cuatrimestre con gráficos de barras y tabla agrupada por enlace.
+ * Datos obtenidos de la hoja "Visitas" en meta4.
+ */
 export const VisitasView: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [datos, setDatos] = useState<DatosVistaVisitas | null>(null);
   const [añoActual] = useState(() => new Date().getFullYear());
+  const [universo, setUniverso] = useState(UNIVERSO_CONST);
+
+  // Meses del año
+  const mesesDelAño = [
+    'Enero', 'Febrero', 'Marzo', 'Abril',
+    'Mayo', 'Junio', 'Julio', 'Agosto',
+    'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
+  const mesActual = mesesDelAño[new Date().getMonth()]; // Nombre del mes actual
 
   useEffect(() => {
     const cargarDatos = async () => {
       setLoading(true);
       const result = await getDatosVisitas(SHEET_VISITAS, añoActual);
       setDatos(result);
+      
+      // Obtener total de infoplazas con ruta en el itinerario (ABIERTAS)
+      const { count } = await supabase
+        .from('itinerario_enlaces')
+        .select('*', { count: 'exact', head: true });
+      if (count) setUniverso(count);
+      
       setLoading(false);
     };
     cargarDatos();
@@ -64,8 +85,8 @@ export const VisitasView: React.FC = () => {
               chartData={buildChartData(meses, cumplimientoNacional)}
               rows={buildTableRows(meses, visitasMock)}
               kpis={buildKpis(datos)}
-              lastMonth={meses[meses.length - 1]}
-              UNIVERSO={UNIVERSO}
+              lastMonth={mesActual}
+              UNIVERSO={universo}
             />
           </TabsContent>
         ))}

@@ -24,6 +24,7 @@ interface TableRow {
   ultimoValor: number | null;
   enlace: string;
   dia: string;
+  estado: 'abierta' | 'cerrada' | 'sin_asignar';
 }
 
 interface EnlaceGroup {
@@ -42,9 +43,19 @@ interface RenderCuatrimestreProps {
 
 /**
  * Agrupa las filas por enlace para renderizar headers de sección.
+ * Estructura: 
+ * - Cada enlace muestra solo las ABIERTAS
+ * - Grupo "Sin asignar" (sin enlace, no cerradas)
+ * - Grupo "Cerradas" al final
  */
 function groupByEnlace(rows: TableRow[]): EnlaceGroup[] {
-  return rows.reduce<EnlaceGroup[]>((acc, row) => {
+  // Separar las filas por estado
+  const abiertas = rows.filter(r => r.estado === 'abierta');
+  const sinAsignar = rows.filter(r => r.estado === 'sin_asignar');
+  const cerradas = rows.filter(r => r.estado === 'cerrada');
+  
+  // Agrupar las ABIERTAS por enlace
+  const gruposAbiertas = abiertas.reduce<EnlaceGroup[]>((acc, row) => {
     const grupoExistente = acc.find(g => g.enlace === row.enlace);
     if (grupoExistente) {
       grupoExistente.rows.push(row);
@@ -53,6 +64,21 @@ function groupByEnlace(rows: TableRow[]): EnlaceGroup[] {
     }
     return acc;
   }, []);
+  
+  // Ordenar grupos de abiertas alfabéticamente
+  gruposAbiertas.sort((a, b) => a.enlace.localeCompare(b.enlace));
+  
+  // Agregar grupo "Sin asignar" si hay
+  if (sinAsignar.length > 0) {
+    gruposAbiertas.push({ enlace: 'Sin asignar', rows: sinAsignar });
+  }
+  
+  // Agregar grupo "Cerradas" si hay
+  if (cerradas.length > 0) {
+    gruposAbiertas.push({ enlace: 'Cerradas', rows: cerradas });
+  }
+  
+  return gruposAbiertas;
 }
 
 /**
@@ -89,8 +115,8 @@ export function RenderCuatrimestre({ meses, chartData, rows, kpis, lastMonth, UN
           <CardTitle className="text-lg">Cumplimiento por Mes</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-[300px] min-h-0">
+            <ResponsiveContainer width="100%" height="100%" debounce={300}>
               <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis dataKey="name" tick={{ fontSize: 12 }} tickLine={false} axisLine={{ stroke: '#e2e8f0' }} />
@@ -123,12 +149,20 @@ export function RenderCuatrimestre({ meses, chartData, rows, kpis, lastMonth, UN
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            {gruposEnlace.map((grupo) => (
+            {gruposEnlace.map((grupo) => {
+              const esCerradas = grupo.enlace === 'Cerradas';
+              const esSinAsignar = grupo.enlace === 'Sin asignar';
+              const bgColor = esCerradas ? 'bg-rose-50' : esSinAsignar ? 'bg-amber-50' : 'bg-indigo-50';
+              const borderColor = esCerradas ? 'border-rose-100' : esSinAsignar ? 'border-amber-100' : 'border-indigo-100';
+              const textColor = esCerradas ? 'text-rose-900' : esSinAsignar ? 'text-amber-900' : 'text-indigo-900';
+              const badgeColor = esCerradas ? 'text-rose-700 border-rose-200' : esSinAsignar ? 'text-amber-700 border-amber-200' : 'text-indigo-700 border-indigo-200';
+              
+              return (
               <div key={grupo.enlace} className="mb-4">
-                <div className="bg-indigo-50 px-4 py-2 border-b border-indigo-100">
+                <div className={`${bgColor} px-4 py-2 border-b ${borderColor}`}>
                   <div className="flex items-center justify-between">
-                    <h4 className="font-semibold text-indigo-900">{grupo.enlace}</h4>
-                    <Badge variant="outline" className="bg-white text-indigo-700 border-indigo-200">
+                    <h4 className={`font-semibold ${textColor}`}>{grupo.enlace}</h4>
+                    <Badge variant="outline" className={`bg-white ${badgeColor}`}>
                       {grupo.rows.length} infoplazas
                     </Badge>
                   </div>
@@ -159,7 +193,8 @@ export function RenderCuatrimestre({ meses, chartData, rows, kpis, lastMonth, UN
                   </tbody>
                 </table>
               </div>
-            ))}
+              );
+            })}
           </div>
         </CardContent>
       </Card>

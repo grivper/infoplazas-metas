@@ -1,25 +1,41 @@
 import { supabase } from '@/lib/supabase';
 
 /**
- * Interfaz para el Catálogo Maestro de Infoplazas en Supabase.
+ * Catálogo Maestro de Infoplazas en Supabase.
  */
 export interface Infoplaza {
-  id?: string;       // UUID generado por Supabase
-  codigo: string;   // Identificador único de negocio (IP-XXX o slug)
-  nombre: string;   // Nombre descriptivo
-  region: string;   // Región/Provincia (Obligatorio)
-  cerrada?: boolean;  // Estado: true = cerrada, false = abierta
-  fecha_cierre?: string | null;  // Fecha cuando se cerró
+  id?: string;
+  codigo: string;
+  nombre: string;
+  region: string;
+  cerrada?: boolean;
+  fecha_cierre?: string | null;
   created_at?: string;
   updated_at?: string;
 }
 
 /**
- * Realiza un upsert masivo de Infoplazas en la tabla `catalogo_infoplazas`.
- * Utiliza el campo `codigo` para manejar conflictos y actualizaciones.
- * 
- * @param data Array de objetos Infoplaza a procesar.
- * @returns Promesa con el resultado de la operación.
+ * Mapeo de código de infoplaza -> información de enlace.
+ */
+export interface InfoplazaEnlace {
+  codigo: string;
+  enlace: string;
+  dia: string;
+  dia_semana: string | null;
+  cerrada: boolean;
+}
+
+/**
+ * Resultado de query join de itinerario_enlaces con catalogo_infoplazas.
+ */
+interface ItinerarioEnlaceRow {
+  enlace_nombre: string | null;
+  dia_semana: string | null;
+  catalogo_infoplazas: { codigo: string; cerrada: boolean } | null;
+}
+
+/**
+ * Upsert masivo de Infoplazas en el catálogo.
  */
 export const upsertInfoplazasBatch = async (data: Infoplaza[]) => {
   if (data.length === 0) return { error: null };
@@ -28,7 +44,7 @@ export const upsertInfoplazasBatch = async (data: Infoplaza[]) => {
     .from('catalogo_infoplazas')
     .upsert(data, { 
       onConflict: 'codigo',
-      ignoreDuplicates: false // Queremos que actualice nombre/region si el código coincide
+      ignoreDuplicates: false
     })
     .select();
 
@@ -41,7 +57,7 @@ export const upsertInfoplazasBatch = async (data: Infoplaza[]) => {
 };
 
 /**
- * Obtiene todas las infoplazas activas en el catálogo.
+ * Obtiene todas las infoplazas del catálogo.
  */
 export const fetchAllInfoplazas = async () => {
   const { data, error } = await supabase
@@ -58,34 +74,21 @@ export const fetchAllInfoplazas = async () => {
 };
 
 /**
- * Genera un código (slug) basado en el nombre si no se proporciona uno.
+ * Genera un código (slug) a partir del nombre.
  */
 export const generateInfoplazaCode = (nombre: string): string => {
   return nombre
     .toLowerCase()
     .trim()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // Elimina acentos
-    .replace(/[^a-z0-9]+/g, '-')     // Reemplaza no-alfanuméricos por guiones
-    .replace(/^-+|-+$/g, '');       // Limpia guiones al inicio/fin
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 };
 
 /**
- * Mapeo de código de infoplaza -> { enlace, dia }.
+ * Obtiene mapa de número de Infoplaza -> info de enlace.
  */
-export interface InfoplazaEnlace {
-  codigo: string;
-  enlace: string;
-  dia: string;
-}
-
-/** Tipo para el resultado de la query join de itinerario_enlaces. */
-interface ItinerarioEnlaceRow {
-  enlace_nombre: string | null;
-  dia_semana: string | null;
-  catalogo_infoplazas: { codigo: string } | null;
-}
-
 export const fetchInfoplazasEnlaceMap = async (): Promise<Record<string, InfoplazaEnlace>> => {
   const { data, error } = await supabase
     .from('itinerario_enlaces')
@@ -93,7 +96,8 @@ export const fetchInfoplazasEnlaceMap = async (): Promise<Record<string, Infopla
       enlace_nombre,
       dia_semana,
       catalogo_infoplazas!inner(
-        codigo
+        codigo,
+        cerrada
       )
     `);
 
@@ -107,12 +111,13 @@ export const fetchInfoplazasEnlaceMap = async (): Promise<Record<string, Infopla
   (data as unknown as ItinerarioEnlaceRow[] | null)?.forEach((item) => {
     const codigoCompleto = item.catalogo_infoplazas?.codigo;
     if (codigoCompleto) {
-      // Extraer número del código (ej: "132-pese" -> "132")
       const numero = codigoCompleto.split('-')[0];
       map[numero] = {
         codigo: codigoCompleto,
         enlace: item.enlace_nombre || 'Sin asignar',
-        dia: item.dia_semana || ''
+        dia: item.dia_semana || '',
+        dia_semana: item.dia_semana,
+        cerrada: item.catalogo_infoplazas?.cerrada ?? false
       };
     }
   });
@@ -121,7 +126,57 @@ export const fetchInfoplazasEnlaceMap = async (): Promise<Record<string, Infopla
 };
 
 /**
- * Obtiene todas las infoplazas (incluye campos de cierre).
+ * Infoplazas sin ruta en itinerario (sin asignar).
+ */
+export const getInfoplazasSinItinerario = async (): Promise<Infoplaza[]> => {
+  const { data: conRuta, error: errorRuta } = await supabase
+    .from('itinerario_enlaces')
+    .select('infoplaza_id');
+
+  if (errorRuta) {
+    console.error('Error al obtener itinerario:', errorRuta);
+    throw errorRuta;
+  }
+
+  const idsConRuta = new Set(conRuta?.map(r => r.infoplaza_id) || []);
+
+  const { data: todas, error: errorTodas } = await supabase
+    .from('catalogo_infoplazas')
+    .select('*')
+    .order('codigo', { ascending: true });
+
+  if (errorTodas) {
+    console.error('Error al obtener catálogo:', errorTodas);
+    throw errorTodas;
+  }
+
+  const sinItinerario = (todas || []).filter(ip => 
+    !idsConRuta.has(ip.id || '') && !ip.cerrada
+  );
+
+  return sinItinerario;
+};
+
+/**
+ * Infoplazas cerradas.
+ */
+export const getInfoplazasCerradas = async (): Promise<Infoplaza[]> => {
+  const { data, error } = await supabase
+    .from('catalogo_infoplazas')
+    .select('*')
+    .eq('cerrada', true)
+    .order('codigo', { ascending: true });
+
+  if (error) {
+    console.error('Error al obtener infoplazas cerradas:', error);
+    throw error;
+  }
+
+  return data as Infoplaza[];
+};
+
+/**
+ * Obtiene todas las infoplazas.
  */
 export const getAllInfoplazas = async (): Promise<Infoplaza[]> => {
   const { data, error } = await supabase
@@ -138,7 +193,7 @@ export const getAllInfoplazas = async (): Promise<Infoplaza[]> => {
 };
 
 /**
- * Crea una nueva infoplaza en el catálogo.
+ * Crea una nueva infoplaza.
  */
 export const createInfoplaza = async (
   codigo: string,
@@ -163,8 +218,7 @@ export const createInfoplaza = async (
 };
 
 /**
- * Alterna el estado de una infoplaza (abierta <-> cerrada).
- * Si se cierra, registra la fecha actual. Si se abre, limpia la fecha.
+ * Alterna estado abierto/cerrado de una infoplaza.
  */
 export const toggleEstadoInfoplaza = async (
   id: string,
@@ -175,10 +229,8 @@ export const toggleEstadoInfoplaza = async (
   };
 
   if (cerrar) {
-    // Agregar fecha de cierre
     updates.fecha_cierre = new Date().toISOString().split('T')[0];
     
-    // IMPORTANTE: Eliminar las rutas asociadas a esta infoplaza cuando se cierra
     const { error: deleteError } = await supabase
       .from('itinerario_enlaces')
       .delete()
@@ -188,7 +240,6 @@ export const toggleEstadoInfoplaza = async (
       console.warn('Warning: No se pudieron eliminar rutas asociadas:', deleteError);
     }
   } else {
-    // Limpiar fecha de cierre al abrir
     updates.fecha_cierre = null;
   }
 
@@ -206,22 +257,7 @@ export const toggleEstadoInfoplaza = async (
 };
 
 /**
- * Interfaz para las rutas de enlaces.
- */
-export interface ItinerarioEnlace {
-  id: string;
-  enlace_nombre: string;
-  dia_ruta: string | null;
-  dia_semana: string | null;
-  infoplaza_id: string;
-  infoplaza_nombre?: string;
-  infoplaza_codigo?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-/**
- * Obtiene todas las infoplazas (para dropdowns de rutas).
+ * Obtiene todas las infoplazas (para dropdowns).
  */
 export const getInfoplazasAbiertas = async (): Promise<Infoplaza[]> => {
   const { data, error } = await supabase
@@ -235,155 +271,4 @@ export const getInfoplazasAbiertas = async (): Promise<Infoplaza[]> => {
   }
 
   return data as Infoplaza[];
-};
-
-/**
- * Obtiene todas las rutas de enlaces con datos de infoplaza.
- */
-export const getItinerarioEnlaces = async (): Promise<ItinerarioEnlace[]> => {
-  const { data, error } = await supabase
-    .from('itinerario_enlaces')
-    .select('*')
-    .order('enlace_nombre', { ascending: true });
-
-  if (error) {
-    console.error('Error al obtener itinerario de enlaces:', error);
-    throw error;
-  }
-
-  if (!data || data.length === 0) return [];
-
-  // Obtener nombres de infoplazas
-  const ipIds = [...new Set(data.map(r => r.infoplaza_id).filter(Boolean))];
-  const { data: ipData } = await supabase
-    .from('catalogo_infoplazas')
-    .select('id, nombre, codigo')
-    .in('id', ipIds);
-
-  const ipMap = new Map((ipData || []).map(i => [i.id, { nombre: i.nombre, codigo: i.codigo }]));
-
-  return data.map(r => ({
-    ...r,
-    infoplaza_nombre: ipMap.get(r.infoplaza_id)?.nombre || 'Sin asignar',
-    infoplaza_codigo: ipMap.get(r.infoplaza_id)?.codigo || '',
-  }));
-};
-
-/**
- * Actualiza una ruta de enlace (asignar infoplaza, cambiar día, etc.).
- */
-export const updateItinerarioEnlace = async (
-  id: string,
-  updates: Partial<ItinerarioEnlace>
-): Promise<{ success: boolean; error?: Error }> => {
-  const { error } = await supabase
-    .from('itinerario_enlaces')
-    .update(updates)
-    .eq('id', id);
-
-  if (error) {
-    console.error('Error al actualizar ruta:', error);
-    return { success: false, error };
-  }
-
-  return { success: true };
-};
-
-/**
- * Crea una nueva ruta de enlace.
- */
-export const createItinerarioEnlace = async (
-  enlace_nombre: string,
-  infoplaza_id: string,
-  dia_ruta?: string,
-  dia_semana?: string
-): Promise<{ success: boolean; error?: Error }> => {
-  const { error } = await supabase
-    .from('itinerario_enlaces')
-    .insert({
-      enlace_nombre,
-      infoplaza_id,
-      dia_ruta: dia_ruta || null,
-      dia_semana: dia_semana || null,
-    });
-
-  if (error) {
-    console.error('Error al crear ruta:', error);
-    return { success: false, error };
-  }
-
-  return { success: true };
-};
-
-/**
- * Elimina una ruta de enlace.
- */
-export const deleteItinerarioEnlace = async (
-  id: string
-): Promise<{ success: boolean; error?: Error }> => {
-  const { error } = await supabase
-    .from('itinerario_enlaces')
-    .delete()
-    .eq('id', id);
-
-  if (error) {
-    console.error('Error al eliminar ruta:', error);
-    return { success: false, error };
-  }
-
-  return { success: true };
-};
-
-/**
- * Elimina todas las infoplazas del catálogo (para poder reimportar).
- * Primero elimina las referencias en radar_kpax_unificado.
- */
-export const truncateCatalogoInfoplazas = async (): Promise<{ success: boolean; error?: Error }> => {
-  try {
-    // 1. Primero obtener los IDs de las infoplazas
-    const { data: ips, error: fetchError } = await supabase
-      .from('catalogo_infoplazas')
-      .select('id');
-
-    if (fetchError) throw fetchError;
-    if (!ips || ips.length === 0) return { success: true };
-
-    const ipIds = ips.map(ip => ip.id);
-
-    // 2. Eliminar referencias en radar_kpax_unificado
-    const { error: radarError } = await supabase
-      .from('radar_kpax_unificado')
-      .delete()
-      .in('infoplaza_id', ipIds);
-
-    if (radarError) {
-      console.warn('Warning: No se pudieron eliminar referencias en radar_kpax_unificado:', radarError);
-    }
-
-    // 3. Eliminar referencias en itinerario_enlaces
-    const { error: itinError } = await supabase
-      .from('itinerario_enlaces')
-      .delete()
-      .in('infoplaza_id', ipIds);
-
-    if (itinError) {
-      console.warn('Warning: No se pudieron eliminar referencias en itinerario_enlaces:', itinError);
-    }
-
-    // 4. Finalmente eliminar las infoplazas
-    const { error } = await supabase
-      .from('catalogo_infoplazas')
-      .delete()
-      .in('id', ipIds);
-
-    if (error) {
-      console.error('Error al eliminar infoplazas:', error);
-      return { success: false, error };
-    }
-
-    return { success: true };
-  } catch (err) {
-    console.error('Error en truncate:', err);
-    return { success: false, error: err as Error };
-  }
 };

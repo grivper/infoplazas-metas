@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { fetchInfoplazasEnlaceMap, type InfoplazaEnlace } from '@/features/auditoria/services/infoplazasService';
+import { fetchInfoplazasEnlaceMap, getInfoplazasSinItinerario, getInfoplazasCerradas, type InfoplazaEnlace } from '@/features/auditoria/services/infoplazasService';
 
 /**
  * Interfaz para el registro de sincronización de Meta 30%.
@@ -60,7 +60,7 @@ export interface DatosVistaVisitas {
   // Para KPIs: cumplimiento por mes (cuántas IP cumplieron >=30% vs meta)
   cumplimientoNacional: Record<string, number>;
   // Para tabla: porcentaje por IP por mes
-  visitasPorInfoplaza: Record<string, { nombre: string; meses: Record<string, number | null>; enlace: string; dia: string }>;
+  visitasPorInfoplaza: Record<string, { nombre: string; meses: Record<string, number | null>; enlace: string; dia: string; cerrada: boolean }>;
   // KPIs globales
   promedioNacional: number;
   ipMetaCumplida: number; // >= 100%
@@ -81,7 +81,7 @@ export const transformarDatosMeta30 = (
   enlaceMap: Record<string, InfoplazaEnlace> = {}
 ): DatosVistaVisitas => {
   // Agrupar por número de Infoplaza y Mes
-  const visitasPorInfoplaza: Record<string, { nombre: string; meses: Record<string, number | null>; enlace: string; dia: string }> = {};
+  const visitasPorInfoplaza: Record<string, { nombre: string; meses: Record<string, number | null>; enlace: string; dia: string; cerrada: boolean }> = {};
   const cumplimientoPorMes: Record<string, number> = {};
 
   const mesesOrdenados = [
@@ -108,7 +108,7 @@ export const transformarDatosMeta30 = (
     const porcentajeNum = typeof Porcentaje === 'string' ? parseFloat(Porcentaje) : Porcentaje;
 
     // Obtener info de enlace
-    const enlaceInfo = enlaceMap[numeroInfoplaza] || { enlace: 'Sin asignar', dia: '' };
+    const enlaceInfo = enlaceMap[numeroInfoplaza] || { enlace: 'Sin asignar', dia: '', cerrada: false };
 
     // Guardar porcentaje por Infoplaza (usar número extraído para comparaciones)
     if (!visitasPorInfoplaza[numeroInfoplaza]) {
@@ -116,7 +116,8 @@ export const transformarDatosMeta30 = (
         nombre: Infoplaza, 
         meses: {},
         enlace: enlaceInfo.enlace,
-        dia: enlaceInfo.dia
+        dia: enlaceInfo.dia,
+        cerrada: enlaceInfo.cerrada
       };
     }
     // Porcentaje del mes (si hay visitas)
@@ -196,9 +197,11 @@ export const getDatosVisitas = async (sheetName: string, año?: number): Promise
   const añoActual = año || new Date().getFullYear();
   
   // Obtener mapeo de infoplaza -> enlace en paralelo
-  const [sync, enlaceMap] = await Promise.all([
+  const [sync, enlaceMap, sinItinerario, cerradas] = await Promise.all([
     getLastMeta30Sync(sheetName),
-    fetchInfoplazasEnlaceMap()
+    fetchInfoplazasEnlaceMap(),
+    getInfoplazasSinItinerario(),
+    getInfoplazasCerradas()
   ]);
   
   if (!sync || !sync.data || sync.data.length === 0) {
@@ -218,5 +221,39 @@ export const getDatosVisitas = async (sheetName: string, año?: number): Promise
     return null;
   }
 
-  return transformarDatosMeta30(registrosFiltrados, enlaceMap);
+  // Crear sets de números de infoplazas sin itinerario y cerradas
+  const numerosSinItinerario = new Set(sinItinerario.map(ip => ip.codigo?.split('-')[0]));
+  const numerosCerradas = new Set(cerradas.map(ip => ip.codigo?.split('-')[0]));
+
+  // Enriquecer el map con información de estado
+  const enlaceMapEnriquecido = { ...enlaceMap };
+  
+  // Agregar las sin itinerario al map como "Sin asignar"
+  numerosSinItinerario.forEach(numero => {
+    if (!enlaceMapEnriquecido[numero]) {
+      enlaceMapEnriquecido[numero] = {
+        codigo: sinItinerario.find(ip => ip.codigo?.startsWith(numero))?.codigo || numero,
+        enlace: 'Sin asignar',
+        dia: '',
+        dia_semana: null,
+        cerrada: false
+      };
+    }
+  });
+
+  // Agregar las cerradas al map (sobrescribir si ya existían)
+  numerosCerradas.forEach(numero => {
+    const ipCerrada = cerradas.find(ip => ip.codigo?.startsWith(numero));
+    if (ipCerrada) {
+      enlaceMapEnriquecido[numero] = {
+        codigo: ipCerrada.codigo,
+        enlace: enlaceMapEnriquecido[numero]?.enlace || 'Sin asignar', // Mantener enlace si existe
+        dia: enlaceMapEnriquecido[numero]?.dia || '',
+        dia_semana: enlaceMapEnriquecido[numero]?.dia_semana || null,
+        cerrada: true
+      };
+    }
+  });
+
+  return transformarDatosMeta30(registrosFiltrados, enlaceMapEnriquecido);
 };

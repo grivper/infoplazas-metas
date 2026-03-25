@@ -7,7 +7,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { StatCard } from '@/components/ui/bento-card';
-import { getAllInfoplazas, getInfoplazasAbiertas, getItinerarioEnlaces, toggleEstadoInfoplaza, deleteItinerarioEnlace, truncateCatalogoInfoplazas, type Infoplaza, type ItinerarioEnlace } from './services/infoplazasService';
+import { getAllInfoplazas, getInfoplazasAbiertas, toggleEstadoInfoplaza, type Infoplaza } from './services/infoplazasService';
+import { getItinerarioEnlaces, deleteItinerarioEnlace, type ItinerarioEnlace } from './services/itinerarioService';
+import { truncateCatalogoInfoplazas } from './services/catalogoService';
 import { ModalAgregarInfoplaza } from './components/ModalAgregarInfoplaza';
 import { ModalEditarRuta } from './components/ModalEditarRuta';
 import { RutaUploader } from './components/RutaUploader';
@@ -16,6 +18,11 @@ import { CatalogoUploader } from './components/CatalogoUploader';
 type TabType = 'catalogo' | 'rutas';
 type FiltroEstado = 'todas' | 'abiertas' | 'cerradas';
 
+/**
+ * Vista de gestión de infoplazas y rutas del sistema de auditoría.
+ * Muestra dos pestañas: Catálogo (infoplazas) y Rutas (itinerario).
+ * Permite agregar, editar, togglear estado y eliminar registros.
+ */
 export const GestionInfoplazasView: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('catalogo');
   const [loading, setLoading] = useState(true);
