@@ -17,6 +17,7 @@ export interface MesaRecord {
   dinamizador: string;   // Nombre del dinamizador capacitado
   fechaInicio: string;   // Fecha de inicio (YYYY-MM-DD)
   fechaFin: string;      // Fecha de fin (YYYY-MM-DD o vacío)
+  fechaGraduacion: string; // Fecha de graduación (YYYY-MM-DD o vacío)
   estado: 'pendiente' | 'en_progreso' | 'completada';
   created_at?: string;
   updated_at?: string;
@@ -56,11 +57,16 @@ interface DbMesaRow {
   dinamizador: string | null;
   fecha_inicio: string | null;
   fecha_fin: string | null;
+  fecha_graduacion: string | null;
   estado: 'pendiente' | 'en_progreso' | 'completada';
   created_at?: string;
   updated_at?: string;
 }
 
+/**
+ * Mapea fila de DB (snake_case) a tipo app (camelCase).
+ * Convierte nulls a strings vacías para UI.
+ */
 const mapRowToMesa = (row: DbMesaRow): MesaRecord => ({
   id: row.id,
   mesa_id: row.mesa_id,
@@ -72,11 +78,16 @@ const mapRowToMesa = (row: DbMesaRow): MesaRecord => ({
   dinamizador: row.dinamizador || '',
   fechaInicio: row.fecha_inicio || '',
   fechaFin: row.fecha_fin || '',
+  fechaGraduacion: row.fecha_graduacion || '',
   estado: row.estado,
   created_at: row.created_at,
   updated_at: row.updated_at,
 });
 
+/**
+ * Mapea tipo app (camelCase) a fila DB (snake_case).
+ * Convierte strings vacías a null para DB.
+ */
 const mapMesaToRow = (mesa: Partial<MesaRecord>): Partial<DbMesaRow> => ({
   mesa_id: mesa.mesa_id,
   infoplaza: mesa.infoplaza,
@@ -87,10 +98,12 @@ const mapMesaToRow = (mesa: Partial<MesaRecord>): Partial<DbMesaRow> => ({
   dinamizador: mesa.dinamizador || null,
   fecha_inicio: mesa.fechaInicio || null,
   fecha_fin: mesa.fechaFin || null,
+  fecha_graduacion: mesa.fechaGraduacion || null,
   estado: mesa.estado,
 });
 
 // --- Genera el ID único de una mesa ---
+// Formato: "penonome-mesa-1" (infoplaza en kebab-case + mesa-numero)
 export const generarMesaId = (infoplaza: string, mesa: number): string =>
   `${infoplaza.toLowerCase().replace(/\s/g, '-')}-mesa-${mesa}`;
 

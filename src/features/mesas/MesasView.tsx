@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Plus, Edit2, Trash2, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,12 @@ import {
   type MesaRecord, type InfoplazaCatalogo,
 } from './services/mesasDb';
 
-// --- Constantes ---
+/**
+ * Mapeo de estados de mesa con label, color e icono para UI.
+ * pendiente: Sin iniciar - gris
+ * en_progreso: En proceso - amber
+ * completada: Finalizada - emerald
+ */
 const ESTADOS: Record<MesaRecord['estado'], { label: string; color: string; icon: React.ReactNode }> = {
   pendiente: { label: 'Pendiente', color: 'bg-slate-100 text-slate-600', icon: <Clock className="w-3 h-3" /> },
   en_progreso: { label: 'En Progreso', color: 'bg-amber-100 text-amber-700', icon: <AlertCircle className="w-3 h-3" /> },
@@ -34,6 +39,7 @@ const MesaForm: React.FC<{
     dinamizador: registro.dinamizador || '',
     fechaInicio: registro.fechaInicio || '',
     fechaFin: registro.fechaFin || '',
+    fechaGraduacion: registro.fechaGraduacion || '',
     estado: registro.estado || 'pendiente' as MesaRecord['estado'],
   });
 
@@ -88,6 +94,10 @@ const MesaForm: React.FC<{
           <input type="date" className={inputCls} value={form.fechaFin} onChange={e => setForm(f => ({ ...f, fechaFin: e.target.value }))} />
         </div>
         <div>
+          <label className={labelCls}>Fecha Graduación</label>
+          <input type="date" className={inputCls} value={form.fechaGraduacion} onChange={e => setForm(f => ({ ...f, fechaGraduacion: e.target.value }))} />
+        </div>
+        <div>
           <label className={labelCls}>Estado</label>
           <select className={inputCls} value={form.estado} onChange={e => setForm(f => ({ ...f, estado: e.target.value as MesaRecord['estado'] }))}>
             <option value="pendiente">Pendiente</option>
@@ -125,11 +135,22 @@ const MesasView: React.FC = () => {
     setEditing(null);
   }, []);
 
-  // Elimina una mesa
+  // Elimina una mesa con manejo de errores
   const handleDelete = useCallback(async (id: string) => {
-    await deleteMesa(id);
-    setMesas(await getAllMesas());
+    try {
+      await deleteMesa(id);
+      setMesas(await getAllMesas());
+    } catch (err) {
+      console.error('Error al eliminar mesa:', err);
+      alert('Error al eliminar la mesa. Intenta de nuevo.');
+    }
   }, []);
+
+  // Ordena mesas por infoplaza y número (mem: evita mutar en render)
+  const mesasOrdenadas = useMemo(() => 
+    [...mesas].sort((a, b) => a.infoplaza.localeCompare(b.infoplaza) || a.mesa - b.mesa), 
+    [mesas]
+  );
 
   // KPIs calculados
   const totalMesas = mesas.length;
@@ -183,13 +204,13 @@ const MesasView: React.FC = () => {
             <table className="w-full text-sm">
               <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
                 <tr>
-                  {['Infoplaza', 'Región', 'Mesa', 'Sesión', 'Participantes', 'Dinamizador', 'Inicio', 'Estado', ''].map(h => (
+                  {['Infoplaza', 'Región', 'Mesa', 'Sesión', 'Participantes', 'Dinamizador', 'Inicio', 'Graduación', 'Estado', ''].map(h => (
                     <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {mesas.sort((a, b) => a.infoplaza.localeCompare(b.infoplaza) || a.mesa - b.mesa).map(m => {
+                {mesasOrdenadas.map(m => {
                   const est = ESTADOS[m.estado];
                   return (
                     <tr key={m.id} className="hover:bg-slate-50/50 transition-colors">
@@ -203,6 +224,7 @@ const MesasView: React.FC = () => {
                       <td className="px-4 py-3 text-slate-700">{m.participantes}</td>
                       <td className="px-4 py-3 text-slate-600">{m.dinamizador || '—'}</td>
                       <td className="px-4 py-3 text-slate-600">{m.fechaInicio || '—'}</td>
+                      <td className="px-4 py-3 text-slate-600">{m.fechaGraduacion || '—'}</td>
                       <td className="px-4 py-3">
                         <Badge variant="secondary" className={`gap-1 ${est.color}`}>{est.icon} {est.label}</Badge>
                       </td>
@@ -220,7 +242,7 @@ const MesasView: React.FC = () => {
                   );
                 })}
                 {totalMesas === 0 && (
-                  <tr><td colSpan={9} className="px-4 py-12 text-center text-slate-400">
+                  <tr><td colSpan={10} className="px-4 py-12 text-center text-slate-400">
                     No hay mesas registradas. Presiona "Nueva Mesa" para comenzar.
                   </td></tr>
                 )}
