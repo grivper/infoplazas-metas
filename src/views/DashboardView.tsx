@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { RemeLoader } from '@/components/ui/reme-loader';
 import { getDatosDashboard } from '@/services/dashboard';
-import { descargarExcelMetas } from '@/services/informe/excel';
+import { descargarExcelMetas } from '@/features/informe/excel';
 import type { MetaItem } from '@/components/MetaCard';
 import { Meta1Card, Meta2Card, Meta3Card, Meta4Card, Meta5Card } from './dashboard';
 import { Download } from 'lucide-react';
