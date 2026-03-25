@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { RemeLoader } from '@/components/ui/reme-loader';
 import { getDatosDashboard } from '@/services/dashboard';
+import { descargarExcelMetas } from '@/services/informe/excel';
 import type { MetaItem } from '@/components/MetaCard';
 import { Meta1Card, Meta2Card, Meta3Card, Meta4Card, Meta5Card } from './dashboard';
+import { Download } from 'lucide-react';
 
 /**
  * DashboardView - Vista principal del dashboard con métricas de las 5 metas
@@ -11,6 +13,19 @@ export const DashboardView: React.FC = () => {
   const [metas, setMetas] = useState<MetaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [exportandoExcel, setExportandoExcel] = useState(false);
+
+  // Handler para exportar Excel
+  const handleExportExcel = async () => {
+    try {
+      setExportandoExcel(true);
+      await descargarExcelMetas();
+    } catch {
+      console.error('Error exportando Excel');
+    } finally {
+      setExportandoExcel(false);
+    }
+  };
 
   useEffect(() => {
     const cargarMetas = async () => {
@@ -67,14 +82,15 @@ export const DashboardView: React.FC = () => {
             Resumen ejecutivo del cumplimiento regional acumulado.
           </p>
         </div>
-        {/* TODO: Reactivar cuando esté implementado el generador de PDF */}
-        {/* <Button 
-          variant="outline" 
-          className="flex items-center gap-2 border-[#b4005d] text-[#b4005d] bg-pink-50 hover:bg-pink-100"
+        {/* Botón para exportar Excel */}
+        <button 
+          className="flex items-center gap-2 px-4 py-2 border border-[#b4005d] text-[#b4005d] bg-pink-50 hover:bg-pink-100 rounded-lg transition-colors"
+          onClick={handleExportExcel}
+          disabled={exportandoExcel}
         >
           <Download className="w-4 h-4" />
-          Exportar PDF
-        </Button> */}
+          {exportandoExcel ? 'Exportando...' : 'Descargar Excel'}
+        </button>
       </div>
 
       {/* Fila 1: Servicio Social + Cumplimiento 30% */}
