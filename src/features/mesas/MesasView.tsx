@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { StatCard } from '@/components/ui/bento-card';
+import { MesaForm } from './components/MesaForm';
 import {
-  getAllMesas, upsertMesa, deleteMesa, generarMesaId, getCatalogoInfoplazas,
+  getAllMesas, upsertMesa, deleteMesa, getCatalogoInfoplazas,
   type MesaRecord, type InfoplazaCatalogo,
 } from './services/mesasDb';
 
@@ -19,99 +20,6 @@ const ESTADOS: Record<MesaRecord['estado'], { label: string; color: string; icon
   pendiente: { label: 'Pendiente', color: 'bg-slate-100 text-slate-600', icon: <Clock className="w-3 h-3" /> },
   en_progreso: { label: 'En Progreso', color: 'bg-amber-100 text-amber-700', icon: <AlertCircle className="w-3 h-3" /> },
   completada: { label: 'Completada', color: 'bg-emerald-100 text-emerald-700', icon: <CheckCircle2 className="w-3 h-3" /> },
-};
-
-// --- Componente: Formulario de Mesa (inline) ---
-const MesaForm: React.FC<{
-  registro: Partial<MesaRecord>;
-  catalogo: InfoplazaCatalogo[];
-  onSave: (r: MesaRecord) => void;
-  onCancel: () => void;
-}> = ({ registro, catalogo, onSave, onCancel }) => {
-  const defaultInfoplaza = catalogo[0] || { nombre: '', region: '' };
-  
-  const [form, setForm] = useState({
-    infoplaza: registro.infoplaza || defaultInfoplaza.nombre,
-    region: registro.region || defaultInfoplaza.region,
-    mesa: registro.mesa || 1,
-    sesionActual: registro.sesionActual || 1,
-    participantes: registro.participantes || 0,
-    dinamizador: registro.dinamizador || '',
-    fechaInicio: registro.fechaInicio || '',
-    fechaFin: registro.fechaFin || '',
-    fechaGraduacion: registro.fechaGraduacion || '',
-    estado: registro.estado || 'pendiente' as MesaRecord['estado'],
-  });
-
-  // Sincroniza la región al cambiar infoplaza
-  const handleInfoplazaChange = (nombre: string) => {
-    const info = catalogo.find(i => i.nombre === nombre);
-    setForm(f => ({ ...f, infoplaza: nombre, region: info?.region || '' }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const mesa_id = registro.mesa_id || generarMesaId(form.infoplaza, form.mesa);
-    onSave({ ...form, mesa_id } as MesaRecord);
-  };
-
-  const inputCls = 'w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300';
-  const labelCls = 'block text-xs font-medium text-slate-500 mb-1';
-
-  return (
-    <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div>
-          <label className={labelCls}>Infoplaza</label>
-          <select className={inputCls} value={form.infoplaza} onChange={e => handleInfoplazaChange(e.target.value)} disabled={!!registro.mesa_id}>
-            {catalogo.map(i => <option key={i.id} value={i.nombre}>{i.nombre} ({i.region})</option>)}
-          </select>
-        </div>
-        <div>
-          <label className={labelCls}>Mesa #</label>
-          <select className={inputCls} value={form.mesa} onChange={e => setForm(f => ({ ...f, mesa: +e.target.value }))} disabled={!!registro.mesa_id}>
-            {[1, 2, 3].map(n => <option key={n} value={n}>Mesa {n}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className={labelCls}>Sesión Actual (1-10)</label>
-          <input type="number" min={1} max={10} className={inputCls} value={form.sesionActual} onChange={e => setForm(f => ({ ...f, sesionActual: +e.target.value }))} />
-        </div>
-        <div>
-          <label className={labelCls}>Participantes</label>
-          <input type="number" min={0} className={inputCls} value={form.participantes} onChange={e => setForm(f => ({ ...f, participantes: +e.target.value }))} />
-        </div>
-        <div>
-          <label className={labelCls}>Dinamizador</label>
-          <input type="text" className={inputCls} value={form.dinamizador} onChange={e => setForm(f => ({ ...f, dinamizador: e.target.value }))} placeholder="Nombre" />
-        </div>
-        <div>
-          <label className={labelCls}>Fecha Inicio</label>
-          <input type="date" className={inputCls} value={form.fechaInicio} onChange={e => setForm(f => ({ ...f, fechaInicio: e.target.value }))} />
-        </div>
-        <div>
-          <label className={labelCls}>Fecha Fin</label>
-          <input type="date" className={inputCls} value={form.fechaFin} onChange={e => setForm(f => ({ ...f, fechaFin: e.target.value }))} />
-        </div>
-        <div>
-          <label className={labelCls}>Fecha Graduación</label>
-          <input type="date" className={inputCls} value={form.fechaGraduacion} onChange={e => setForm(f => ({ ...f, fechaGraduacion: e.target.value }))} />
-        </div>
-        <div>
-          <label className={labelCls}>Estado</label>
-          <select className={inputCls} value={form.estado} onChange={e => setForm(f => ({ ...f, estado: e.target.value as MesaRecord['estado'] }))}>
-            <option value="pendiente">Pendiente</option>
-            <option value="en_progreso">En Progreso</option>
-            <option value="completada">Completada</option>
-          </select>
-        </div>
-      </div>
-      <div className="flex gap-2 justify-end">
-        <Button type="button" variant="ghost" size="sm" onClick={onCancel}>Cancelar</Button>
-        <Button type="submit" size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white">{registro.id ? 'Actualizar' : 'Crear Mesa'}</Button>
-      </div>
-    </form>
-  );
 };
 
 // --- Componente Principal ---
@@ -146,7 +54,8 @@ const MesasView: React.FC = () => {
     }
   }, []);
 
-  // Ordena mesas por infoplaza y número (mem: evita mutar en render)
+  // Ordena mesas por infoplaza y número.
+  // Usa useMemo para evitar recalcular en cada render y evitar mutación del estado.
   const mesasOrdenadas = useMemo(() => 
     [...mesas].sort((a, b) => a.infoplaza.localeCompare(b.infoplaza) || a.mesa - b.mesa), 
     [mesas]
@@ -204,7 +113,7 @@ const MesasView: React.FC = () => {
             <table className="w-full text-sm">
               <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
                 <tr>
-                  {['Infoplaza', 'Región', 'Mesa', 'Sesión', 'Participantes', 'Dinamizador', 'Inicio', 'Graduación', 'Estado', ''].map(h => (
+                  {['Infoplaza', 'Región', 'Mesa', 'Sesión', 'Participantes', 'Dinamizador', 'Inicio', 'Fin', 'Graduación', 'Estado', ''].map(h => (
                     <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
                   ))}
                 </tr>
@@ -213,7 +122,7 @@ const MesasView: React.FC = () => {
                 {mesasOrdenadas.map(m => {
                   const est = ESTADOS[m.estado];
                   return (
-                    <tr key={m.id} className="hover:bg-slate-50/50 transition-colors">
+                    <tr key={m.mesa_id} className="hover:bg-slate-50/50 transition-colors">
                       <td className="px-4 py-3 font-medium text-slate-800">{m.infoplaza}</td>
                       <td className="px-4 py-3 text-slate-600">{m.region}</td>
                       <td className="px-4 py-3 text-slate-700">Mesa {m.mesa}</td>
@@ -224,6 +133,7 @@ const MesasView: React.FC = () => {
                       <td className="px-4 py-3 text-slate-700">{m.participantes}</td>
                       <td className="px-4 py-3 text-slate-600">{m.dinamizador || '—'}</td>
                       <td className="px-4 py-3 text-slate-600">{m.fechaInicio || '—'}</td>
+                      <td className="px-4 py-3 text-slate-600">{m.fechaFin || '—'}</td>
                       <td className="px-4 py-3 text-slate-600">{m.fechaGraduacion || '—'}</td>
                       <td className="px-4 py-3">
                         <Badge variant="secondary" className={`gap-1 ${est.color}`}>{est.icon} {est.label}</Badge>
@@ -242,7 +152,7 @@ const MesasView: React.FC = () => {
                   );
                 })}
                 {totalMesas === 0 && (
-                  <tr><td colSpan={10} className="px-4 py-12 text-center text-slate-400">
+                  <tr><td colSpan={11} className="px-4 py-12 text-center text-slate-400">
                     No hay mesas registradas. Presiona "Nueva Mesa" para comenzar.
                   </td></tr>
                 )}
