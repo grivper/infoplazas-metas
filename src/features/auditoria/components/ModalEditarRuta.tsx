@@ -7,6 +7,14 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { createItinerarioEnlace, updateItinerarioEnlace, type ItinerarioEnlace } from '../services/itinerarioService';
 import type { Infoplaza } from '../services/infoplazasService';
 
+/**
+ * Props del componente ModalEditarRuta.
+ * @param open - Controla la visibilidad del modal
+ * @param onOpenChange - Callback al cerrar/abrir el modal
+ * @param ruta - Ruta a editar (undefined para crear nueva)
+ * @param infoplazas - Lista de infoplazas disponibles
+ * @param onSuccess - Callback llamado tras guardar exitosamente
+ */
 interface ModalEditarRutaProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -17,11 +25,14 @@ interface ModalEditarRutaProps {
 
 export const ModalEditarRuta: React.FC<ModalEditarRutaProps> = ({ open, onOpenChange, ruta, infoplazas, onSuccess }) => {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [enlace, setEnlace] = useState('');
   const [infoplazaId, setInfoplazaId] = useState('');
   const [diaSemana, setDiaSemana] = useState('');
   const [diaRuta, setDiaRuta] = useState('');
 
+  // Sincroniza el estado del formulario con los datos de la ruta seleccionada.
+  // Se ejecuta cada vez que cambia la ruta o se abre/cierra el modal.
   useEffect(() => {
     if (ruta) {
       setEnlace(ruta.enlace_nombre);
@@ -31,14 +42,20 @@ export const ModalEditarRuta: React.FC<ModalEditarRutaProps> = ({ open, onOpenCh
     } else {
       setEnlace(''); setInfoplazaId(''); setDiaSemana(''); setDiaRuta('');
     }
+    setError(null); // Limpiar errores al abrir/cerrar
   }, [ruta, open]);
 
+  // Maneja el envío del formulario.
+  // Determina si es creación o actualización según si existe ruta,
+  // luego llama al servicio correspondiente y maneja el resultado.
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    let result;
+    setError(null);
+    let result: { success: boolean; error?: Error };
     if (ruta) {
-      result = await updateItinerarioEnlace(ruta.id, { enlace_nombre: enlace, infoplaza_id: infoplazaId, dia_semana: diaSemana || null, dia_ruta: diaRuta || null });
+      const updateResult = await updateItinerarioEnlace(ruta.id, { enlace_nombre: enlace, infoplaza_id: infoplazaId, dia_semana: diaSemana || null, dia_ruta: diaRuta || null });
+      result = { success: updateResult.success, error: updateResult.success ? undefined : updateResult.error };
     } else {
       result = await createItinerarioEnlace(enlace, infoplazaId, diaRuta, diaSemana);
     }
@@ -48,7 +65,7 @@ export const ModalEditarRuta: React.FC<ModalEditarRutaProps> = ({ open, onOpenCh
       onOpenChange(false);
       onSuccess();
     } else {
-      alert('Error al guardar ruta.');
+      setError(result.error?.message || 'Error al guardar ruta.');
     }
   };
 
@@ -63,6 +80,11 @@ export const ModalEditarRuta: React.FC<ModalEditarRutaProps> = ({ open, onOpenCh
           <DialogDescription>Asigna una infoplaza a un enlace.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          {error && (
+            <div className="bg-red-50 text-red-600 text-sm p-3 rounded-md border border-red-200">
+              {error}
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="enlace">Enlace</Label>
             <Input id="enlace" value={enlace} onChange={(e) => setEnlace(e.target.value)} placeholder="Ej: Rogelio" required />

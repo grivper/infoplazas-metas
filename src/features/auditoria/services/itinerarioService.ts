@@ -66,12 +66,19 @@ export const getItinerarioEnlaces = async (): Promise<ItinerarioEnlace[]> => {
 };
 
 /**
+ * Tipo de retorno unificado para operaciones de itinerario.
+ */
+type ItinerarioResult<T = ItinerarioEnlace> = 
+  | { success: true; data: T }
+  | { success: false; error: Error };
+
+/**
  * Actualiza un registro de itinerario.
  */
 export const updateItinerarioEnlace = async (
   id: string,
   updates: Partial<ItinerarioEnlace>
-): Promise<ItinerarioEnlace> => {
+): Promise<ItinerarioResult> => {
   const { data, error } = await supabase
     .from('itinerario_enlaces')
     .update(updates)
@@ -81,10 +88,10 @@ export const updateItinerarioEnlace = async (
 
   if (error) {
     console.error('Error al actualizar itinerario:', error);
-    throw error;
+    return { success: false, error: new Error(error.message) };
   }
 
-  return data;
+  return { success: true, data };
 };
 
 /**
