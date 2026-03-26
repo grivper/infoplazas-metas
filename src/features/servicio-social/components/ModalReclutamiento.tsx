@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { supabase } from '@/lib/supabase';
-import { createReclutamiento } from '../services/reclutamientoDb';
+import { createReclutamiento, updateEstudiante } from '../services/reclutamientoDb';
 import { getAlianzas, type Alianza } from '../services/alianzasDb';
 
 interface Infoplaza {
@@ -28,31 +28,68 @@ interface Infoplaza {
   codigo?: string;
 }
 
+interface EstudianteData {
+  id: string;
+  nombre_estudiante: string;
+  cedula: string;
+  universidad_id: string | null;
+  carrera: string;
+  anio_cursa: string;
+  infoplaza_id: string | null;
+}
+
 interface ModalReclutamientoProps {
   children?: React.ReactNode;
   onSuccess?: () => void;
+  estudiante?: EstudianteData | null; // Para modo edición
 }
 
 /**
  * ModalReclutamiento
  * Formulario para registrar un estudiante individual de servicio social.
+ * Modo edición: cuando se pasa el prop 'estudiante', se editable.
  * Campos: Universidad de origen (Select), Estudiante (Input), Carrera (Input), Año (Select), Infoplaza (Select), Período (Input).
  */
-export const ModalReclutamiento: React.FC<ModalReclutamientoProps> = ({ children, onSuccess }) => {
+export const ModalReclutamiento: React.FC<ModalReclutamientoProps> = ({ children, onSuccess, estudiante }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+  const isEditing = !!estudiante;
+
+  // Effect para abrir el modal automáticamente cuando se pasa un estudiante para editar
+  useEffect(() => {
+    if (estudiante) {
+      setOpen(true);
+    }
+  }, [estudiante]);
+
+  // Effect para resetear el form cuando se cierra el modal
+  // IMPORTANTE: Si no-reseteamos, al abrir para crear nuevo estudiantes,
+  // podrían verse los datos del anterior estudiante editado
+  useEffect(() => {
+    if (!open) {
+      // Reset form solo cuando se cierra y NO estamos editando
+      if (!isEditing) {
+        setUniversidadId('');
+        setInfoplazaId('');
+        setNombreEstudiante('');
+        setCedula('');
+        setCarrera('');
+        setAnioCursa('');
+      }
+    }
+  }, [open, isEditing]);
+
   // Data for selects
   const [universidades, setUniversidades] = useState<Alianza[]>([]);
   const [infoplazas, setInfoplazas] = useState<Infoplaza[]>([]);
   
-  // Form state
-  const [universidadId, setUniversidadId] = useState<string>('');
-  const [infoplazaId, setInfoplazaId] = useState<string>('');
-  const [nombreEstudiante, setNombreEstudiante] = useState<string>('');
-  const [cedula, setCedula] = useState<string>('');
-  const [carrera, setCarrera] = useState<string>('');
-  const [anioCursa, setAnioCursa] = useState<string>('');
+  // Form state - almacenar datos del formulario
+  const [universidadId, setUniversidadId] = useState<string>('');      // ID de la universidad seleccionada
+  const [infoplazaId, setInfoplazaId] = useState<string>('');         // ID de la infoplaza asignada
+  const [nombreEstudiante, setNombreEstudiante] = useState<string>('');  // Nombre completo del estudiante
+  const [cedula, setCedula] = useState<string>('');                   // Número de identificación
+  const [carrera, setCarrera] = useState<string>('');                 // Carrera que estudia
+  const [anioCursa, setAnioCursa] = useState<string>('');             // Año académico (1-5)
 
   // Load data when modal opens
   useEffect(() => {
@@ -69,23 +106,48 @@ export const ModalReclutamiento: React.FC<ModalReclutamientoProps> = ({ children
       if (infos.data) {
         setInfoplazas(infos.data);
       }
+
+      // Si estamos en modo edición, cargar datos del estudiante
+      if (estudiante) {
+        setUniversidadId(estudiante.universidad_id || '');
+        setInfoplazaId(estudiante.infoplaza_id || '');
+        setNombreEstudiante(estudiante.nombre_estudiante);
+        setCedula(estudiante.cedula);
+        setCarrera(estudiante.carrera);
+        setAnioCursa(estudiante.anio_cursa);
+      }
     };
 
     cargarDatos();
-  }, [open]);
+  }, [open, estudiante]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const result = await createReclutamiento(
-      universidadId || null,
-      infoplazaId || null,
-      nombreEstudiante,
-      cedula,
-      carrera,
-      anioCursa
-    );
+    let result: { success: boolean; error?: Error };
+
+    if (isEditing) {
+      // Modo edición: actualizar estudiante
+      result = await updateEstudiante(estudiante.id, {
+        nombre_estudiante: nombreEstudiante,
+        cedula: cedula,
+        universidad_id: universidadId || null,
+        carrera: carrera,
+        anio_cursa: anioCursa,
+        infoplaza_id: infoplazaId || null,
+      });
+    } else {
+      // Modo creación: nuevo estudiante
+      result = await createReclutamiento(
+        universidadId || null,
+        infoplazaId || null,
+        nombreEstudiante,
+        cedula,
+        carrera,
+        anioCursa
+      );
+    }
 
     setLoading(false);
 
@@ -111,9 +173,11 @@ export const ModalReclutamiento: React.FC<ModalReclutamientoProps> = ({ children
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Inscribir Estudiante</DialogTitle>
+          <DialogTitle>{isEditing ? 'Editar Estudiante' : 'Inscribir Estudiante'}</DialogTitle>
           <DialogDescription>
-            Registra los datos del estudiante que realizará servicio social.
+            {isEditing 
+              ? 'Actualiza los datos del estudiante de servicio social.'
+              : 'Registra los datos del estudiante que realizará servicio social.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
@@ -203,7 +267,7 @@ export const ModalReclutamiento: React.FC<ModalReclutamientoProps> = ({ children
 
           <DialogFooter className="pt-4">
             <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700" disabled={loading}>
-              {loading ? 'Registrando...' : 'Registrar Estudiante'}
+              {loading ? (isEditing ? 'Guardando...' : 'Registrando...') : (isEditing ? 'Guardar Cambios' : 'Registrar Estudiante')}
             </Button>
           </DialogFooter>
         </form>

@@ -132,3 +132,33 @@ export const updateEstadoEstudiante = async (
 
   return { success: true };
 };
+
+/**
+ * Actualiza los datos de un estudiante (modo edición)
+ */
+export const updateEstudiante = async (
+  estudianteId: string,
+  datos: {
+    nombre_estudiante?: string | null;
+    cedula?: string | null;
+    universidad_id?: string | null;
+    carrera?: string | null;
+    anio_cursa?: string | null;
+    infoplaza_id?: string | null;
+  }
+): Promise<{ success: boolean; error?: Error }> => {
+  const { error } = await supabase
+    .from('reclutamiento_estudiantes')
+    .update({
+      ...datos,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', estudianteId);
+
+  if (error) {
+    console.error('Error al actualizar estudiante:', error);
+    return { success: false, error };
+  }
+
+  return { success: true };
+};

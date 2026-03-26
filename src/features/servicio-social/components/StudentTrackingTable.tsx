@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Users, CheckCircle, X, RotateCcw, Search } from 'lucide-react';
+import { Users, CheckCircle, X, RotateCcw, Search, Pencil } from 'lucide-react';
 import { useState } from 'react';
 
 interface StudentData {
@@ -17,20 +17,35 @@ interface StudentData {
   fecha_inscripcion: string;
   status: 'Activo' | 'Completado' | 'Cancelado';
   estado_original: 'activo' | 'completado' | 'cancelado';
+  // Datos originales para edición
+  universidad_id?: string | null;
+  infoplaza_id?: string | null;
+}
+
+interface EstudianteParaEditar {
+  id: string;
+  nombre_estudiante: string;
+  cedula: string;
+  universidad_id: string | null;
+  carrera: string;
+  anio_cursa: string;
+  infoplaza_id: string | null;
 }
 
 interface StudentTrackingTableProps {
   students: StudentData[];
   onCambiarEstado: (id: string, nuevoEstado: 'activo' | 'completado' | 'cancelado') => void;
+  onEditarEstudiante?: (estudiante: EstudianteParaEditar) => void;
 }
 
 type FiltroTab = 'todos' | 'activos' | 'completados' | 'cancelados';
 
-export function StudentTrackingTable({ students, onCambiarEstado }: StudentTrackingTableProps) {
+export function StudentTrackingTable({ students, onCambiarEstado, onEditarEstudiante }: StudentTrackingTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filtroTab, setFiltroTab] = useState<FiltroTab>('todos');
 
-  // Filtrar estudiantes por término de búsqueda y tab
+  // Filtrar estudiantes por término de búsqueda (nombre, cédula, universidad, infoplaza, carrera)
+  // Y por tab de estado (todos, activos, completados, cancelados)
   const estudiantesFiltrados = students.filter(student => {
     const search = searchTerm.toLowerCase();
     const matchSearch = 
@@ -47,7 +62,7 @@ export function StudentTrackingTable({ students, onCambiarEstado }: StudentTrack
     return matchSearch;
   });
 
-  // Separar por estado
+  // Agrupar estudiantes por estado para mostrar en secciones separadas en vista "Todos"
   const activos = estudiantesFiltrados.filter(s => s.status === 'Activo');
   const completados = estudiantesFiltrados.filter(s => s.status === 'Completado');
   const cancelados = estudiantesFiltrados.filter(s => s.status === 'Cancelado');
@@ -66,6 +81,26 @@ export function StudentTrackingTable({ students, onCambiarEstado }: StudentTrack
       >
         {student.status}
       </Badge>
+      {/* Botón de editar (disponible para todos los estados) */}
+      {onEditarEstudiante && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 px-2 text-xs text-slate-600 hover:text-slate-800 hover:bg-slate-100"
+          onClick={() => onEditarEstudiante({
+            id: student.id,
+            nombre_estudiante: student.nombre_estudiante,
+            cedula: student.cedula,
+            universidad_id: student.universidad_id || null,
+            carrera: student.carrera,
+            anio_cursa: student.anio_cursa,
+            infoplaza_id: student.infoplaza_id || null,
+          })}
+          title="Editar estudiante"
+        >
+          <Pencil className="w-3 h-3" />
+        </Button>
+      )}
       {/* Solo mostrar acciones si está ACTIVO */}
       {student.status === 'Activo' && (
         <>

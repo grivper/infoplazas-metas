@@ -145,3 +145,30 @@ export const getTalleresCountByReclutamiento = async (reclutamientoId: string): 
 
   return count || 0;
 };
+
+/**
+ * Obtiene el conteo de talleres para múltiples reclutamientos en una sola query (evita N+1)
+ * Retorna un Map con reclutamientoId -> conteo
+ */
+export const getTalleresCountBulk = async (reclutamientoIds: string[]): Promise<Map<string, number>> => {
+  if (reclutamientoIds.length === 0) return new Map();
+
+  const { data, error } = await supabase
+    .from('talleres_impartidos')
+    .select('reclutamiento_id')
+    .in('reclutamiento_id', reclutamientoIds);
+
+  if (error) {
+    console.error('Error al obtener conteo bulk de talleres:', error);
+    return new Map();
+  }
+
+  // Contar por reclutamiento
+  const countMap = new Map<string, number>();
+  (data || []).forEach(t => {
+    const id = t.reclutamiento_id;
+    countMap.set(id, (countMap.get(id) || 0) + 1);
+  });
+
+  return countMap;
+};

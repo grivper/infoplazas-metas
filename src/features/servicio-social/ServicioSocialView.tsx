@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Users, BookOpen, GraduationCap, Building2, Handshake, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { StatCardWithProgress } from '@/components/ui/bento-card';
@@ -6,13 +6,13 @@ import { ModalAlianza } from './components/ModalAlianza';
 import { ModalReclutamiento } from './components/ModalReclutamiento';
 import { ModalTaller } from './components/ModalTaller';
 import { StudentTrackingTable } from './components/StudentTrackingTable';
-import { WorkflowTimeline } from './components/WorkflowTimeline';
+import { WorkflowTimeline, type Workflow } from './components/WorkflowTimeline';
 import { RemeLoader } from '@/components/ui/reme-loader';
 
 // DB Services
 import { getAlianzasCount } from './services/alianzasDb';
 import { getReclutamientos, getTotalEstudiantesReclutados, updateEstadoEstudiante } from './services/reclutamientoDb';
-import { getTalleresCount, getTotalUsuariosCapacitados, getTalleresCountByReclutamiento } from './services/talleresDb';
+import { getTalleresCount, getTotalUsuariosCapacitados, getTalleresCountBulk } from './services/talleresDb';
 
 // Tipos para datos reales
 interface KPIData {
@@ -22,13 +22,6 @@ interface KPIData {
   progress: number;
   color: 'blue' | 'emerald' | 'amber' | 'purple';
   peso: number; // Peso en % para el promedio ponderado
-}
-
-interface Workflow {
-  phase: string;
-  dates: string;
-  desc: string;
-  status: 'Completado' | 'En curso' | 'Planificado';
 }
 
 interface StudentData {
@@ -43,6 +36,19 @@ interface StudentData {
   fecha_inscripcion: string;
   status: 'Activo' | 'Completado' | 'Cancelado';
   estado_original: 'activo' | 'completado' | 'cancelado';
+  universidad_id?: string | null;
+  infoplaza_id?: string | null;
+}
+
+// Tipo para pasar al modal de edición
+interface EstudianteParaEditar {
+  id: string;
+  nombre_estudiante: string;
+  cedula: string;
+  universidad_id: string | null;
+  carrera: string;
+  anio_cursa: string;
+  infoplaza_id: string | null;
 }
 
 export const ServicioSocialView: React.FC = () => {
@@ -50,18 +56,24 @@ export const ServicioSocialView: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [kpiData, setKpiData] = useState<KPIData[]>([]);
   const [studentTracking, setStudentTracking] = useState<StudentData[]>([]);
+  const [estudianteEditando, setEstudianteEditando] = useState<EstudianteParaEditar | null>(null);
 
-  // Función para cambiar estado del estudiante
-  const handleCambiarEstado = async (estudianteId: string, nuevoEstado: 'activo' | 'completado' | 'cancelado') => {
+  // Función para cambiar estado del estudiante (completar o cancelar) - memoizada
+  const handleCambiarEstado = useCallback(async (estudianteId: string, nuevoEstado: 'activo' | 'completado' | 'cancelado') => {
     const result = await updateEstadoEstudiante(estudianteId, nuevoEstado);
     if (result.success) {
-      // Recargar datos
+      // Recargar datos para reflejar el cambio en la UI
       cargarDatos();
     }
-  };
+  }, []);
 
-  // Workflows calculados dinámicamente desde Supabase
-  const getWorkflows = (): Workflow[] => {
+  // Función para abrir el modal de edición con los datos del estudiante seleccionado - memoizada
+  const handleEditarEstudiante = useCallback((estudiante: EstudianteParaEditar) => {
+    setEstudianteEditando(estudiante);
+  }, []);
+
+  // Workflows calculados dinámicamente desde Supabase - memoizado para evitar re-cálculos
+  const workflows = useMemo((): Workflow[] => {
     const alianzas = kpiData[0]?.value as number || 0;
     const estudiantes = kpiData[1]?.value as number || 0;
     const talleres = kpiData[2]?.value as number || 0;
@@ -75,24 +87,24 @@ export const ServicioSocialView: React.FC = () => {
         phase: 'Alianzas',
         dates: `${alianzas}/${metaAlianzas} universidades`,
         desc: 'Gestión de acuerdos con universidades.',
-        status: alianzas >= metaAlianzas ? 'Completado' : 'En curso',
+        status: (alianzas >= metaAlianzas ? 'Completado' : 'En curso') as 'Completado' | 'En curso',
       },
       {
         phase: 'Reclutamiento',
         dates: `${estudiantes}/${metaEstudiantes} estudiantes`,
         desc: 'Selección y captación de estudiantes.',
-        status: estudiantes >= metaEstudiantes ? 'Completado' : 'En curso',
+        status: (estudiantes >= metaEstudiantes ? 'Completado' : 'En curso') as 'Completado' | 'En curso',
       },
       {
         phase: 'Ejecución',
         dates: `${talleres}/${metaTalleres} talleres`,
         desc: 'Despliegue operativo en Infoplazas.',
-        status: talleres >= metaTalleres ? 'Completado' : 'En curso',
+        status: (talleres >= metaTalleres ? 'Completado' : 'En curso') as 'Completado' | 'En curso',
       },
     ];
-  };
+  }, [kpiData]);
 
-  // Workflows se genera dinámicamente con getWorkflows()
+  // Workflows se genera dinámicamente con useMemo
   // Los estados se calculan desde Supabase
   const cargarDatos = async () => {
     setLoading(true);
@@ -148,32 +160,33 @@ export const ServicioSocialView: React.FC = () => {
         },
       ]);
 
+      // Obtener conteo de talleres para todos los reclutamientos en una sola query (evita N+1)
+      const reclutamientoIds = reclutamientosData.map(r => r.id);
+      const talleresCountMap = await getTalleresCountBulk(reclutamientoIds);
+
       // Mapear reclutamientos a formato de tabla de estudiantes
-      const students: StudentData[] = await Promise.all(
-        reclutamientosData.map(async (r) => {
-          // Contar talleres para este estudiante
-          const talleresCount = await getTalleresCountByReclutamiento(r.id);
-          
-          // Mapear estado de la DB
-          let statusLabel: 'Activo' | 'Completado' | 'Cancelado' = 'Activo';
-          if (r.estado === 'completado') statusLabel = 'Completado';
-          else if (r.estado === 'cancelado') statusLabel = 'Cancelado';
-          
-          return {
-            id: r.id,
-            nombre_estudiante: r.nombre_estudiante || 'Sin nombre',
-            cedula: r.cedula || '-',
-            universidad: r.nombre_universidad || 'Sin universidad',
-            infoplaza: r.nombre_infoplaza || 'Sin asignar',
-            carrera: r.carrera || '-',
-            anio_cursa: r.anio_cursa || '-',
-            talleres: talleresCount,
-            fecha_inscripcion: r.created_at ? new Date(r.created_at).toLocaleDateString('es-PA') : '-',
-            status: statusLabel,
-            estado_original: r.estado || 'activo',
-          };
-        })
-      );
+      const students: StudentData[] = reclutamientosData.map((r) => {
+        // Mapear estado de la DB
+        let statusLabel: 'Activo' | 'Completado' | 'Cancelado' = 'Activo';
+        if (r.estado === 'completado') statusLabel = 'Completado';
+        else if (r.estado === 'cancelado') statusLabel = 'Cancelado';
+        
+        return {
+          id: r.id,
+          nombre_estudiante: r.nombre_estudiante || 'Sin nombre',
+          cedula: r.cedula || '-',
+          universidad: r.nombre_universidad || 'Sin universidad',
+          infoplaza: r.nombre_infoplaza || 'Sin asignar',
+          carrera: r.carrera || '-',
+          anio_cursa: r.anio_cursa || '-',
+          talleres: talleresCountMap.get(r.id) || 0,
+          fecha_inscripcion: r.created_at ? new Date(r.created_at).toLocaleDateString('es-PA') : '-',
+          status: statusLabel,
+          estado_original: r.estado || 'activo',
+          universidad_id: r.universidad_id,
+          infoplaza_id: r.infoplaza_id,
+        };
+      });
       setStudentTracking(students);
 
     } catch (error) {
@@ -249,15 +262,27 @@ export const ServicioSocialView: React.FC = () => {
       {/* Middle Section: Workflow Timeline */}
       <section>
         <h2 className="text-xl font-semibold text-slate-800 mb-4">Cronograma de Ejecución</h2>
-        <WorkflowTimeline workflows={getWorkflows()} />
+        <WorkflowTimeline workflows={workflows} />
       </section>
 
       {/* Bottom Section: Student Tracking Table */}
       <section>
         <StudentTrackingTable 
           students={studentTracking} 
-          onCambiarEstado={handleCambiarEstado} 
+          onCambiarEstado={handleCambiarEstado}
+          onEditarEstudiante={handleEditarEstudiante}
         />
+        
+        {/* Modal de edición de estudiante */}
+        <ModalReclutamiento
+          estudiante={estudianteEditando}
+          onSuccess={() => {
+            setEstudianteEditando(null);
+            cargarDatos();
+          }}
+        >
+          <span />
+        </ModalReclutamiento>
       </section>
     </div>
   );

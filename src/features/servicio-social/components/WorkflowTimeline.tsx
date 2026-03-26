@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowRight } from 'lucide-react';
 import { Fragment } from 'react';
 
-interface Workflow {
+export interface Workflow {
   phase: string;
   dates: string;
   desc: string;
