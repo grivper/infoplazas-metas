@@ -17,7 +17,8 @@ export interface Taller {
 }
 
 /**
- * Obtiene todos los talleres conjoin a reclutamiento e infoplaza
+ * Obtiene todos los talleres con join a reclutamiento e infoplaza
+ * Optimizado: usa queries bulk para evitar N+1
  */
 export const getTalleres = async (): Promise<Taller[]> => {
   const { data, error } = await supabase
@@ -30,45 +31,34 @@ export const getTalleres = async (): Promise<Taller[]> => {
     return [];
   }
 
-  // Si hay datos, obtenemos los nombres relacionados
-  if (data && data.length > 0) {
-    const talleres = await Promise.all(
-      data.map(async (t) => {
-        let nombreInfoplaza = '';
-        let periodoLectivo = '';
+  if (!data || data.length === 0) return [];
 
-        // Obtener infoplaza desde reclutamiento
-        if (t.reclutamiento_id) {
-          const { data: reclu } = await supabase
-            .from('reclutamiento_estudiantes')
-            .select('infoplaza_id, periodo_lectivo')
-            .eq('id', t.reclutamiento_id)
-            .single();
+  // Recolectar IDs únicos para evitar N+1 queries
+  const reclutamientoIds = [...new Set(data.map(t => t.reclutamiento_id).filter(Boolean))];
 
-          if (reclu?.infoplaza_id) {
-            const { data: info } = await supabase
-              .from('catalogo_infoplazas')
-              .select('nombre')
-              .eq('id', reclu.infoplaza_id)
-              .single();
-            nombreInfoplaza = info?.nombre || '';
-          }
+  // Queries bulk en paralelo: obtener reclutamientos e infoplazas
+  const [recluData, infoData] = await Promise.all([
+    reclutamientoIds.length > 0
+      ? supabase.from('reclutamiento_estudiantes').select('id, infoplaza_id, periodo_lectivo').in('id', reclutamientoIds)
+      : { data: [] },
+    supabase.from('catalogo_infoplazas').select('id, nombre')
+  ]);
 
-          periodoLectivo = reclu?.periodo_lectivo || '';
-        }
+  // Mapear por ID para lookup O(1)
+  const recluMap = new Map((recluData.data || []).map(r => [r.id, r]));
+  const infoMap = new Map((infoData.data || []).map(i => [i.id, i.nombre]));
 
-        return {
-          ...t,
-          nombre_infoplaza: nombreInfoplaza,
-          periodo_lectivo: periodoLectivo,
-        };
-      })
-    );
-
-    return talleres;
-  }
-
-  return data || [];
+  // Mapear talleres con datos relacionados
+  return data.map(t => {
+    const reclu = t.reclutamiento_id ? recluMap.get(t.reclutamiento_id) : null;
+    const nombreInfoplaza = reclu?.infoplaza_id ? infoMap.get(reclu.infoplaza_id) || '' : '';
+    
+    return {
+      ...t,
+      nombre_infoplaza: nombreInfoplaza,
+      periodo_lectivo: reclu?.periodo_lectivo || '',
+    };
+  });
 };
 
 /**
