@@ -24,7 +24,7 @@ export const getItinerarioEnlaces = async (): Promise<ItinerarioEnlace[]> => {
     .from('itinerario_enlaces')
     .select(`
       *,
-      catalogo_infoplazas:id(infoplaza_id:id, nombre, codigo)
+      catalogo_infoplazas(nombre, codigo)
     `)
     .order('enlace_nombre', { ascending: true });
 
