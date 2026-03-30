@@ -154,7 +154,7 @@ export const ServicioSocialView: React.FC = () => {
           title: 'Usuarios Capacitados',
           value: usuariosCapacitados,
           icon: GraduationCap,
-          progress: Math.min((usuariosCapacitados / 1000) * 100, 100), // Meta: 1000 usuarios
+          progress: Math.min((usuariosCapacitados / 600) * 100, 100), // Meta: 600 usuarios
           color: 'purple',
           peso: 15,
         },
