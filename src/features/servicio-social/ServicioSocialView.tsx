@@ -21,7 +21,7 @@ interface KPIData {
   icon: React.ElementType;
   progress: number;
   color: 'blue' | 'emerald' | 'amber' | 'purple';
-  peso: number; // Peso en % para el promedio ponderado
+  peso: number;
 }
 
 interface StudentData {
@@ -52,27 +52,111 @@ interface EstudianteParaEditar {
 }
 
 export const ServicioSocialView: React.FC = () => {
-  // State para datos reales
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [kpiData, setKpiData] = useState<KPIData[]>([]);
   const [studentTracking, setStudentTracking] = useState<StudentData[]>([]);
   const [estudianteEditando, setEstudianteEditando] = useState<EstudianteParaEditar | null>(null);
 
-  // Función para cambiar estado del estudiante (completar o cancelar) - memoizada
-  const handleCambiarEstado = useCallback(async (estudianteId: string, nuevoEstado: 'activo' | 'completado' | 'cancelado') => {
-    const result = await updateEstadoEstudiante(estudianteId, nuevoEstado);
-    if (result.success) {
-      // Recargar datos para reflejar el cambio en la UI
-      cargarDatos();
+  // Función memoizada para cargar datos
+  const cargarDatos = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [
+        alianzasCount,
+        estudiantesTotal,
+        talleresCount,
+        usuariosCapacitados,
+        reclutamientosData
+      ] = await Promise.all([
+        getAlianzasCount(),
+        getTotalEstudiantesReclutados(),
+        getTalleresCount(),
+        getTotalUsuariosCapacitados(),
+        getReclutamientos()
+      ]);
+
+      setKpiData([
+        {
+          title: 'Universidades Aliadas',
+          value: alianzasCount,
+          icon: Building2,
+          progress: Math.min((alianzasCount / 5) * 100, 100),
+          color: 'blue',
+          peso: 40,
+        },
+        {
+          title: 'Estudiantes Reclutados',
+          value: estudiantesTotal,
+          icon: Users,
+          progress: Math.min((estudiantesTotal / 60) * 100, 100),
+          color: 'emerald',
+          peso: 30,
+        },
+        {
+          title: 'Talleres Impartidos',
+          value: talleresCount,
+          icon: BookOpen,
+          progress: Math.min((talleresCount / 140) * 100, 100),
+          color: 'amber',
+          peso: 15,
+        },
+        {
+          title: 'Usuarios Capacitados',
+          value: usuariosCapacitados,
+          icon: GraduationCap,
+          progress: Math.min((usuariosCapacitados / 600) * 100, 100),
+          color: 'purple',
+          peso: 15,
+        },
+      ]);
+
+      const reclutamientoIds = reclutamientosData.map(r => r.id);
+      const talleresCountMap = await getTalleresCountBulk(reclutamientoIds);
+
+      const students: StudentData[] = reclutamientosData.map((r) => {
+        let statusLabel: 'Activo' | 'Completado' | 'Cancelado' = 'Activo';
+        if (r.estado === 'completado') statusLabel = 'Completado';
+        else if (r.estado === 'cancelado') statusLabel = 'Cancelado';
+        
+        return {
+          id: r.id,
+          nombre_estudiante: r.nombre_estudiante || 'Sin nombre',
+          cedula: r.cedula || '-',
+          universidad: r.nombre_universidad || 'Sin universidad',
+          infoplaza: r.nombre_infoplaza || 'Sin asignar',
+          carrera: r.carrera || '-',
+          anio_cursa: r.anio_cursa || '-',
+          talleres: talleresCountMap.get(r.id) || 0,
+          fecha_inscripcion: r.created_at ? new Date(r.created_at).toLocaleDateString('es-PA') : '-',
+          status: statusLabel,
+          estado_original: r.estado || 'activo',
+          universidad_id: r.universidad_id,
+          infoplaza_id: r.infoplaza_id,
+        };
+      });
+      setStudentTracking(students);
+
+    } catch (err) {
+      setError('Error al cargar los datos. Por favor, intenta de nuevo.');
+      console.error('Error al cargar datos de Servicio Social:', err);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  // Función para abrir el modal de edición con los datos del estudiante seleccionado - memoizada
+  const handleCambiarEstado = useCallback(async (estudianteId: string, nuevoEstado: 'activo' | 'completado' | 'cancelado') => {
+    const result = await updateEstadoEstudiante(estudianteId, nuevoEstado);
+    if (result.success) {
+      cargarDatos();
+    }
+  }, [cargarDatos]);
+
   const handleEditarEstudiante = useCallback((estudiante: EstudianteParaEditar) => {
     setEstudianteEditando(estudiante);
   }, []);
 
-  // Workflows calculados dinámicamente desde Supabase - memoizado para evitar re-cálculos
   const workflows = useMemo((): Workflow[] => {
     const alianzas = kpiData[0]?.value as number || 0;
     const estudiantes = kpiData[1]?.value as number || 0;
@@ -104,108 +188,27 @@ export const ServicioSocialView: React.FC = () => {
     ];
   }, [kpiData]);
 
-  // Workflows se genera dinámicamente con useMemo
-  // Los estados se calculan desde Supabase
-  const cargarDatos = async () => {
-    setLoading(true);
-    try {
-      // Cargar todos los datos en paralelo
-      const [
-        alianzasCount,
-        estudiantesTotal,
-        talleresCount,
-        usuariosCapacitados,
-        reclutamientosData
-      ] = await Promise.all([
-        getAlianzasCount(),
-        getTotalEstudiantesReclutados(),
-        getTalleresCount(),
-        getTotalUsuariosCapacitados(),
-        getReclutamientos()
-      ]);
-
-      // Actualizar KPIs
-      setKpiData([
-        {
-          title: 'Universidades Aliadas',
-          value: alianzasCount,
-          icon: Building2,
-          progress: Math.min((alianzasCount / 5) * 100, 100), // Meta: 5 universidades
-          color: 'blue',
-          peso: 40,
-        },
-        {
-          title: 'Estudiantes Reclutados',
-          value: estudiantesTotal,
-          icon: Users,
-          progress: Math.min((estudiantesTotal / 60) * 100, 100), // Meta: 60 estudiantes
-          color: 'emerald',
-          peso: 30,
-        },
-        {
-          title: 'Talleres Impartidos',
-          value: talleresCount,
-          icon: BookOpen,
-          progress: Math.min((talleresCount / 140) * 100, 100), // Meta: 140 talleres
-          color: 'amber',
-          peso: 15,
-        },
-        {
-          title: 'Usuarios Capacitados',
-          value: usuariosCapacitados,
-          icon: GraduationCap,
-          progress: Math.min((usuariosCapacitados / 600) * 100, 100), // Meta: 600 usuarios
-          color: 'purple',
-          peso: 15,
-        },
-      ]);
-
-      // Obtener conteo de talleres para todos los reclutamientos en una sola query (evita N+1)
-      const reclutamientoIds = reclutamientosData.map(r => r.id);
-      const talleresCountMap = await getTalleresCountBulk(reclutamientoIds);
-
-      // Mapear reclutamientos a formato de tabla de estudiantes
-      const students: StudentData[] = reclutamientosData.map((r) => {
-        // Mapear estado de la DB
-        let statusLabel: 'Activo' | 'Completado' | 'Cancelado' = 'Activo';
-        if (r.estado === 'completado') statusLabel = 'Completado';
-        else if (r.estado === 'cancelado') statusLabel = 'Cancelado';
-        
-        return {
-          id: r.id,
-          nombre_estudiante: r.nombre_estudiante || 'Sin nombre',
-          cedula: r.cedula || '-',
-          universidad: r.nombre_universidad || 'Sin universidad',
-          infoplaza: r.nombre_infoplaza || 'Sin asignar',
-          carrera: r.carrera || '-',
-          anio_cursa: r.anio_cursa || '-',
-          talleres: talleresCountMap.get(r.id) || 0,
-          fecha_inscripcion: r.created_at ? new Date(r.created_at).toLocaleDateString('es-PA') : '-',
-          status: statusLabel,
-          estado_original: r.estado || 'activo',
-          universidad_id: r.universidad_id,
-          infoplaza_id: r.infoplaza_id,
-        };
-      });
-      setStudentTracking(students);
-
-    } catch (error) {
-      console.error('Error al cargar datos de Servicio Social:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Cargar datos al montar el componente
   useEffect(() => {
     cargarDatos();
-  }, []);
+  }, [cargarDatos]);
 
-  // Mostrar estado de carga
+  // Mostrar estado de carga o error
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <RemeLoader size={32} />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <p className="text-red-600 font-medium">{error}</p>
+        <Button onClick={() => cargarDatos()} variant="outline">
+          Reintentar
+        </Button>
       </div>
     );
   }
