@@ -8,6 +8,7 @@ dist
 .gga
 Kpax-plantilla
 Mesas-plantilla
+stitch - plantilla
 src/secrets
 .vercel
 .claude/skills/exceljs
