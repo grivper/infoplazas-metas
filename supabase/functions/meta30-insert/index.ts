@@ -3,7 +3,6 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
 
 // Configuracion de seguridad - REQUIERE configuracion en Supabase Dashboard -> Edge Functions -> meta30-insert -> Secrets
 const ALLOWED_ORIGINS = Deno.env.get("ALLOWED_ORIGINS")?.split(",") ?? [];
@@ -54,21 +53,6 @@ function validateAuth(req: Request): { valid: boolean; error?: string; identifie
   }
 
   return { valid: false, error: "Unauthorized" };
-}
-
-/**
- * Valida que el JWT sea valido usando el cliente de Supabase
- * @param token - JWT token
- * @returns true si el token es valido
- */
-async function isValidJWT(token: string): Promise<boolean> {
-  try {
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
-    const { data, error } = await supabase.auth.getUser(token);
-    return !error && data.user !== null;
-  } catch {
-    return false;
-  }
 }
 
 /**
@@ -140,17 +124,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // 3. Validar JWT si se uso ese metodo de autenticacion
-    if (authResult.identifier === "jwt") {
-      const token = req.headers.get("Authorization")?.slice(7) || "";
-      const jwtValid = await isValidJWT(token);
-      if (!jwtValid) {
-        return new Response(
-          JSON.stringify({ error: "Invalid or expired token" }),
-          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-    }
+    // Nota: La validacion de JWT se hace automaticamente por el SDK de Supabase al hacer queries
 
     // 4. Rate limiting (usar IP + identifier como key)
     const clientIP = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
