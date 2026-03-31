@@ -58,12 +58,19 @@ export const RadarKpaxView: React.FC = () => {
       }
 
       // Sincronizar a Supabase
-      await syncKpaxUnificadoToSupabase(parsed);
+      const result = await syncKpaxUnificadoToSupabase(parsed);
 
       // Recargar datos
       await loadData();
 
-      alert(`${parsed.length} dispositivos procesados correctamente`);
+      let msg = `${result.syncCount} dispositivos procesados correctamente`;
+      if (result.resolvedCount > 0) {
+        msg += `\n${result.resolvedCount} movidos al historial (resueltos/desaparecidos)`;
+      }
+      if (result.deletedCount > 0) {
+        msg += `\n${result.deletedCount} eliminados de la vista activa`;
+      }
+      alert(msg);
     } catch (err) {
       console.error('[Radar KPAX] Error procesando CSV:', err);
       alert('No se pudo procesar el archivo CSV');

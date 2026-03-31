@@ -151,28 +151,48 @@ export const limpiarMotivoFalla = async (numeroSerie: string): Promise<void> => 
 };
 
 /**
+ * Obtiene todos los dispositivos KPAX unificados (para detectar eliminaciones)
+ */
+export const fetchAllKpaxUnificado = async (): Promise<{ numero_serie: string; nombre_agente: string | null; motivo_falla: string | null }[]> => {
+  const { data, error } = await supabase
+    .from('radar_kpax_unificado')
+    .select('numero_serie, nombre_agente, motivo_falla');
+
+  if (error) {
+    console.error('Error obteniendo todos los KPAX:', error);
+    return [];
+  }
+
+  return (data || []) as { numero_serie: string; nombre_agente: string | null; motivo_falla: string | null }[];
+};
+
+/**
  * Sincroniza los dispositivos KPAX unificados a Supabase
  * Detecta cambios y mueve a historial los que se resolvieron o desaparecieron
  */
 export const syncKpaxUnificadoToSupabase = async (
   dispositivos: KpaxUnificadoSync[]
-): Promise<{ syncCount: number; resolvedCount: number }> => {
-  if (dispositivos.length === 0) return { syncCount: 0, resolvedCount: 0 };
+): Promise<{ syncCount: number; resolvedCount: number; deletedCount: number }> => {
+  if (dispositivos.length === 0) return { syncCount: 0, resolvedCount: 0, deletedCount: 0 };
 
   // 1. Obtener dispositivos que tienen motivo_falla (estado anterior)
   const conMotivoAnterior = await fetchDispositivosConMotivo();
   const numerosSerieActuales = new Set(dispositivos.map(d => d.numero_serie));
 
-  // 2. Identificar los que se resolvieron o desaparecieron
+  // 2. Obtener TODOS los dispositivos de la DB para detectar los que desaparecieron
+  const todosDeDB = await fetchAllKpaxUnificado();
+  
+  // 3. Identificar dispositivos que ya NO están en el CSV nuevo
+  const paraEliminar = todosDeDB.filter(d => !numerosSerieActuales.has(d.numero_serie));
+
+  // 4. Mover al historial los que tienen motivo y desaparecieron (o se resolvieron)
   const paraMoverAHistorial = conMotivoAnterior.filter(d => {
-    // Ya no está en el CSV nuevo
-    if (!numerosSerieActuales.has(d.numero_serie)) return true;
-    // O ahora está online (se resolvió manualmente)
-    if (d.estado === 'online') return true;
+    if (!numerosSerieActuales.has(d.numero_serie)) return true; // Desapareció del CSV
+    if (d.estado === 'online') return true; // Se resolvió manualmente
     return false;
   });
 
-  // 3. Mover a historial y limpiar motivo
+  // 5. Mover a historial y limpiar motivo
   for (const disp of paraMoverAHistorial) {
     try {
       await moverAHistorial(disp);
@@ -182,7 +202,37 @@ export const syncKpaxUnificadoToSupabase = async (
     }
   }
 
-  // 4. Upsert normal de los dispositivos del CSV
+  // 6. Los que desaparecen pero NO tenían motivo -> asignar "Agente movido/desaparecido" y mover a historial
+  const paraMoverSinMotivo = paraEliminar.filter(d => !d.motivo_falla);
+  for (const disp of paraMoverSinMotivo) {
+    try {
+      // Crear un objeto compatible con moverAHistorial
+      const dispCompleto = {
+        numero_serie: disp.numero_serie,
+        nombre_agente: disp.nombre_agente,
+        motivo_falla: 'Agente movido/desaparecido',
+        fecha_registro_falla: new Date().toISOString(),
+        catalogo_infoplazas: null
+      };
+      await moverAHistorial(dispCompleto);
+    } catch (e) {
+      console.error(`[KPAX] Error moviendo sin motivo ${disp.numero_serie}:`, e);
+    }
+  }
+
+  // 7. ELIMINAR de la tabla principal los que ya no están en el CSV
+  if (paraEliminar.length > 0) {
+    const { error: deleteError } = await supabase
+      .from('radar_kpax_unificado')
+      .delete()
+      .in('numero_serie', paraEliminar.map(d => d.numero_serie));
+
+    if (deleteError) {
+      console.error('Error eliminando dispositivos:', deleteError);
+    }
+  }
+
+  // 8. Upsert normal de los dispositivos del CSV
   // NOTA: estado es GENERATED STORED en la tabla, PostgreSQL lo calcula automáticamente con umbral 96h
   const records = dispositivos.map(d => ({
     numero_serie: d.numero_serie,
@@ -215,6 +265,7 @@ export const syncKpaxUnificadoToSupabase = async (
 
   return {
     syncCount: records.length,
-    resolvedCount: paraMoverAHistorial.length
+    resolvedCount: paraMoverAHistorial.length,
+    deletedCount: paraEliminar.length
   };
 };
