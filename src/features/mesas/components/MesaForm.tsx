@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Combobox } from '@/components/ui/combobox';
 import { generarMesaId, type MesaRecord, type InfoplazaCatalogo } from '../services/mesasDb';
 
 interface MesaFormProps {
@@ -65,15 +66,33 @@ export const MesaForm: React.FC<MesaFormProps> = ({ registro, catalogo, onSave, 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div>
           <label className={labelCls}>Infoplaza</label>
-          <select className={inputCls} value={form.infoplaza} onChange={e => handleInfoplazaChange(e.target.value)} disabled={!!registro.mesa_id}>
-            {catalogo.map(i => <option key={i.id} value={i.nombre}>{i.nombre} ({i.region})</option>)}
-          </select>
+          {registro.mesa_id ? (
+            <div className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-700">
+              {form.infoplaza} ({form.region})
+            </div>
+          ) : (
+            <Combobox
+              value={form.infoplaza}
+              onValueChange={handleInfoplazaChange}
+              placeholder="Seleccionar infoplaza..."
+            >
+              {catalogo.map(i => (
+                <option key={i.id} value={i.nombre}>{i.nombre} ({i.region})</option>
+              ))}
+            </Combobox>
+          )}
         </div>
         <div>
           <label className={labelCls}>Mesa #</label>
-          <select className={inputCls} value={form.mesa} onChange={e => setForm(f => ({ ...f, mesa: +e.target.value }))} disabled={!!registro.mesa_id}>
-            {[1, 2, 3].map(n => <option key={n} value={n}>Mesa {n}</option>)}
-          </select>
+          {registro.mesa_id ? (
+            <div className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-700">
+              Mesa {form.mesa}
+            </div>
+          ) : (
+            <select className={inputCls} value={form.mesa} onChange={e => setForm(f => ({ ...f, mesa: +e.target.value }))}>
+              {[1, 2, 3].map(n => <option key={n} value={n}>Mesa {n}</option>)}
+            </select>
+          )}
         </div>
         <div>
           <label className={labelCls}>Sesión Actual (1-10)</label>

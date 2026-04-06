@@ -6,6 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { StatCard } from '@/components/ui/bento-card';
 import { MesaForm } from './components/MesaForm';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   getAllMesas, upsertMesa, deleteMesa, getCatalogoInfoplazas,
   type MesaRecord, type InfoplazaCatalogo,
 } from './services/mesasDb';
@@ -26,7 +32,7 @@ const ESTADOS: Record<MesaRecord['estado'], { label: string; color: string; icon
 const MesasView: React.FC = () => {
   const [mesas, setMesas] = useState<MesaRecord[]>([]);
   const [catalogo, setCatalogo] = useState<InfoplazaCatalogo[]>([]);
-  const [showForm, setShowForm] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [editing, setEditing] = useState<MesaRecord | null>(null);
 
   // Carga datos al montar
@@ -35,11 +41,23 @@ const MesasView: React.FC = () => {
     getCatalogoInfoplazas().then(setCatalogo);
   }, []);
 
+  // Abre el modal para nueva mesa
+  const handleNewMesa = useCallback(() => {
+    setEditing(null);
+    setOpenDialog(true);
+  }, []);
+
+  // Abre el modal para editar
+  const handleEditMesa = useCallback((m: MesaRecord) => {
+    setEditing(m);
+    setOpenDialog(true);
+  }, []);
+
   // Guarda o actualiza una mesa
   const handleSave = useCallback(async (record: MesaRecord) => {
     await upsertMesa(record);
     setMesas(await getAllMesas());
-    setShowForm(false);
+    setOpenDialog(false);
     setEditing(null);
   }, []);
 
@@ -75,7 +93,7 @@ const MesasView: React.FC = () => {
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Mesas de Transformación</h1>
           <p className="text-slate-500 mt-1">Seguimiento de 21 Infoplazas • 3 Mesas × 10 Sesiones</p>
         </div>
-        <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2" onClick={() => { setEditing(null); setShowForm(true); }}>
+        <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2" onClick={handleNewMesa}>
           <Plus className="w-4 h-4" /> Nueva Mesa
         </Button>
       </div>
@@ -92,15 +110,20 @@ const MesasView: React.FC = () => {
         ))}
       </div>
 
-      {/* Formulario (crear / editar) */}
-      {(showForm || editing) && (
-        <MesaForm 
-          registro={editing || {}} 
-          catalogo={catalogo}
-          onSave={handleSave} 
-          onCancel={() => { setShowForm(false); setEditing(null); }} 
-        />
-      )}
+      {/* Modal de formulario (crear / editar) */}
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{editing ? 'Editar Mesa' : 'Nueva Mesa de Transformación'}</DialogTitle>
+          </DialogHeader>
+          <MesaForm 
+            registro={editing || {}} 
+            catalogo={catalogo}
+            onSave={handleSave} 
+            onCancel={() => { setOpenDialog(false); setEditing(null); }} 
+          />
+        </DialogContent>
+      </Dialog>
 
       {/* Tabla de mesas */}
       <Card className="border-none shadow-sm">
@@ -140,7 +163,7 @@ const MesasView: React.FC = () => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" onClick={() => { setEditing(m); setShowForm(false); }}>
+                          <Button variant="ghost" size="sm" onClick={() => handleEditMesa(m)}>
                             <Edit2 className="w-3.5 h-3.5 text-slate-500" />
                           </Button>
                           <Button variant="ghost" size="sm" onClick={() => handleDelete(m.mesa_id)}>
