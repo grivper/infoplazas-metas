@@ -112,7 +112,7 @@ const MesasView: React.FC = () => {
 
       {/* Modal de formulario (crear / editar) */}
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-5xl">
           <DialogHeader>
             <DialogTitle>{editing ? 'Editar Mesa' : 'Nueva Mesa de Transformación'}</DialogTitle>
           </DialogHeader>
