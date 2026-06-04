@@ -35,7 +35,6 @@ export const getMeta2Cumplimiento = async (): Promise<MetaItem> => {
   let ipSobre30 = 0;
   let ipDebajo30 = 0;
   let mesAnteriorSobre30 = 0;
-  let mesActualNombre = '';
 
   if (sync?.data && Array.isArray(sync.data)) {
     const data = sync.data as Array<{
@@ -57,8 +56,6 @@ export const getMeta2Cumplimiento = async (): Promise<MetaItem> => {
       const registrosMes = registrosAño.filter(r => r.Mes === mes);
       
       if (registrosMes.length > 0) {
-        mesActualNombre = mes;
-        
         // Contar IPs sobre/debajo 30%
         registrosMes.forEach(r => {
           const pct = typeof r.Porcentaje === 'string' ? parseFloat(r.Porcentaje) : (r.Porcentaje || 0);
