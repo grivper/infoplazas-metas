@@ -15,9 +15,16 @@ export interface TableRow {
   estado: 'abierta' | 'cerrada' | 'sin_asignar';
 }
 
+/** Meses ordenados del año para navegación cross-cuatrimestre. */
+const MESES_DEL_AÑO = [
+  'Enero', 'Febrero', 'Marzo', 'Abril',
+  'Mayo', 'Junio', 'Julio', 'Agosto',
+  'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+];
+
 /**
  * Construye las filas de la tabla de infoplazas ordenadas por enlace.
- * Calcula el incremento de visitas respecto al mes anterior.
+ * Calcula el incremento de visitas respecto al mes anterior (cross-cuatrimestre).
  * Ordena por: 1) enlace alfabético, 2) último valor descendente (NULLs al final).
  */
 export function buildTableRows(meses: string[], visitasMock: Record<string, InfoplazaData>): TableRow[] {
@@ -27,19 +34,31 @@ export function buildTableRows(meses: string[], visitasMock: Record<string, Info
     .map((ipData) => {
       const cells = meses.map((mes, i) => {
         const val = ipData.meses[mes] ?? null;
-        const prev = i > 0 ? (ipData.meses[meses[i - 1]] ?? null) : null;
         
-        let incremento: number | null = null;
-        if (i === 0) {
-          incremento = val !== null ? 0 : null;
-        } else if (val !== null && prev !== null) {
-          incremento = Number((val - prev).toFixed(2));
+        // Determinar el mes anterior (puede estar fuera del cuatrimestre actual)
+        let prevMonthKey: string | null = null;
+        if (i > 0) {
+          prevMonthKey = meses[i - 1];
         } else {
-          incremento = null;
+          const idx = MESES_DEL_AÑO.indexOf(mes);
+          if (idx > 0) prevMonthKey = MESES_DEL_AÑO[idx - 1];
         }
+        
+        const prev = prevMonthKey ? (ipData.meses[prevMonthKey] ?? null) : null;
+        
+        // Calcular incremento: diferencia contra el mes anterior (si existe y no es null)
+        let incremento: number | null = null;
+        if (val !== null && prev !== null) {
+          incremento = Number((val - prev).toFixed(2));
+        } else if (val !== null) {
+          // Hay valor actual pero no hay mes anterior (ej: Enero, o sin datos previos)
+          incremento = 0;
+        }
+        // Si val es null, incremento queda como null
         
         return { mes, visitas: val, incremento };
       });
+      
       const estado: 'abierta' | 'cerrada' | 'sin_asignar' = ipData.cerrada 
         ? 'cerrada' 
         : (ipData.enlace === 'Sin asignar' ? 'sin_asignar' : 'abierta');

@@ -1,7 +1,7 @@
 import React from 'react';
 import { MapPin, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import type { EnlaceRutaData } from '@/services/dashboard/meta4-rutas';
+import type { EnlaceRutaData } from '../services/meta4-rutas';
 
 interface Meta4CardProps {
   enlaces: EnlaceRutaData[];

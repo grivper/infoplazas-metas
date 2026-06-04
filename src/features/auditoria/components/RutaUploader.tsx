@@ -8,8 +8,8 @@ import {
   getInfoplazaLookup, 
   insertItinerariosBatch, 
   deleteItinerariosByEnlace,
-  type Itinerario 
-} from '../services/itinerariosService';
+  type ItinerarioInsert
+} from '../services/itinerarioService';
 
 // Función para normalizar nombres de cabeceras (quitar tildes, espacios y a minúsculas)
 const normalizeHeader = (header: string) => {
@@ -45,7 +45,7 @@ export const RutaUploader: React.FC<{ onProcessComplete: () => void, badgeCount?
             const rows = results.data;
             const lookup = await getInfoplazaLookup();
             
-            const itinerarios: Itinerario[] = [];
+            const itinerarios: ItinerarioInsert[] = [];
             const missing = new Set<{original: string, enlace: string}>();
             const enlacesEnArchivo = new Set<string>();
 

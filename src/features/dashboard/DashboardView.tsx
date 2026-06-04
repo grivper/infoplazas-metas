@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { RemeLoader } from '@/components/ui/reme-loader';
-import { getDatosDashboard } from '@/services/dashboard';
+import { getDatosDashboard } from './services';
 import { descargarExcelMetas } from '@/features/informe/excel';
 import type { MetaItem } from '@/components/MetaCard';
-import { Meta1Card, Meta2Card, Meta3Card, Meta4Card, Meta5Card } from './dashboard';
+import { Meta1Card, Meta2Card, Meta3Card, Meta4Card, Meta5Card } from './components';
 import { Download } from 'lucide-react';
 
 /**
@@ -100,7 +100,7 @@ export const DashboardView: React.FC = () => {
 
         {/* Card 2: Cumplimiento 30% */}
         {meta2 && meta2.historial && meta2.historial.length > 0 && (
-          <Meta2Card historial={meta2.historial} />
+          <Meta2Card progreso={meta2.progreso} historial={meta2.historial} />
         )}
       </div>
 

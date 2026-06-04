@@ -1,9 +1,11 @@
 import React from 'react';
 import { ClipboardCheck, ArrowRight } from 'lucide-react';
 import { DonutChart } from '@/components/ui/donut-chart';
-import { buildMesValorMap, buildCuatrimestreData } from './utils';
+import { buildMesValorMap, buildCuatrimestreData } from '../utils';
 
 interface Meta2CardProps {
+  /** Progreso anual ya calculado por el servicio (posición absoluta vs meta 95) */
+  progreso: number;
   historial: Array<{
     mes_nombre: string;
     ip_sobre_30: number;
@@ -11,42 +13,15 @@ interface Meta2CardProps {
 }
 
 /**
- * Card de Cumplimiento 30% (Meta 2)
- * Muestra progreso por cuatrimestres
+ * Card de Cumplimiento 30% (Meta 2).
+ * Consume el progreso ya calculado por el servicio para no duplicar lógica.
+ * Muestra evolución por cuatrimestres usando incrementos cross-cuatrimestre.
  */
-export const Meta2Card: React.FC<Meta2CardProps> = ({ historial }) => {
-  // Construir mapa de IPs por mes
+export const Meta2Card: React.FC<Meta2CardProps> = ({ progreso, historial }) => {
+  // Construir mapa de IPs por mes (única fuente de verdad para incrementos)
   const ipPorMes = buildMesValorMap(historial, 'ip_sobre_30');
 
-  // Calcular progreso anual
-  const incrC1 = historial.filter(h => 
-    ['Enero', 'Febrero', 'Marzo', 'Abril'].includes(h.mes_nombre)
-  ).reduce((sum, h, i, arr) => {
-    if (i === 0) return sum;
-    const prev = arr[i - 1].ip_sobre_30;
-    return sum + Math.max(0, h.ip_sobre_30 - prev);
-  }, 0);
-
-  const incrC2 = historial.filter(h => 
-    ['Mayo', 'Junio', 'Julio', 'Agosto'].includes(h.mes_nombre)
-  ).reduce((sum, h, i, arr) => {
-    if (i === 0) return sum;
-    const prev = arr[i - 1].ip_sobre_30;
-    return sum + Math.max(0, h.ip_sobre_30 - prev);
-  }, 0);
-
-  const incrC3 = historial.filter(h => 
-    ['Septiembre', 'Octubre', 'Noviembre', 'Diciembre'].includes(h.mes_nombre)
-  ).reduce((sum, h, i, arr) => {
-    if (i === 0) return sum;
-    const prev = arr[i - 1].ip_sobre_30;
-    return sum + Math.max(0, h.ip_sobre_30 - prev);
-  }, 0);
-
-  const incrTotal = incrC1 + incrC2 + incrC3;
-  const progresoAnual = Math.round((incrTotal / 95) * 100);
-
-  // Datos de cuatrimestres para UI
+  // Datos de cuatrimestres: suma de incrementos positivos mes a mes
   const cuats = buildCuatrimestreData(ipPorMes);
 
   return (
@@ -62,9 +37,9 @@ export const Meta2Card: React.FC<Meta2CardProps> = ({ historial }) => {
           <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: 'rgb(180 0 93 / 0.1)', color: 'rgb(180 0 93)' }}>
             Meta 2
           </span>
-          <p className="text-sm text-outline mt-2">Incrementos por cuatrimestre vs meta de 31.66 IPs</p>
+          <p className="text-sm text-outline mt-2">Suma de incrementos mensuales por cuatrimestre vs meta de 31.66</p>
         </div>
-        <DonutChart percentage={progresoAnual} color="secondary" size="md" />
+        <DonutChart percentage={progreso} color="secondary" size="md" />
       </div>
       
       {/* Progreso por Cuatrimestre */}
@@ -82,7 +57,7 @@ export const Meta2Card: React.FC<Meta2CardProps> = ({ historial }) => {
               <div className="flex justify-between text-xs text-outline mb-1">
                 <span>{q.incremento.toFixed(1)} / 31.66 incrementos</span>
                 <span style={{ color: q.isCompletado ? '#059669' : q.estaAtrasado ? '#dc2626' : '#b4005d' }}>
-                  {q.isCompletado ? '✓' : q.isActivo ? `${q.pct}%` : '-'}
+                  {q.isCompletado ? '✓' : `${q.pct}%`}
                 </span>
               </div>
               <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
@@ -104,7 +79,7 @@ export const Meta2Card: React.FC<Meta2CardProps> = ({ historial }) => {
               ) : q.isActivo ? (
                 <span className="text-xs font-bold text-[#b4005d] bg-pink-50 px-2 py-1 rounded-full">En curso</span>
               ) : (
-                <span className="text-xs font-bold text-gray-400 px-2 py-1 rounded-full">Pendiente</span>
+                <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-full">No cumplido</span>
               )}
             </div>
           </div>

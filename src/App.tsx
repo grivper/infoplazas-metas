@@ -6,7 +6,7 @@ import { RemeLoader } from '@/components/ui/reme-loader';
 
 // Vistas de Autenticación y Dashboard
 import { LoginView } from './views/LoginView';
-import { DashboardView } from './views/DashboardView';
+import { DashboardView } from './features/dashboard/DashboardView';
 
 // Layout Principal estilo "Polished Luminary"
 import LayoutBento from './core/LayoutBento';

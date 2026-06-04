@@ -80,23 +80,10 @@ export const getMeta2Cumplimiento = async (): Promise<MetaItem> => {
     }
   }
 
-  // 4. Calcular incrementos
+  // 4. Calcular incremento del último mes (para métricas)
   const incrementoMes = ipSobre30 - mesAnteriorSobre30;
-  const mesIndex = mesesOrdenados.indexOf(mesActualNombre);
-  const metaAcumulada = mesIndex * 7;
 
-  // 5. Progreso global vs meta de 95 infoplazas sobre 30% al final del año
-  const metaAnual = 95;
-  const progreso = Math.min(Math.round((ipSobre30 / metaAnual) * 100), 100);
-
-  const metricas: MetaMetrica[] = [
-    { label: 'Sobre 30%', valor: ipSobre30, meta: totalIP },
-    { label: 'Bajo 30%', valor: ipDebajo30, meta: totalIP },
-    { label: 'Incremento mes', valor: incrementoMes, meta: 7 },
-    { label: 'vs Meta acumulada', valor: ipSobre30, meta: metaAcumulada },
-  ];
-
-  // Obtener historial de snapshots para gráficos de evolución
+  // 5. Obtener historial de snapshots para cálculo de progreso acumulado
   const historialRaw = await getMeta30SnapshotHistory(añoActual);
   const historial = historialRaw.map(s => ({
     fecha: s.fecha,
@@ -106,6 +93,25 @@ export const getMeta2Cumplimiento = async (): Promise<MetaItem> => {
     meta_base: (s as any).meta_base || 0,
     progreso_pct: s.progreso_pct,
   }));
+
+  // 6. Progreso global: suma acumulada de todos los incrementos positivos del año vs meta 95
+  const metaAnual = 95;
+  let totalIncrementos = 0;
+  let prevVal: number | null = null;
+  for (const h of historial) {
+    if (prevVal !== null) {
+      totalIncrementos += Math.max(0, h.ip_sobre_30 - prevVal);
+    }
+    prevVal = h.ip_sobre_30;
+  }
+  const progreso = Math.min(Math.round((totalIncrementos / metaAnual) * 100), 100);
+
+  const metricas: MetaMetrica[] = [
+    { label: 'Sobre 30%', valor: ipSobre30, meta: totalIP },
+    { label: 'Bajo 30%', valor: ipDebajo30, meta: totalIP },
+    { label: 'Incremento mes', valor: incrementoMes, meta: 7 },
+    { label: 'Incremento acumulado', valor: totalIncrementos, meta: metaAnual },
+  ];
 
   return {
     id: 'meta-2',

@@ -15,10 +15,11 @@ export interface MesaRecord {
   sesionActual: number;  // 1 a 10 (progreso)
   participantes: number;  // Cantidad de participantes
   dinamizador: string;   // Nombre del dinamizador capacitado
+  email: string;         // Correo electrónico de contacto
   fechaInicio: string;   // Fecha de inicio (YYYY-MM-DD)
   fechaFin: string;      // Fecha de fin (YYYY-MM-DD o vacío)
   fechaGraduacion: string; // Fecha de graduación (YYYY-MM-DD o vacío)
-  estado: 'pendiente' | 'en_progreso' | 'completada';
+  estado: 'pendiente' | 'en_progreso' | 'completada' | 'por_graduacion' | 'por_certificado';
   created_at?: string;
   updated_at?: string;
 }
@@ -55,10 +56,11 @@ interface DbMesaRow {
   sesion_actual: number;
   participantes: number;
   dinamizador: string | null;
+  email: string | null;
   fecha_inicio: string | null;
   fecha_fin: string | null;
   fecha_graduacion: string | null;
-  estado: 'pendiente' | 'en_progreso' | 'completada';
+  estado: 'pendiente' | 'en_progreso' | 'completada' | 'por_graduacion' | 'por_certificado';
   created_at?: string;
   updated_at?: string;
 }
@@ -76,6 +78,7 @@ const mapRowToMesa = (row: DbMesaRow): MesaRecord => ({
   sesionActual: row.sesion_actual,
   participantes: row.participantes,
   dinamizador: row.dinamizador || '',
+  email: row.email || '',
   fechaInicio: row.fecha_inicio || '',
   fechaFin: row.fecha_fin || '',
   fechaGraduacion: row.fecha_graduacion || '',
@@ -96,6 +99,7 @@ const mapMesaToRow = (mesa: Partial<MesaRecord>): Partial<DbMesaRow> => ({
   sesion_actual: mesa.sesionActual,
   participantes: mesa.participantes,
   dinamizador: mesa.dinamizador || null,
+  email: mesa.email || null,
   fecha_inicio: mesa.fechaInicio || null,
   fecha_fin: mesa.fechaFin || null,
   fecha_graduacion: mesa.fechaGraduacion || null,

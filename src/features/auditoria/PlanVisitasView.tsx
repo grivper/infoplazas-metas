@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   fetchAllItinerarios,
   deleteItinerariosByEnlace
-} from './services/itinerariosService';
+} from './services/itinerarioService';
 import { getAllVisitasCognito } from './services/rutasDb';
 
 // --- Constantes ---

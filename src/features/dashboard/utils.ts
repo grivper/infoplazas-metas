@@ -36,13 +36,32 @@ export const buildMesValorMap = <T extends { mes_nombre: string }>(
 };
 
 /**
- * Calcula incrementos acumulados entre meses de un cuatrimestre
+ * Meses ordenados del año para navegación cross-cuatrimestre.
+ * Sirve para buscar el mes anterior aunque esté fuera del array actual.
+ */
+export const MESES_DEL_AÑO = [
+  'Enero', 'Febrero', 'Marzo', 'Abril',
+  'Mayo', 'Junio', 'Julio', 'Agosto',
+  'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+];
+
+/**
+ * Calcula incrementos acumulados entre meses de un cuatrimestre.
+ * Incluye el salto desde el mes anterior (cross-cuatrimestre) si se provee.
  */
 export const calcularIncrementos = (
   ipPorMes: Map<string, number>,
-  meses: string[]
+  meses: string[],
+  prevMonthValue?: number
 ): number => {
   let total = 0;
+  
+  // Incluir el salto desde el mes anterior al primer mes del cuatrimestre
+  if (prevMonthValue !== undefined && meses.length > 0) {
+    const firstMonthVal = ipPorMes.get(meses[0]) || 0;
+    total += Math.max(0, firstMonthVal - prevMonthValue);
+  }
+  
   for (let i = 1; i < meses.length; i++) {
     const ipActual = ipPorMes.get(meses[i]) || 0;
     const ipAnterior = ipPorMes.get(meses[i - 1]) || 0;
@@ -52,12 +71,14 @@ export const calcularIncrementos = (
 };
 
 /**
- * Datos para un cuatrimestre
+ * Datos para un cuatrimestre en la UI.
+ * incremento = suma de crecimientos netos mes a mes (solo positivos).
+ * La meta es 95 IPs al año → +31.66 incrementos por cuatrimestre.
  */
 export interface CuatrimestreData {
   nombre: string;
   meses: string;
-  incremento: number;
+  incremento: number;  // Suma de incrementos positivos mes a mes
   current: boolean;
   pct: number;
   isCompletado: boolean;
@@ -66,7 +87,9 @@ export interface CuatrimestreData {
 }
 
 /**
- * Construye datos de cuatrimestres para UI
+ * Construye datos de cuatrimestres para UI.
+ * Suma todos los incrementos positivos mes a mes dentro del cuatrimestre,
+ * incluyendo el salto cross-cuatrimestre (ej: Abril → Mayo).
  */
 export const buildCuatrimestreData = (
   ipPorMes: Map<string, number>,
@@ -81,11 +104,15 @@ export const buildCuatrimestreData = (
   ];
 
   return cuats.map(({ nombre, meses, mesesList, num }) => {
-    const incremento = calcularIncrementos(ipPorMes, mesesList);
+    // Buscar valor del mes anterior al cuatrimestre (cross-boundary)
+    const prevMesIdx = MESES_DEL_AÑO.indexOf(mesesList[0]) - 1;
+    const prevMonthValue = prevMesIdx >= 0 ? ipPorMes.get(MESES_DEL_AÑO[prevMesIdx]) : undefined;
+    
+    const incremento = calcularIncrementos(ipPorMes, mesesList, prevMonthValue);
     const pct = metaCuatrimestre > 0 ? Math.round((incremento / metaCuatrimestre) * 100) : 0;
     const isCompletado = incremento >= metaCuatrimestre;
     const isActivo = num === cuatrimestreActual;
-    const estaAtrasado = isActivo && incremento < metaCuatrimestre && incremento > 0;
+    const estaAtrasado = isActivo && !isCompletado;
 
     return { nombre, meses, incremento, current: isActivo, pct, isCompletado, isActivo, estaAtrasado };
   });

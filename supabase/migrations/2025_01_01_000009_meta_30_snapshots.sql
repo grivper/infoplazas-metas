@@ -41,32 +41,23 @@ DECLARE
   v_ip_sobre_30 INTEGER := 0;
   v_ip_debajo_30 INTEGER := 0;
   v_total_ip INTEGER := 0;
-  v_meta_acumulada INTEGER := v_month * 7; -- +7 por cada mes transcurrido
+  v_meta_acumulada INTEGER := v_month * 7;
   v_progreso_pct NUMERIC(5,2) := 0;
   v_mes_nombre VARCHAR(20);
   v_result meta_30_snapshots;
-  
-  -- Datos crudos de sincronización
   v_sync_data JSONB;
-  
-  -- Nombres de meses
-  v_meses TEXT[] := ARRAY['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-                           'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  v_meses TEXT[] := ARRAY['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                           'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  v_sync_month INTEGER;
 BEGIN
-  -- Obtener total de infoplazas del catálogo
-  SELECT COUNT(*)::INTEGER INTO v_total_ip
-  FROM catalogo_infoplazas;
+  SELECT COUNT(*)::INTEGER INTO v_total_ip FROM catalogo_infoplazas;
 
-  -- Obtener último sync de meta_30_sincronizacion para el año actual
   SELECT data INTO v_sync_data
   FROM meta_30_sincronizacion
-  WHERE sheet_name LIKE '%meta%30%' OR sheet_name LIKE '%cognito%'
   ORDER BY fecha_sincronizacion DESC
   LIMIT 1;
 
-  -- Si hay datos, procesarlos
   IF v_sync_data IS NOT NULL AND jsonb_typeof(v_sync_data) = 'array' THEN
-    -- Procesar registros del año y mes actual
     SELECT 
       COUNT(*) FILTER (WHERE (value->>'Porcentaje')::NUMERIC >= 30)::INTEGER,
       COUNT(*) FILTER (WHERE (value->>'Porcentaje')::NUMERIC < 30 OR (value->>'Porcentaje') IS NULL)::INTEGER
@@ -74,33 +65,38 @@ BEGIN
     FROM jsonb_array_elements(v_sync_data) AS value
     WHERE (value->>'Año')::TEXT = v_year::TEXT
       AND value->>'Mes' = v_meses[v_month];
+
+    IF v_ip_sobre_30 = 0 AND v_ip_debajo_30 = 0 THEN
+      FOR v_sync_month IN REVERSE v_month..1 LOOP
+        SELECT 
+          COUNT(*) FILTER (WHERE (value->>'Porcentaje')::NUMERIC >= 30)::INTEGER,
+          COUNT(*) FILTER (WHERE (value->>'Porcentaje')::NUMERIC < 30 OR (value->>'Porcentaje') IS NULL)::INTEGER
+        INTO v_ip_sobre_30, v_ip_debajo_30
+        FROM jsonb_array_elements(v_sync_data) AS value
+        WHERE (value->>'Año')::TEXT = v_year::TEXT
+          AND value->>'Mes' = v_meses[v_sync_month];
+        EXIT WHEN v_ip_sobre_30 > 0 OR v_ip_debajo_30 > 0;
+      END LOOP;
+    END IF;
   END IF;
 
-  -- Calcular progreso vs meta de 95
-  IF v_ip_sobre_30 > 0 THEN
-    v_progreso_pct := LEAST(ROUND((v_ip_sobre_30::NUMERIC / 95) * 100, 2), 100);
+  IF v_ip_sobre_30 > 0 OR v_ip_debajo_30 > 0 THEN
+    IF v_ip_sobre_30 > 0 THEN
+      v_progreso_pct := LEAST(ROUND((v_ip_sobre_30::NUMERIC / 95) * 100, 2), 100);
+    END IF;
+    v_mes_nombre := v_meses[v_month];
+
+    INSERT INTO meta_30_snapshots (fecha, ip_sobre_30, ip_debajo_30, total_ip, meta_acumulada, progreso_pct, mes_nombre, updated_at)
+    VALUES (v_fecha, v_ip_sobre_30, v_ip_debajo_30, v_total_ip, v_meta_acumulada, v_progreso_pct, v_mes_nombre, NOW())
+    ON CONFLICT (fecha) DO UPDATE SET
+      ip_sobre_30 = EXCLUDED.ip_sobre_30,
+      ip_debajo_30 = EXCLUDED.ip_debajo_30,
+      total_ip = EXCLUDED.total_ip,
+      meta_acumulada = EXCLUDED.meta_acumulada,
+      progreso_pct = EXCLUDED.progreso_pct,
+      updated_at = NOW()
+    RETURNING * INTO v_result;
   END IF;
-
-  -- Nombre del mes
-  v_mes_nombre := v_meses[v_month];
-
-  -- Upsert: insertar o actualizar si ya existe
-  INSERT INTO meta_30_snapshots (
-    fecha, ip_sobre_30, ip_debajo_30, total_ip, 
-    meta_acumulada, progreso_pct, mes_nombre, updated_at
-  )
-  VALUES (
-    v_fecha, v_ip_sobre_30, v_ip_debajo_30, v_total_ip,
-    v_meta_acumulada, v_progreso_pct, v_mes_nombre, NOW()
-  )
-  ON CONFLICT (fecha) DO UPDATE SET
-    ip_sobre_30 = EXCLUDED.ip_sobre_30,
-    ip_debajo_30 = EXCLUDED.ip_debajo_30,
-    total_ip = EXCLUDED.total_ip,
-    meta_acumulada = EXCLUDED.meta_acumulada,
-    progreso_pct = EXCLUDED.progreso_pct,
-    updated_at = NOW()
-  RETURNING * INTO v_result;
 
   RETURN v_result;
 END;

@@ -24,6 +24,7 @@ export const MesaForm: React.FC<MesaFormProps> = ({ registro, catalogo, onSave, 
     sesionActual: 1,
     participantes: 0,
     dinamizador: '',
+    email: '',
     fechaInicio: '',
     fechaFin: '',
     fechaGraduacion: '',
@@ -39,6 +40,7 @@ export const MesaForm: React.FC<MesaFormProps> = ({ registro, catalogo, onSave, 
       sesionActual: registro.sesionActual || 1,
       participantes: registro.participantes || 0,
       dinamizador: registro.dinamizador || '',
+      email: registro.email || '',
       fechaInicio: registro.fechaInicio || '',
       fechaFin: registro.fechaFin || '',
       fechaGraduacion: registro.fechaGraduacion || '',
@@ -107,6 +109,10 @@ export const MesaForm: React.FC<MesaFormProps> = ({ registro, catalogo, onSave, 
           <input type="text" className={inputCls} value={form.dinamizador} onChange={e => setForm(f => ({ ...f, dinamizador: e.target.value }))} placeholder="Nombre" />
         </div>
         <div>
+          <label className={labelCls}>Email</label>
+          <input type="email" className={inputCls} value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="correo@ejemplo.com" />
+        </div>
+        <div>
           <label className={labelCls}>Fecha Inicio</label>
           <input type="date" className={inputCls} value={form.fechaInicio} onChange={e => setForm(f => ({ ...f, fechaInicio: e.target.value }))} />
         </div>
@@ -124,6 +130,8 @@ export const MesaForm: React.FC<MesaFormProps> = ({ registro, catalogo, onSave, 
             <option value="pendiente">Pendiente</option>
             <option value="en_progreso">En Progreso</option>
             <option value="completada">Completada</option>
+            <option value="por_graduacion">Por Graduación</option>
+            <option value="por_certificado">Por Certificado</option>
           </select>
         </div>
       </div>
