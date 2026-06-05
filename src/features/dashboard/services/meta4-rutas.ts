@@ -34,6 +34,10 @@ export interface EnlaceRutaData {
  * 2. % Cumplimiento = (IPs visitadas / Total IPs) × 100
  * 3. Brecha = Meta mínima - Visitadas
  * 4. Tasa Éxito YTD = (MesesOK / MesesEval) × 100
+ *
+ * Lógica territorial: Las visitas se acreditan al DUEÑO de la ruta (región geográfica),
+ * no al visitante. Cualquier visitante que vaya a una Infoplaza en su mes la pinta verde
+ * para el dueño de esa ruta.
  */
 export const getMeta4Rutas = async (): Promise<MetaItem> => {
   const mesActualNum = new Date().getMonth() + 1;
@@ -66,23 +70,33 @@ export const getMeta4Rutas = async (): Promise<MetaItem> => {
     };
   }
 
-  // 3. Agrupar IPs programadas por enlace
+  // 3. Agrupar IPs programadas por enlace (route owner = geographic region)
   const progMap = new Map<string, Set<string>>();
   itinerarios.forEach((i) => {
     if (!progMap.has(i.enlace_nombre)) progMap.set(i.enlace_nombre, new Set());
     progMap.get(i.enlace_nombre)!.add(i.infoplaza_id);
   });
 
-  // 4. Agrupar IPs visitadas por enlace y por mes (IPs únicas)
-  const enlacesEnItinerario = new Set(progMap.keys());
+  // 3b. Construir mapa inverso: infoplaza_id -> enlace_nombre (route owner)
+  const ipToOwnerMap = new Map<string, string>();
+  itinerarios.forEach((i) => {
+    ipToOwnerMap.set(i.infoplaza_id, i.enlace_nombre);
+  });
+
+  // 4. Agrupar IPs visitadas por RUTA (dueño territorial), no por visitante
+  //    Cualquier visitante que vaya a una IP la acredita al DUENO de esa ruta
   const visitMap = new Map<string, Map<number, Set<string>>>();
 
   cognito.forEach((c) => {
-    if (c.enlace_original && enlacesEnItinerario.has(c.enlace_original) && c.infoplaza_id && c.mes) {
-      if (!visitMap.has(c.enlace_original)) {
-        visitMap.set(c.enlace_original, new Map());
+    if (c.infoplaza_id && c.mes) {
+      // Buscar el dueño de esta Infoplaza en los itinerarios
+      const routeOwner = ipToOwnerMap.get(c.infoplaza_id);
+      if (!routeOwner) return; // IP no está en ningún itinerario, ignorar
+
+      if (!visitMap.has(routeOwner)) {
+        visitMap.set(routeOwner, new Map());
       }
-      const mesMap = visitMap.get(c.enlace_original)!;
+      const mesMap = visitMap.get(routeOwner)!;
       if (!mesMap.has(c.mes)) {
         mesMap.set(c.mes, new Set());
       }
@@ -151,10 +165,12 @@ export const getMeta4Rutas = async (): Promise<MetaItem> => {
     });
   });
 
-  // 6. Calcular promedio de tasa de éxito YTD global (excluye vacantes)
-  const enlacesConMeta = datosEnlaces.filter(e => !e.enlace.includes('(Vacante)'));
-  const promedioGlobal = enlacesConMeta.length > 0
-    ? Math.round(enlacesConMeta.reduce((sum, e) => sum + e.tasaExitoYtd, 0) / enlacesConMeta.length)
+  // 6. Calcular promedio de tasa de éxito YTD global
+  //    Incluimos TODAS las rutas (incluyendo Vacantes) porque ahora la lógica
+  //    territorial hace que las Vacantes acumulen correctamente el % de ayuda
+  //    cruzada de otros visitantes
+  const promedioGlobal = datosEnlaces.length > 0
+    ? Math.round(datosEnlaces.reduce((sum, e) => sum + e.tasaExitoYtd, 0) / datosEnlaces.length)
     : 0;
 
   const metricas: MetaMetrica[] = [
