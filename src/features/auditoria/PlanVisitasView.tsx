@@ -111,7 +111,6 @@ const PlanVisitasView: React.FC = () => {
 
     // 3. Forma el arreglo renderizable y ejecuta Cruce Match Anti-Encoding e Inquebrantable Numérico
     const itinerariosArray: ItinerarioEnlace[] = Object.entries(mapItinerarios).map(([enlace, diasObj]) => {
-      const normEnlaceRuta = normalize(enlace);
       
       const ipsVisitadasSet = new Set<string>(); // Set para evitar sobrecontar infoplazas visitadas varias veces
       
