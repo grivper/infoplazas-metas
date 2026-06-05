@@ -113,12 +113,6 @@ const PlanVisitasView: React.FC = () => {
     const itinerariosArray: ItinerarioEnlace[] = Object.entries(mapItinerarios).map(([enlace, diasObj]) => {
       const normEnlaceRuta = normalize(enlace);
       
-      const visitasDelEnlace = visitasMes.filter((v) => {
-        const rawEnlace = v.enlace_original || v['Enlace Regional'] || v.enlace || '';
-        const normVisitante = normalize(rawEnlace);
-        return normVisitante.includes(normEnlaceRuta) || normEnlaceRuta.includes(normVisitante);
-      });
-
       const ipsVisitadasSet = new Set<string>(); // Set para evitar sobrecontar infoplazas visitadas varias veces
       
       // Construir sub-arbol y setear el booleano 'visitada' para el UI Semáforo
@@ -126,8 +120,8 @@ const PlanVisitasView: React.FC = () => {
         const stadoIps: InfoplazaStatus[] = d.infoplazas
           .sort((a, b) => a.nombre.localeCompare(b.nombre))
           .map(ip => {
-            // Buscar si esta infoplaza fue visitada en este mes
-            const matchVisita = visitasDelEnlace.some((v) => {
+            // Buscar si esta infoplaza fue visitada en este mes por CUALQUIERA (lógica territorial)
+            const matchVisita = visitasMes.some((v) => {
               // 1. Comparar por UUID directo (Supabase)
               if (ip.uuid && v.infoplaza_id && ip.uuid === v.infoplaza_id) return true;
               
