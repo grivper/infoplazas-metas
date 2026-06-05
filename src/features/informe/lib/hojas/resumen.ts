@@ -59,16 +59,16 @@ export const crearHojaResumen = async (
       inicio: '01/01/2026', fin: '30/11/2026', responsable: 'Guillermo Rivera', avance: `${avance1}%`, color: COLORES_META.meta1 },
     { nro: 2, nombre: 'Incrementar la participación ciudadana en las Infoplazas mediante supervisión constante, identificación de problemas y aplicación de soluciones.',
       desc: 'Indicador:\n• Meta cuatrimestral: Incrementar en 29 Infoplazas al 30%.\n• Utilización del COGNITOS al 100%.',
-      inicio: '01/01/2026', fin: '31/12/2026', responsable: 'Jose Ruiz', avance: `${avance2}%`, color: COLORES_META.meta2 },
+      inicio: '01/01/2026', fin: '31/12/2026', responsable: 'Ruta Coclé (Vacante)', avance: `${avance2}%`, color: COLORES_META.meta2 },
     { nro: 3, nombre: 'Organizar y completar 21 Mesas de Transformación en la regional de Los Santos.',
       desc: 'Obtener 80% de participación por provincia.\nDeben participar 21 mesas:\nCoclé: 6 | Los Santos: 9 | Herrera: 6',
       inicio: '01/01/2026', fin: '31/12/2026', responsable: 'Rogelio Cruz', avance: `${avance3}%`, color: COLORES_META.meta3 },
     { nro: 4, nombre: 'Realizar y cumplir plan de visitas a las Infoplazas 95% mensual.',
       desc: 'Cumplir con el plan de visitas en 95%.\nVerificación de sincronización de Bases de datos 100%.',
-      inicio: '01/01/2026', fin: '31/12/2026', responsable: 'Jose Ruiz, Rogelio Cruz, Guillermo Rivera', avance: `${avance4}%`, color: COLORES_META.meta4 },
+      inicio: '01/01/2026', fin: '31/12/2026', responsable: 'Ruta Coclé (Vacante), Rogelio Cruz, Guillermo Rivera', avance: `${avance4}%`, color: COLORES_META.meta4 },
     { nro: 5, nombre: 'Seguimiento a los softwares de soporte de datos:\n-Proyecto KPAX',
       desc: 'Indicador:\n• 100% de equipos reportando correctamente.\n• Mantener activos el 100% de las licencias.',
-      inicio: '01/01/2026', fin: '31/12/2026', responsable: 'Jose Ruiz, Rogelio Cruz, Guillermo Rivera', avance: `${avance5}%`, color: COLORES_META.meta5 }
+      inicio: '01/01/2026', fin: '31/12/2026', responsable: 'Ruta Coclé (Vacante), Rogelio Cruz, Guillermo Rivera', avance: `${avance5}%`, color: COLORES_META.meta5 }
   ];
 
   metas.forEach((meta, idx) => {
