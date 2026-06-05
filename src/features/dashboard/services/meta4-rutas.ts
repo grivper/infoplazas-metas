@@ -109,8 +109,7 @@ export const getMeta4Rutas = async (): Promise<MetaItem> => {
 
       if (mesNum > mesActualNum) break;
 
-      const ipsVisitadasMes = [...(mesMap.get(mesNum) || [])].filter(ip => progSet.has(ip));
-      const visitadas = ipsVisitadasMes.length;
+      const visitadas = (mesMap.get(mesNum) || new Set()).size;
       const cumplimiento = totalIp > 0 ? Math.round((visitadas / totalIp) * 100) : 0;
       const cumple = visitadas >= metaMinima;
 
@@ -152,9 +151,10 @@ export const getMeta4Rutas = async (): Promise<MetaItem> => {
     });
   });
 
-  // 6. Calcular promedio de tasa de éxito YTD global
-  const promedioGlobal = datosEnlaces.length > 0
-    ? Math.round(datosEnlaces.reduce((sum, e) => sum + e.tasaExitoYtd, 0) / datosEnlaces.length)
+  // 6. Calcular promedio de tasa de éxito YTD global (excluye vacantes)
+  const enlacesConMeta = datosEnlaces.filter(e => !e.enlace.includes('(Vacante)'));
+  const promedioGlobal = enlacesConMeta.length > 0
+    ? Math.round(enlacesConMeta.reduce((sum, e) => sum + e.tasaExitoYtd, 0) / enlacesConMeta.length)
     : 0;
 
   const metricas: MetaMetrica[] = [
