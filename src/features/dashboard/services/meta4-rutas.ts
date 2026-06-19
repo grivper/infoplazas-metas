@@ -1,10 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import type { MetaItem, MetaMetrica } from '@/components/MetaCard';
 
-/**
- * Datos de un enlace para la Meta 4.
- * Incluye todas las métricas: Meta Mínima, Cumplimiento Mensual, Brecha, Tasa Éxito YTD.
- */
 export interface EnlaceRutaData {
   enlace: string;
   totalIp: number;
@@ -27,20 +23,9 @@ export interface EnlaceRutaData {
   }[];
 }
 
-/**
- * Meta 4: Cumplimiento de Rutas (Auditoría)
- * Aplica las 4 fórmulas:
- * 1. Meta Mínima = ⌈IPs × 0.95⌉
- * 2. % Cumplimiento = (IPs visitadas / Total IPs) × 100
- * 3. Brecha = Meta mínima - Visitadas
- * 4. Tasa Éxito YTD = (MesesOK / MesesEval) × 100
- *
- * Lógica territorial: Las visitas se acreditan al DUEÑO de la ruta (región geográfica),
- * no al visitante. Cualquier visitante que vaya a una Infoplaza en su mes la pinta verde
- * para el dueño de esa ruta.
- */
 export const getMeta4Rutas = async (): Promise<MetaItem> => {
   const mesActualNum = new Date().getMonth() + 1;
+  const añoActual = new Date().getFullYear();
 
   const mesesOrdenados = [
     'Enero', 'Febrero', 'Marzo', 'Abril',
@@ -48,15 +33,19 @@ export const getMeta4Rutas = async (): Promise<MetaItem> => {
     'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
 
-  // 1. Obtener itinerarios (rutas planificadas por enlace)
   const { data: itinerarios } = await supabase
     .from('itinerario_enlaces')
     .select('enlace_nombre, infoplaza_id');
 
-  // 2. Obtener visitas de Cognito con mes
   const { data: cognito } = await supabase
     .from('cognito_registros')
     .select('enlace_original, infoplaza_id, mes');
+
+  // Obtener la memoria (snapshots) de meses anteriores
+  const { data: snapshotsData } = await supabase
+    .from('meta_4_snapshots')
+    .select('enlace_nombre, mes_num, total_ip')
+    .eq('año', añoActual);
 
   if (!itinerarios || !cognito) {
     return {
@@ -70,28 +59,30 @@ export const getMeta4Rutas = async (): Promise<MetaItem> => {
     };
   }
 
-  // 3. Agrupar IPs programadas por enlace (route owner = geographic region)
+  const snapshotsMap = new Map<string, Map<number, number>>();
+  if (snapshotsData) {
+    snapshotsData.forEach(s => {
+      if (!snapshotsMap.has(s.enlace_nombre)) snapshotsMap.set(s.enlace_nombre, new Map());
+      snapshotsMap.get(s.enlace_nombre)!.set(s.mes_num, s.total_ip);
+    });
+  }
+
   const progMap = new Map<string, Set<string>>();
   itinerarios.forEach((i) => {
     if (!progMap.has(i.enlace_nombre)) progMap.set(i.enlace_nombre, new Set());
     progMap.get(i.enlace_nombre)!.add(i.infoplaza_id);
   });
 
-  // 3b. Construir mapa inverso: infoplaza_id -> enlace_nombre (route owner)
   const ipToOwnerMap = new Map<string, string>();
   itinerarios.forEach((i) => {
     ipToOwnerMap.set(i.infoplaza_id, i.enlace_nombre);
   });
 
-  // 4. Agrupar IPs visitadas por RUTA (dueño territorial), no por visitante
-  //    Cualquier visitante que vaya a una IP la acredita al DUENO de esa ruta
   const visitMap = new Map<string, Map<number, Set<string>>>();
-
   cognito.forEach((c) => {
     if (c.infoplaza_id && c.mes) {
-      // Buscar el dueño de esta Infoplaza en los itinerarios
       const routeOwner = ipToOwnerMap.get(c.infoplaza_id);
-      if (!routeOwner) return; // IP no está en ningún itinerario, ignorar
+      if (!routeOwner) return;
 
       if (!visitMap.has(routeOwner)) {
         visitMap.set(routeOwner, new Map());
@@ -104,18 +95,27 @@ export const getMeta4Rutas = async (): Promise<MetaItem> => {
     }
   });
 
-  // 5. Calcular métricas por enlace
   const datosEnlaces: EnlaceRutaData[] = [];
+  const snapshotsToUpsert: any[] = [];
 
   progMap.forEach((progSet, enlace) => {
-    const totalIp = progSet.size;
-    const metaMinima = Math.ceil(totalIp * 0.95);
+    const totalIpActual = progSet.size;
+    const metaMinimaActual = Math.ceil(totalIpActual * 0.95);
     const mesMap = visitMap.get(enlace) || new Map();
 
     const historial: EnlaceRutaData['historial'] = [];
     let mesesCumplidos = 0;
     let mesesEvaluados = 0;
     let visitadasMesActual = 0;
+    
+    // Preparar el snapshot del mes actual (para guardar la "foto" en vivo)
+    snapshotsToUpsert.push({
+      enlace_nombre: enlace,
+      mes_num: mesActualNum,
+      año: añoActual,
+      total_ip: totalIpActual,
+      infoplazas_json: Array.from(progSet)
+    });
 
     for (let i = 0; i < 12; i++) {
       const mesNum = i + 1;
@@ -123,14 +123,22 @@ export const getMeta4Rutas = async (): Promise<MetaItem> => {
 
       if (mesNum > mesActualNum) break;
 
+      // Magia de Persistencia: Si es un mes pasado, buscamos la foto histórica.
+      // Si no hay foto histórica, usamos el valor actual como respaldo.
+      let totalIpMes = totalIpActual;
+      if (mesNum < mesActualNum && snapshotsMap.has(enlace) && snapshotsMap.get(enlace)!.has(mesNum)) {
+        totalIpMes = snapshotsMap.get(enlace)!.get(mesNum)!;
+      }
+      
+      const metaMinimaMes = Math.ceil(totalIpMes * 0.95);
       const visitadas = (mesMap.get(mesNum) || new Set()).size;
-      const cumplimiento = totalIp > 0 ? Math.round((visitadas / totalIp) * 100) : 0;
-      const cumple = visitadas >= metaMinima;
+      const cumplimiento = totalIpMes > 0 ? Math.round((visitadas / totalIpMes) * 100) : 0;
+      const cumple = visitadas >= metaMinimaMes;
 
       historial.push({
         mes: mesNombre.substring(0, 3),
         visitadas,
-        metaMinima,
+        metaMinima: metaMinimaMes,
         cumplimiento,
         cumple,
       });
@@ -143,18 +151,18 @@ export const getMeta4Rutas = async (): Promise<MetaItem> => {
       }
     }
 
-    const brecha = metaMinima - visitadasMesActual;
+    const brecha = metaMinimaActual - visitadasMesActual;
     const tasaExitoYtd = mesesEvaluados > 0
       ? Math.round((mesesCumplidos / mesesEvaluados) * 100)
       : 0;
 
     datosEnlaces.push({
       enlace,
-      totalIp,
-      metaMinima,
+      totalIp: totalIpActual,
+      metaMinima: metaMinimaActual,
       mesActual: {
         visitadas: visitadasMesActual,
-        cumplimiento: totalIp > 0 ? Math.round((visitadasMesActual / totalIp) * 100) : 0,
+        cumplimiento: totalIpActual > 0 ? Math.round((visitadasMesActual / totalIpActual) * 100) : 0,
         brecha,
         nombreMes: mesesOrdenados[mesActualNum - 1],
       },
@@ -165,10 +173,15 @@ export const getMeta4Rutas = async (): Promise<MetaItem> => {
     });
   });
 
-  // 6. Calcular promedio de tasa de éxito YTD global
-  //    Incluimos TODAS las rutas (incluyendo Vacantes) porque ahora la lógica
-  //    territorial hace que las Vacantes acumulen correctamente el % de ayuda
-  //    cruzada de otros visitantes
+  // Guardamos la foto del mes actual silenciosamente en background
+  if (snapshotsToUpsert.length > 0) {
+    supabase.from('meta_4_snapshots').upsert(snapshotsToUpsert, {
+      onConflict: 'enlace_nombre, mes_num, año'
+    }).then(({ error }) => {
+      if (error) console.error('Error al guardar snapshot de Meta 4:', error);
+    });
+  }
+
   const promedioGlobal = datosEnlaces.length > 0
     ? Math.round(datosEnlaces.reduce((sum, e) => sum + e.tasaExitoYtd, 0) / datosEnlaces.length)
     : 0;

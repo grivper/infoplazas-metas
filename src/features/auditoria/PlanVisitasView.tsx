@@ -8,6 +8,7 @@ import {
   deleteItinerariosByEnlace
 } from './services/itinerarioService';
 import { getAllVisitasCognito } from './services/rutasDb';
+import { supabase } from '@/lib/supabase';
 
 // --- Constantes ---
 const MESES: Record<number, string> = {
@@ -99,6 +100,25 @@ const PlanVisitasView: React.FC = () => {
     // 2. Extrae visitas de Cognito respetando el filtro mensual
     const visitas = await getAllVisitasCognito() as CognitoVisita[];
     
+    // Obtener la memoria (snapshots) del mes evaluado
+    const añoActual = new Date().getFullYear();
+    const { data: snapshotsData } = await supabase
+      .from('meta_4_snapshots')
+      .select('enlace_nombre, total_ip, infoplazas_json')
+      .eq('mes_num', mes)
+      .eq('año', añoActual);
+      
+    const snapshotsMap = new Map<string, number>();
+    const snapshotsIdsMap = new Map<string, Set<string>>();
+    if (snapshotsData) {
+      snapshotsData.forEach(s => {
+        snapshotsMap.set(s.enlace_nombre, s.total_ip);
+        if (s.infoplazas_json && Array.isArray(s.infoplazas_json)) {
+          snapshotsIdsMap.set(s.enlace_nombre, new Set(s.infoplazas_json));
+        }
+      });
+    }
+    
     const visitasMes = visitas.filter((v) => {
       let vMes = v.mes;
       const rawFecha = v.fecha || v['Fecha'] || '';
@@ -117,6 +137,13 @@ const PlanVisitasView: React.FC = () => {
       // Construir sub-arbol y setear el booleano 'visitada' para el UI Semáforo
       const diasArray = Object.values(diasObj).map(d => {
         const stadoIps: InfoplazaStatus[] = d.infoplazas
+          // MAGIA: Filtrar visualmente las que no existían en la foto histórica
+          .filter(ip => {
+            if (mes >= MES_ACTUAL) return true;
+            const validIds = snapshotsIdsMap.get(enlace);
+            if (!validIds) return true;
+            return ip.uuid ? validIds.has(ip.uuid) : true;
+          })
           .sort((a, b) => a.nombre.localeCompare(b.nombre))
           .map(ip => {
             // Buscar si esta infoplaza fue visitada en este mes por CUALQUIERA (lógica territorial)
@@ -155,12 +182,21 @@ const PlanVisitasView: React.FC = () => {
       // Orden natural alfanumérico para los días
       diasArray.sort((a, b) => a.diaRuta.localeCompare(b.diaRuta, undefined, { numeric: true, sensitivity: 'base' }));
 
+      // Eliminar días que se quedaron sin infoplazas tras el filtro histórico
+      const diasActivos = diasArray.filter(d => d.infoplazas.length > 0);
+
       // Matemáticas Finales del Nodo
-      const totalIps = diasArray.reduce((acc, d) => acc + d.infoplazas.length, 0);
+      let totalIps = diasActivos.reduce((acc, d) => acc + d.infoplazas.length, 0);
+      
+      // Si es un mes pasado y existe snapshot, respetamos la historia
+      if (mes < MES_ACTUAL && snapshotsMap.has(enlace)) {
+        totalIps = snapshotsMap.get(enlace)!;
+      }
+
       const funcActUnique = ipsVisitadasSet.size;
       const p = totalIps > 0 ? Math.round((funcActUnique / totalIps) * 100) : 0;
 
-      return { enlace, dias: diasArray, totalInfoplazas: totalIps, visitadasUnicas: funcActUnique, pct: p };
+      return { enlace, dias: diasActivos, totalInfoplazas: totalIps, visitadasUnicas: funcActUnique, pct: p };
     });
     
     setItinerarios(itinerariosArray.sort((a, b) => a.enlace.localeCompare(b.enlace)));
