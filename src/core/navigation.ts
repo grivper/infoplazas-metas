@@ -5,7 +5,8 @@ import {
   Network, 
   MapPin, 
   Radar,
-  Settings 
+  Settings,
+  CalendarDays
 } from 'lucide-react';
 
 /**
@@ -19,6 +20,7 @@ export const navigation = [
   { name: 'Mesas de Transformación', href: '/mesas', icon: Network },
   { name: 'Cumplimiento de Rutas', href: '/auditoria', icon: MapPin },
   { name: 'Radar Kpax', href: '/radar', icon: Radar },
+  { name: 'Encuentros', href: '/encuentros', icon: CalendarDays },
   { name: 'Gestión de Infoplazas', href: '/auditoria/infoplazas', icon: Settings },
 ];
 
