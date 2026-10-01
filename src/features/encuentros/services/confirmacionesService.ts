@@ -5,6 +5,10 @@ export type EstadoEnvio = 'pendiente' | 'enviado' | 'confirmado';
 export interface Confirmacion {
   id: string;
   estado_envio: EstadoEnvio;
+  asiste: boolean | null;
+  se_hospeda: boolean | null;
+  cena: boolean | null;
+  confirmado_at: string | null;
   dinamizador: {
     nombre: string;
     celular: string | null;
@@ -14,9 +18,19 @@ export interface Confirmacion {
   };
 }
 
+export interface RespuestaConfirmacionInput {
+  asiste: boolean;
+  seHospeda: boolean;
+  cena: boolean;
+}
+
 type ConfirmacionQueryRow = {
   id: string;
   estado_envio: EstadoEnvio;
+  asiste: boolean | null;
+  se_hospeda: boolean | null;
+  cena: boolean | null;
+  confirmado_at: string | null;
   dinamizadores: {
     nombre: string;
     celular: string | null;
@@ -35,6 +49,10 @@ export const getConfirmacionesByEncuentro = async (
     .select(`
       id,
       estado_envio,
+      asiste,
+      se_hospeda,
+      cena,
+      confirmado_at,
       dinamizadores (
         nombre,
         celular,
@@ -54,6 +72,10 @@ export const getConfirmacionesByEncuentro = async (
     return [{
       id: confirmacion.id,
       estado_envio: confirmacion.estado_envio,
+      asiste: confirmacion.asiste,
+      se_hospeda: confirmacion.se_hospeda,
+      cena: confirmacion.cena,
+      confirmado_at: confirmacion.confirmado_at,
       dinamizador: {
         nombre: confirmacion.dinamizadores.nombre,
         celular: confirmacion.dinamizadores.celular,
@@ -61,4 +83,27 @@ export const getConfirmacionesByEncuentro = async (
       },
     }];
   });
+};
+
+/**
+ * Actualiza la respuesta de una confirmación desde el panel administrativo.
+ * Si la fila no tenía confirmado_at, lo establece a la hora actual.
+ */
+export const updateRespuestaConfirmacion = async (
+  id: string,
+  respuesta: RespuestaConfirmacionInput,
+  confirmadoAtPrevio: string | null,
+): Promise<void> => {
+  const { error } = await supabase
+    .from('confirmaciones')
+    .update({
+      asiste: respuesta.asiste,
+      se_hospeda: respuesta.asiste ? respuesta.seHospeda : false,
+      cena: respuesta.asiste ? respuesta.cena : false,
+      estado_envio: 'confirmado',
+      confirmado_at: confirmadoAtPrevio ?? new Date().toISOString(),
+    })
+    .eq('id', id);
+
+  if (error) throw error;
 };

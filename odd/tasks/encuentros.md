@@ -19,7 +19,7 @@ Crear el módulo Encuentros para administrar dinamizadores y, en iteraciones pos
 - [x] Añadir tablero de confirmaciones, plantilla editable y tablas de estado.
 - [x] Mover la gestión de dinamizadores a Gestión de Infoplazas, junto a Catálogo y Rutas.
 - [ ] Conectar el envío de WhatsApp después de crear el enlace público de confirmación.
-- [ ] Añadir formulario público de autoconfirmación.
+- [x] Añadir formulario público de autoconfirmación (/confirmar/:token).
 
 ## Evidencia
 - Migración: `supabase/migrations/20260620000000_encuentros_dinamizadores.sql`, aplicada remotamente.

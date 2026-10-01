@@ -17,7 +17,7 @@ import VisitasIncidencias from './features/visitas-cognitos';
 import MesasTransformacion from './features/mesas';
 import PlanVisitasView, { GestionInfoplazasView } from './features/auditoria/index';
 import { MonitoreoConectividadView } from './features/radar-conectividad';
-import EncuentrosAdminView from './features/encuentros';
+import EncuentrosAdminView, { ConfirmarAsistenciaView } from './features/encuentros';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -46,6 +46,20 @@ const App: React.FC = () => {
       // El estado de sesión cambiará automáticamente a través de onAuthStateChange
     }
   });
+
+  // Ruta pública de autoconfirmación: debe funcionar SIN sesión iniciada.
+  // La verificamos antes que los early-returns de carga/login para que un
+  // dinamizador sin cuenta pueda abrir /confirmar/:token sin ver el spinner
+  // de 'Verificando sesión' ni la pantalla de login.
+  if (window.location.pathname.startsWith('/confirmar/')) {
+    return (
+      <BrowserRouter>
+        <Routes>
+          <Route path="/confirmar/:token" element={<ConfirmarAsistenciaView />} />
+        </Routes>
+      </BrowserRouter>
+    );
+  }
 
   if (isLoading) {
     // Loading state con spinner

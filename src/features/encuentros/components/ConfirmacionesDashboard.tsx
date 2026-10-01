@@ -22,24 +22,23 @@ import {
   updateMensajeTemplate,
   type Encuentro,
 } from '../services/encuentrosService';
+import { RespuestasTab } from './RespuestasTab';
+import { ModalEditarRespuesta } from './ModalEditarRespuesta';
 
 const ENCUENTRO_CLAVE = 'encuentro-regional-dinamizadores-2026';
 
-const estados: Array<{ estado: EstadoEnvio; titulo: string; vacio: string }> = [
+const estados: Array<{ estado: EstadoEnvio; titulo: string; vacio: string; conAccion: boolean }> = [
   {
     estado: 'pendiente',
     titulo: 'Pendientes de envío',
     vacio: 'No hay confirmaciones pendientes de envío.',
+    conAccion: false,
   },
   {
     estado: 'enviado',
     titulo: 'Enviados sin responder',
     vacio: 'No hay confirmaciones enviadas sin respuesta.',
-  },
-  {
-    estado: 'confirmado',
-    titulo: 'Confirmados',
-    vacio: 'Todavía no hay confirmaciones recibidas.',
+    conAccion: true,
   },
 ];
 
@@ -62,6 +61,7 @@ export function ConfirmacionesDashboard() {
   const [error, setError] = useState('');
   const [guardando, setGuardando] = useState(false);
   const [guardado, setGuardado] = useState(false);
+  const [confirmacionARegistrar, setConfirmacionARegistrar] = useState<Confirmacion | null>(null);
 
   const cargarDatos = useCallback(async () => {
     setCargando(true);
@@ -92,6 +92,14 @@ export function ConfirmacionesDashboard() {
   useEffect(() => {
     void cargarDatos();
   }, [cargarDatos]);
+
+  // Recarga solo las confirmaciones tras editar una respuesta. No muestra la
+  // pantalla de carga (para no volver a la primera pestaña) ni pisa el mensaje
+  // que se esté escribiendo.
+  const recargarConfirmaciones = useCallback(async () => {
+    if (!encuentro) return;
+    setConfirmaciones(await getConfirmacionesByEncuentro(encuentro.id));
+  }, [encuentro]);
 
   const confirmacionesPorEstado = useMemo(() => new Map(
     estados.map(({ estado }) => [
@@ -152,20 +160,26 @@ export function ConfirmacionesDashboard() {
       <Tabs defaultValue="seguimiento">
         <TabsList aria-label="Secciones de confirmaciones">
           <TabsTrigger value="seguimiento">Seguimiento</TabsTrigger>
+          <TabsTrigger value="respuestas">Respuestas</TabsTrigger>
           <TabsTrigger value="mensaje">Mensaje de confirmación</TabsTrigger>
         </TabsList>
 
         <TabsContent value="seguimiento" className="mt-6">
-          <div className="grid gap-4 lg:grid-cols-3">
-            {estados.map(({ estado, titulo, vacio }) => (
+          <div className="grid gap-4 lg:grid-cols-2">
+            {estados.map(({ estado, titulo, vacio, conAccion }) => (
               <TablaConfirmaciones
                 key={estado}
                 titulo={titulo}
                 confirmaciones={confirmacionesPorEstado.get(estado) ?? []}
                 vacio={vacio}
+                onRegistrar={conAccion ? setConfirmacionARegistrar : undefined}
               />
             ))}
           </div>
+        </TabsContent>
+
+        <TabsContent value="respuestas" className="mt-6">
+          <RespuestasTab confirmaciones={confirmaciones} onActualizada={recargarConfirmaciones} />
         </TabsContent>
 
         <TabsContent value="mensaje" className="mt-6">
@@ -195,6 +209,12 @@ export function ConfirmacionesDashboard() {
           </form>
         </TabsContent>
       </Tabs>
+
+      <ModalEditarRespuesta
+        confirmacion={confirmacionARegistrar}
+        onCerrar={() => setConfirmacionARegistrar(null)}
+        onGuardado={recargarConfirmaciones}
+      />
     </section>
   );
 }
@@ -203,9 +223,17 @@ interface TablaConfirmacionesProps {
   titulo: string;
   confirmaciones: Confirmacion[];
   vacio: string;
+  onRegistrar?: (confirmacion: Confirmacion) => void;
 }
 
-function TablaConfirmaciones({ titulo, confirmaciones, vacio }: TablaConfirmacionesProps) {
+function TablaConfirmaciones({
+  titulo,
+  confirmaciones,
+  vacio,
+  onRegistrar,
+}: TablaConfirmacionesProps) {
+  const columnas = onRegistrar ? 4 : 3;
+
   return (
     <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
       <div className="border-b border-slate-200 px-4 py-3">
@@ -218,18 +246,26 @@ function TablaConfirmaciones({ titulo, confirmaciones, vacio }: TablaConfirmacio
             <TableHead>Infoplaza</TableHead>
             <TableHead>Dinamizador</TableHead>
             <TableHead>Celular</TableHead>
+            {onRegistrar && <TableHead />}
           </TableRow>
         </TableHeader>
         <TableBody>
           {confirmaciones.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={3} className="text-center text-slate-600">{vacio}</TableCell>
+              <TableCell colSpan={columnas} className="text-center text-slate-600">{vacio}</TableCell>
             </TableRow>
           ) : confirmaciones.map((confirmacion) => (
             <TableRow key={confirmacion.id}>
               <TableCell className="font-medium">{confirmacion.dinamizador.infoplaza?.nombre ?? 'Sin infoplaza'}</TableCell>
               <TableCell>{confirmacion.dinamizador.nombre}</TableCell>
               <TableCell>{confirmacion.dinamizador.celular ?? '—'}</TableCell>
+              {onRegistrar && (
+                <TableCell>
+                  <Button variant="outline" size="sm" onClick={() => onRegistrar(confirmacion)}>
+                    Registrar respuesta
+                  </Button>
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>
