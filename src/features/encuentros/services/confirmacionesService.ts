@@ -36,6 +36,7 @@ type ConfirmacionQueryRow = {
     celular: string | null;
     catalogo_infoplazas: {
       nombre: string;
+      cerrada: boolean;
     } | null;
   } | null;
 };
@@ -56,7 +57,7 @@ export const getConfirmacionesByEncuentro = async (
       dinamizadores (
         nombre,
         celular,
-        catalogo_infoplazas (nombre)
+        catalogo_infoplazas (nombre, cerrada)
       )
     `)
     .eq('encuentro_id', encuentroId)
@@ -69,6 +70,10 @@ export const getConfirmacionesByEncuentro = async (
   return ((data ?? []) as unknown as ConfirmacionQueryRow[]).flatMap((confirmacion) => {
     if (!confirmacion.dinamizadores) return [];
 
+    // Una infoplaza cerrada ya no participa del encuentro: no se lista ni cuenta en los totales.
+    const infoplaza = confirmacion.dinamizadores.catalogo_infoplazas;
+    if (infoplaza?.cerrada) return [];
+
     return [{
       id: confirmacion.id,
       estado_envio: confirmacion.estado_envio,
@@ -79,7 +84,7 @@ export const getConfirmacionesByEncuentro = async (
       dinamizador: {
         nombre: confirmacion.dinamizadores.nombre,
         celular: confirmacion.dinamizadores.celular,
-        infoplaza: confirmacion.dinamizadores.catalogo_infoplazas,
+        infoplaza: infoplaza ? { nombre: infoplaza.nombre } : null,
       },
     }];
   });
