@@ -60,7 +60,7 @@ export function ConfirmarAsistenciaView() {
       <PaginaCentrada>
         <div className="flex flex-col items-center gap-3 text-slate-600">
           <Loader2 className="size-6 animate-spin text-emerald-700" />
-          <p className="text-sm font-medium">Cargando información...</p>
+          <p className="text-base font-medium">Cargando información...</p>
         </div>
       </PaginaCentrada>
     );
@@ -70,7 +70,7 @@ export function ConfirmarAsistenciaView() {
     return (
       <PaginaCentrada>
         <div className="rounded-2xl border border-destructive/25 bg-white p-6 text-center shadow-xl shadow-slate-950/5">
-          <p className="text-sm text-destructive" role="alert">
+          <p className="text-base text-destructive" role="alert">
             Este enlace de confirmación no es válido o ya no está disponible. Contactá al equipo organizador si creés que esto es un error.
           </p>
         </div>
@@ -82,7 +82,7 @@ export function ConfirmarAsistenciaView() {
     return (
       <PaginaCentrada>
         <div className="rounded-2xl border border-destructive/25 bg-white p-6 text-center shadow-xl shadow-slate-950/5">
-          <p className="text-sm text-destructive" role="alert">No se pudo cargar la información: {error}</p>
+          <p className="text-base text-destructive" role="alert">No se pudo cargar la información: {error}</p>
           <Button className="mt-4" variant="outline" size="sm" onClick={() => void cargarDatos()}>Reintentar</Button>
         </div>
       </PaginaCentrada>
@@ -200,7 +200,7 @@ function FormularioConfirmacion({ token, confirmacion, onGuardado, onYaRespondid
           />
         )}
         {error && (
-          <p className="rounded-xl border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive" role="alert">
+          <p className="rounded-xl border border-destructive/25 bg-destructive/5 px-4 py-3 text-base text-destructive" role="alert">
             {error}
           </p>
         )}
