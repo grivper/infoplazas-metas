@@ -52,11 +52,8 @@ export function ModalEditarRespuesta({
     setError('');
 
     try {
-      await updateRespuestaConfirmacion(
-        confirmacion.id,
-        { asiste, seHospeda: asiste ? seHospeda : false, cena: asiste ? cena : false },
-        confirmacion.confirmado_at,
-      );
+      // El servicio aplica las reglas: sin asistencia no hay hospedaje/cena y el hospedaje incluye cena.
+      await updateRespuestaConfirmacion(confirmacion.id, { asiste, seHospeda, cena });
       await onGuardado();
       onCerrar();
     } catch (saveError) {
@@ -98,16 +95,25 @@ export function ModalEditarRespuesta({
                 nombre="hospedaje"
                 pregunta="¿Se va a hospedar?"
                 valor={seHospeda}
-                onChange={setSeHospeda}
+                onChange={(val) => {
+                  setSeHospeda(val);
+                  if (val) setCena(true);
+                }}
                 disabled={guardando}
               />
-              <OpcionSiNo
-                nombre="cena"
-                pregunta="¿Va a cenar?"
-                valor={cena}
-                onChange={setCena}
-                disabled={guardando}
-              />
+              {seHospeda ? (
+                <div className="rounded-md bg-blue-50 border border-blue-200 p-3 text-sm text-blue-800">
+                  <span className="font-semibold">Cena:</span> Incluida automáticamente con el hospedaje.
+                </div>
+              ) : (
+                <OpcionSiNo
+                  nombre="cena"
+                  pregunta="¿Va a cenar?"
+                  valor={cena}
+                  onChange={setCena}
+                  disabled={guardando}
+                />
+              )}
             </>
           )}
 

@@ -86,24 +86,24 @@ export const getConfirmacionesByEncuentro = async (
 };
 
 /**
- * Actualiza la respuesta de una confirmación desde el panel administrativo.
- * Si la fila no tenía confirmado_at, lo establece a la hora actual.
+ * Actualiza la respuesta de una confirmación desde el panel administrativo
+ * validando los cupos atómicamente a través de la función de base de datos.
  */
 export const updateRespuestaConfirmacion = async (
   id: string,
   respuesta: RespuestaConfirmacionInput,
-  confirmadoAtPrevio: string | null,
 ): Promise<void> => {
-  const { error } = await supabase
-    .from('confirmaciones')
-    .update({
-      asiste: respuesta.asiste,
-      se_hospeda: respuesta.asiste ? respuesta.seHospeda : false,
-      cena: respuesta.asiste ? respuesta.cena : false,
-      estado_envio: 'confirmado',
-      confirmado_at: confirmadoAtPrevio ?? new Date().toISOString(),
-    })
-    .eq('id', id);
+  // Regla de negocio (única en el cliente; la base de datos la vuelve a validar):
+  // quien no asiste no se hospeda ni cena, y quien se hospeda cena automáticamente.
+  const seHospeda = respuesta.asiste && respuesta.seHospeda;
+  const cena = respuesta.asiste && (seHospeda || respuesta.cena);
+
+  const { error } = await supabase.rpc('admin_actualizar_respuesta', {
+    p_confirmacion_id: id,
+    p_asiste: respuesta.asiste,
+    p_se_hospeda: seHospeda,
+    p_cena: cena,
+  });
 
   if (error) throw error;
 };

@@ -10,6 +10,8 @@ export interface ConfirmacionPublica {
   seHospeda: boolean;
   cena: boolean;
   respondido: boolean;
+  cuposHospedajeDisponibles: number;
+  cuposCenaDisponibles: number;
 }
 
 export interface RespuestaConfirmacion {
@@ -28,6 +30,8 @@ type ConfirmacionPublicaRow = {
   se_hospeda: boolean;
   cena: boolean;
   respondido: boolean;
+  cupos_hospedaje_disponibles: number;
+  cupos_cena_disponibles: number;
 };
 
 /**
@@ -58,6 +62,8 @@ export const getConfirmacionPublica = async (
     seHospeda: fila.se_hospeda,
     cena: fila.cena,
     respondido: fila.respondido,
+    cuposHospedajeDisponibles: Number(fila.cupos_hospedaje_disponibles ?? 0),
+    cuposCenaDisponibles: Number(fila.cupos_cena_disponibles ?? 0),
   };
 };
 

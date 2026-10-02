@@ -16,6 +16,11 @@ interface RespuestasTabProps {
   onActualizada: () => Promise<void>;
 }
 
+// Cupos máximos del encuentro; deben coincidir con los límites validados en la función SQL
+// de la migración 20260624120000_encuentros_cupos_hospedaje_cena.
+const CUPO_HOSPEDAJE = 52;
+const CUPO_CENA = 62;
+
 const formatFechaHora = (fecha: string): string => new Intl.DateTimeFormat('es-PA', {
   dateStyle: 'medium',
   timeStyle: 'short',
@@ -41,11 +46,11 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-5">
-        <Contador titulo="Asisten" valor={contadores.asisten} />
+        <Contador titulo="Asisten" valor={`${contadores.asisten} / ${confirmaciones.length}`} />
         <Contador titulo="No asisten" valor={contadores.noAsisten} />
         <Contador titulo="Sin responder" valor={contadores.sinResponder} />
-        <Contador titulo="Se hospedan" valor={contadores.seHospedan} />
-        <Contador titulo="Cenan" valor={contadores.cenan} />
+        <Contador titulo="Se hospedan" valor={`${contadores.seHospedan} / ${CUPO_HOSPEDAJE}`} alerta={contadores.seHospedan >= CUPO_HOSPEDAJE} />
+        <Contador titulo="Cenan" valor={`${contadores.cenan} / ${CUPO_CENA}`} alerta={contadores.cenan >= CUPO_CENA} />
       </div>
 
       <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
@@ -106,11 +111,11 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
   );
 }
 
-function Contador({ titulo, valor }: { titulo: string; valor: number }) {
+function Contador({ titulo, valor, alerta = false }: { titulo: string; valor: number | string; alerta?: boolean }) {
   return (
-    <div className="rounded-md border border-slate-200 bg-white p-4">
+    <div className={`rounded-md border p-4 ${alerta ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'}`}>
       <p className="text-sm text-slate-600">{titulo}</p>
-      <p className="mt-1 text-2xl font-bold text-slate-900">{valor}</p>
+      <p className={`mt-1 text-2xl font-bold ${alerta ? 'text-amber-900' : 'text-slate-900'}`}>{valor}</p>
     </div>
   );
 }
