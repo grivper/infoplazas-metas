@@ -10,6 +10,9 @@ export interface Encuentro {
   mensaje_template: string | null;
 }
 
+/** Clave estable del encuentro regional de dinamizadores 2026. */
+export const ENCUENTRO_CLAVE = 'encuentro-regional-dinamizadores-2026';
+
 type EncuentroRow = Encuentro;
 
 /** Obtiene el encuentro identificado por su clave estable. */
