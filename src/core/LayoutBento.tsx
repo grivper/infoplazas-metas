@@ -100,7 +100,7 @@ const LayoutBento: React.FC = () => {
       )}
 
       {/* Main Stage */}
-      <main className="flex-1 lg:ml-64 min-h-screen relative">
+      <main className="flex-1 min-w-0 lg:ml-64 min-h-screen relative">
         {/* Top App Bar */}
         <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-slate-100/50">
           <div className="flex justify-between items-center px-6 lg:px-8 py-4">
