@@ -3,7 +3,8 @@ import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FilaProvincia } from '@/components/FilaProvincia';
-import { agruparPorProvincia } from '@/lib/provincias';
+import { FiltroProvincia, TODAS_LAS_PROVINCIAS } from '@/components/FiltroProvincia';
+import { agruparPorProvincia, obtenerProvincias } from '@/lib/provincias';
 import {
   Table,
   TableBody,
@@ -39,17 +40,26 @@ export function TablaConfirmaciones({
   textoWhatsapp = 'Enviar WhatsApp',
 }: TablaConfirmacionesProps) {
   const [busqueda, setBusqueda] = useState('');
+  const [provincia, setProvincia] = useState(TODAS_LAS_PROVINCIAS);
   const conAcciones = Boolean(onRegistrar || onEnviarWhatsapp);
 
-  // Filtra por infoplaza, dinamizador o celular.
+  const provincias = useMemo(
+    () => obtenerProvincias(confirmaciones, (c) => c.dinamizador.infoplaza?.region),
+    [confirmaciones],
+  );
+
+  // Filtra por provincia y luego por infoplaza, dinamizador o celular.
   const visibles = useMemo(() => {
     const termino = normalizar(busqueda.trim());
-    if (!termino) return confirmaciones;
+    const deProvincia = provincia === TODAS_LAS_PROVINCIAS
+      ? confirmaciones
+      : confirmaciones.filter(({ dinamizador }) => dinamizador.infoplaza?.region === provincia);
+    if (!termino) return deProvincia;
 
-    return confirmaciones.filter(({ dinamizador }) => normalizar(
+    return deProvincia.filter(({ dinamizador }) => normalizar(
       `${dinamizador.infoplaza?.nombre ?? ''} ${dinamizador.nombre} ${dinamizador.celular ?? ''}`,
     ).includes(termino));
-  }, [confirmaciones, busqueda]);
+  }, [confirmaciones, busqueda, provincia]);
 
   // Agrupa por la provincia de la infoplaza, ya aplicado el filtro.
   const grupos = useMemo(
@@ -63,19 +73,27 @@ export function TablaConfirmaciones({
       <div className="border-b border-slate-200 px-4 py-3">
         <h2 className="font-semibold text-slate-900">{titulo}</h2>
         <p className="mt-1 text-sm text-slate-600">
-          {busqueda.trim()
+          {busqueda.trim() || provincia !== TODAS_LAS_PROVINCIAS
             ? `${visibles.length} de ${confirmaciones.length}`
             : `${confirmaciones.length} en total`}
         </p>
-        <div className="relative mt-3">
-          <Search className="pointer-events-none absolute left-2.5 top-2.5 size-4 text-slate-400" aria-hidden="true" />
-          <Input
-            type="search"
-            value={busqueda}
-            onChange={(event) => setBusqueda(event.target.value)}
-            placeholder="Buscar por infoplaza, nombre o celular"
-            aria-label={`Buscar en ${titulo}`}
-            className="pl-8"
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-2.5 top-2.5 size-4 text-slate-400" aria-hidden="true" />
+            <Input
+              type="search"
+              value={busqueda}
+              onChange={(event) => setBusqueda(event.target.value)}
+              placeholder="Buscar por infoplaza, nombre o celular"
+              aria-label={`Buscar en ${titulo}`}
+              className="pl-8"
+            />
+          </div>
+          <FiltroProvincia
+            value={provincia}
+            onChange={setProvincia}
+            provincias={provincias}
+            className="sm:w-44"
           />
         </div>
       </div>
