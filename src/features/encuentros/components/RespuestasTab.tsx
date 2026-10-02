@@ -14,16 +14,12 @@ import { agruparPorProvincia, obtenerProvincias } from '@/lib/provincias';
 import type { Confirmacion } from '../services/confirmacionesService';
 import { DescargarConfirmacionesButton } from './DescargarConfirmacionesButton';
 import { ModalEditarRespuesta } from './ModalEditarRespuesta';
+import { LIMITE_CENA_EXTRA, LIMITE_HOSPEDAJE, totalCenasACobrar } from '../utils/cuposCena';
 
 interface RespuestasTabProps {
   confirmaciones: Confirmacion[];
   onActualizada: () => Promise<void>;
 }
-
-// Cupos máximos del encuentro; deben coincidir con los límites validados en la función SQL
-// de la migración 20260624120000_encuentros_cupos_hospedaje_cena.
-const CUPO_HOSPEDAJE = 52;
-const CUPO_CENA = 62;
 
 const formatFechaHora = (fecha: string): string => new Intl.DateTimeFormat('es-PA', {
   dateStyle: 'medium',
@@ -59,22 +55,32 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
     [visibles],
   );
 
-  const contadores = useMemo(() => ({
-    asisten: respondidas.filter((confirmacion) => confirmacion.asiste === true).length,
-    noAsisten: respondidas.filter((confirmacion) => confirmacion.asiste === false).length,
-    sinResponder: confirmaciones.length - respondidas.length,
-    seHospedan: respondidas.filter((confirmacion) => confirmacion.se_hospeda === true).length,
-    cenan: respondidas.filter((confirmacion) => confirmacion.cena === true).length,
-  }), [confirmaciones, respondidas]);
+  const contadores = useMemo(() => {
+    const seHospedan = respondidas.filter((confirmacion) => confirmacion.se_hospeda === true).length;
+    // Cenas extra: solo cuentan las de quienes asisten pero NO se hospedan.
+    // La cena de un hospedado es automática y no forma parte de este cupo de 10.
+    const cenanExtra = respondidas.filter(
+      (confirmacion) => confirmacion.se_hospeda === false && confirmacion.cena === true,
+    ).length;
+    return {
+      asisten: respondidas.filter((confirmacion) => confirmacion.asiste === true).length,
+      noAsisten: respondidas.filter((confirmacion) => confirmacion.asiste === false).length,
+      sinResponder: confirmaciones.length - respondidas.length,
+      seHospedan,
+      cenanExtra,
+      cenasACobrar: totalCenasACobrar(seHospedan, cenanExtra),
+    };
+  }, [confirmaciones, respondidas]);
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
         <Contador titulo="Asisten" valor={`${contadores.asisten} / ${confirmaciones.length}`} />
         <Contador titulo="No asisten" valor={contadores.noAsisten} />
         <Contador titulo="Sin responder" valor={contadores.sinResponder} />
-        <Contador titulo="Se hospedan" valor={`${contadores.seHospedan} / ${CUPO_HOSPEDAJE}`} alerta={contadores.seHospedan >= CUPO_HOSPEDAJE} />
-        <Contador titulo="Cenan" valor={`${contadores.cenan} / ${CUPO_CENA}`} alerta={contadores.cenan >= CUPO_CENA} />
+        <Contador titulo="Se hospedan" valor={`${contadores.seHospedan} / ${LIMITE_HOSPEDAJE}`} alerta={contadores.seHospedan >= LIMITE_HOSPEDAJE} />
+        <Contador titulo="Cenas extra (no hospedados)" valor={`${contadores.cenanExtra} / ${LIMITE_CENA_EXTRA}`} alerta={contadores.cenanExtra >= LIMITE_CENA_EXTRA} />
+        <Contador titulo="Cenas a cobrar" valor={contadores.cenasACobrar} />
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
