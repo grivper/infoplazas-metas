@@ -16,6 +16,7 @@ export interface Confirmacion {
     celular: string | null;
     infoplaza: {
       nombre: string;
+      region: string | null;
     } | null;
   };
 }
@@ -39,6 +40,7 @@ type ConfirmacionQueryRow = {
     celular: string | null;
     catalogo_infoplazas: {
       nombre: string;
+      region: string | null;
       cerrada: boolean;
     } | null;
   } | null;
@@ -61,7 +63,7 @@ export const getConfirmacionesByEncuentro = async (
       dinamizadores (
         nombre,
         celular,
-        catalogo_infoplazas (nombre, cerrada)
+        catalogo_infoplazas (nombre, region, cerrada)
       )
     `)
     .eq('encuentro_id', encuentroId)
@@ -89,7 +91,7 @@ export const getConfirmacionesByEncuentro = async (
       dinamizador: {
         nombre: confirmacion.dinamizadores.nombre,
         celular: confirmacion.dinamizadores.celular,
-        infoplaza: infoplaza ? { nombre: infoplaza.nombre } : null,
+        infoplaza: infoplaza ? { nombre: infoplaza.nombre, region: infoplaza.region } : null,
       },
     }];
   });

@@ -8,6 +8,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { FilaProvincia } from '@/components/FilaProvincia';
+import { agruparPorProvincia } from '@/lib/provincias';
 import type { Confirmacion } from '../services/confirmacionesService';
 import { ModalEditarRespuesta } from './ModalEditarRespuesta';
 
@@ -33,6 +35,12 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
   const respondidas = useMemo(
     () => confirmaciones.filter((confirmacion) => confirmacion.confirmado_at !== null),
     [confirmaciones],
+  );
+
+  // Agrupa las respuestas por la provincia de la infoplaza.
+  const grupos = useMemo(
+    () => agruparPorProvincia(respondidas, (confirmacion) => confirmacion.dinamizador.infoplaza?.region),
+    [respondidas],
   );
 
   const contadores = useMemo(() => ({
@@ -74,7 +82,14 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
                   Todavía no hay respuestas registradas.
                 </TableCell>
               </TableRow>
-            ) : respondidas.map((confirmacion) => (
+            ) : grupos.flatMap(({ provincia, elementos }) => [
+              <FilaProvincia
+                key={`provincia-${provincia}`}
+                provincia={provincia}
+                cantidad={elementos.length}
+                columnas={8}
+              />,
+              ...elementos.map((confirmacion) => (
               <TableRow key={confirmacion.id}>
                 <TableCell className="font-medium">
                   {confirmacion.dinamizador.infoplaza?.nombre ?? 'Sin infoplaza'}
@@ -97,7 +112,8 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
                   </Button>
                 </TableCell>
               </TableRow>
-            ))}
+              )),
+            ])}
           </TableBody>
         </Table>
       </div>

@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { FilaProvincia } from '@/components/FilaProvincia';
+import { agruparPorProvincia } from '@/lib/provincias';
 import {
   Table,
   TableBody,
@@ -49,6 +51,11 @@ export function TablaConfirmaciones({
     ).includes(termino));
   }, [confirmaciones, busqueda]);
 
+  // Agrupa por la provincia de la infoplaza, ya aplicado el filtro.
+  const grupos = useMemo(
+    () => agruparPorProvincia(visibles, (confirmacion) => confirmacion.dinamizador.infoplaza?.region),
+    [visibles],
+  );
   const columnas = conAcciones ? 4 : 3;
 
   return (
@@ -88,7 +95,14 @@ export function TablaConfirmaciones({
                 {confirmaciones.length === 0 ? vacio : 'Sin resultados para la búsqueda.'}
               </TableCell>
             </TableRow>
-          ) : visibles.map((confirmacion) => (
+          ) : grupos.flatMap(({ provincia, elementos }) => [
+            <FilaProvincia
+              key={`provincia-${provincia}`}
+              provincia={provincia}
+              cantidad={elementos.length}
+              columnas={columnas}
+            />,
+            ...elementos.map((confirmacion) => (
             <TableRow key={confirmacion.id}>
               <TableCell className="font-medium">{confirmacion.dinamizador.infoplaza?.nombre ?? 'Sin infoplaza'}</TableCell>
               <TableCell>{confirmacion.dinamizador.nombre}</TableCell>
@@ -113,7 +127,8 @@ export function TablaConfirmaciones({
                 </TableCell>
               )}
             </TableRow>
-          ))}
+          )),
+          ])}
         </TableBody>
       </Table>
     </div>

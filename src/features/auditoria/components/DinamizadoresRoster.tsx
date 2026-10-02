@@ -3,10 +3,11 @@ import { Pencil, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ModalDinamizador } from "./ModalDinamizador";
-import { FilaProvincia, RosterTable } from "./RosterTable";
+import { RosterTable } from "./RosterTable";
+import { FilaProvincia } from "@/components/FilaProvincia";
+import { agruparPorProvincia } from "@/lib/provincias";
 import { TableCell, TableRow } from "@/components/ui/table";
 import {
-  agruparPorProvincia,
   buildEncuentroViewRows,
   getCatalogoInfoplazas,
   getDinamizadores,
@@ -86,11 +87,11 @@ export function DinamizadoresRoster() {
   );
 
   const gruposAsignados = useMemo(
-    () => agruparPorProvincia(filasAsignadas),
+    () => agruparPorProvincia(filasAsignadas, (fila) => fila.infoplaza.region),
     [filasAsignadas],
   );
   const gruposSinAsignar = useMemo(
-    () => agruparPorProvincia(filasSinAsignar),
+    () => agruparPorProvincia(filasSinAsignar, (fila) => fila.infoplaza.region),
     [filasSinAsignar],
   );
 
@@ -177,14 +178,14 @@ export function DinamizadoresRoster() {
             vacio="No hay dinamizadores asignados que coincidan con la búsqueda."
             sinFilas={filasAsignadas.length === 0}
           >
-            {gruposAsignados.map(({ provincia, filas }) => [
+            {gruposAsignados.map(({ provincia, elementos }) => [
               <FilaProvincia
                 key={`provincia-${provincia}`}
                 provincia={provincia}
-                cantidad={filas.length}
-                columnas={5}
+                cantidad={elementos.length}
+                columnas={6}
               />,
-              ...filas.map(({ infoplaza, dinamizador }) => (
+              ...elementos.map(({ infoplaza, dinamizador }) => (
                 <TableRow key={infoplaza.codigo}>
                   <TableCell className="font-medium">
                     {infoplaza.nombre}
@@ -224,14 +225,14 @@ export function DinamizadoresRoster() {
             vacio="No hay infoplazas sin dinamizador que coincidan con la búsqueda."
             sinFilas={filasSinAsignar.length === 0}
           >
-            {gruposSinAsignar.map(({ provincia, filas }) => [
+            {gruposSinAsignar.map(({ provincia, elementos }) => [
               <FilaProvincia
                 key={`provincia-${provincia}`}
                 provincia={provincia}
-                cantidad={filas.length}
-                columnas={2}
+                cantidad={elementos.length}
+                columnas={3}
               />,
-              ...filas.map(({ infoplaza }) => (
+              ...elementos.map(({ infoplaza }) => (
                 <TableRow key={infoplaza.codigo}>
                   <TableCell className="font-medium">
                     {infoplaza.nombre}
