@@ -13,3 +13,13 @@ src/secrets
 .vercel
 .claude/skills/exceljs
 skills-lock.json
+# Local Pi runtime state
+.atl/
+
+# Local tooling, generated graph data, and working source material
+.codegraph/
+.opencode/
+graphify-out/
+encuentros/
+plsntilla informe/
+stitch_formulario_interactivo_de_tarjetas (1)/

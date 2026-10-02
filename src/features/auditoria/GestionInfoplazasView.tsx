@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Route, Plus, ToggleLeft, ToggleRight, Trash2, Edit3, Search } from 'lucide-react';
+import { MapPin, Route, Plus, ToggleLeft, ToggleRight, Trash2, Edit3, Search, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -14,13 +14,14 @@ import { ModalAgregarInfoplaza } from './components/ModalAgregarInfoplaza';
 import { ModalEditarRuta } from './components/ModalEditarRuta';
 import { RutaUploader } from './components/RutaUploader';
 import { CatalogoUploader } from './components/CatalogoUploader';
+import { DinamizadoresRoster } from './components/DinamizadoresRoster';
 
-type TabType = 'catalogo' | 'rutas';
+type TabType = 'catalogo' | 'rutas' | 'dinamizadores';
 type FiltroEstado = 'todas' | 'abiertas' | 'cerradas';
 
 /**
  * Vista de gestión de infoplazas y rutas del sistema de auditoría.
- * Muestra dos pestañas: Catálogo (infoplazas) y Rutas (itinerario).
+ * Muestra las pestañas Catálogo (infoplazas), Rutas (itinerario) y Dinamizadores.
  * Permite agregar, editar, togglear estado y eliminar registros.
  */
 export const GestionInfoplazasView: React.FC = () => {
@@ -120,6 +121,7 @@ export const GestionInfoplazasView: React.FC = () => {
       <div className="flex gap-2 border-b border-slate-200">
         <button onClick={() => setActiveTab('catalogo')} className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === 'catalogo' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500'}`}><MapPin className="w-4 h-4 inline mr-2" />Catálogo</button>
         <button onClick={() => setActiveTab('rutas')} className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === 'rutas' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500'}`}><Route className="w-4 h-4 inline mr-2" />Rutas</button>
+        <button onClick={() => setActiveTab('dinamizadores')} className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === 'dinamizadores' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500'}`}><Users className="w-4 h-4 inline mr-2" />Dinamizadores</button>
       </div>
 
       {activeTab === 'catalogo' && (
@@ -281,6 +283,8 @@ export const GestionInfoplazasView: React.FC = () => {
           )}
         </div>
       )}
+
+      {activeTab === 'dinamizadores' && <DinamizadoresRoster />}
 
       <ModalEditarRuta open={modalRutaOpen} onOpenChange={setModalRutaOpen} ruta={rutaEditando} infoplazas={infoplazasAbiertas} onSuccess={loadData} />
     </div>
