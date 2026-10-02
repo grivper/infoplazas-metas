@@ -11,6 +11,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CampoSelect, CampoTexto } from "./CamposDinamizador";
+import {
+  OPCIONES_SEXO,
+  OPCIONES_TALLA,
+} from "../constants/opcionesDinamizador";
 import {
   Select,
   SelectContent,
@@ -196,17 +201,19 @@ export function ModalDinamizador({
               disabled={guardando}
               onChange={(value) => actualizarCampo("email", value)}
             />
-            <CampoTexto
+            <CampoSelect
               etiqueta="Sexo"
               id="sexo"
               value={form.sexo}
+              opciones={OPCIONES_SEXO}
               disabled={guardando}
               onChange={(value) => actualizarCampo("sexo", value)}
             />
-            <CampoTexto
+            <CampoSelect
               etiqueta="Talla"
               id="talla"
               value={form.talla}
+              opciones={OPCIONES_TALLA}
               disabled={guardando}
               onChange={(value) => actualizarCampo("talla", value)}
             />
@@ -254,36 +261,5 @@ export function ModalDinamizador({
         </form>
       </DialogContent>
     </Dialog>
-  );
-}
-
-interface CampoTextoProps {
-  etiqueta: string;
-  id: string;
-  value: string;
-  type?: "email" | "text";
-  disabled: boolean;
-  onChange: (value: string) => void;
-}
-
-function CampoTexto({
-  etiqueta,
-  id,
-  value,
-  type = "text",
-  disabled,
-  onChange,
-}: CampoTextoProps) {
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>{etiqueta}</Label>
-      <Input
-        id={id}
-        type={type}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        disabled={disabled}
-      />
-    </div>
   );
 }
