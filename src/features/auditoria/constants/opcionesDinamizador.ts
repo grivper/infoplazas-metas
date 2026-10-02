@@ -7,6 +7,7 @@ export const OPCIONES_TALLA = [
   "M-Hombre",
   "L-Hombre",
   "XL-Hombre",
+  "XXL-Hombre",
   "S-Mujer / 14",
   "M-Mujer / 16",
   "L-Mujer / 18",
