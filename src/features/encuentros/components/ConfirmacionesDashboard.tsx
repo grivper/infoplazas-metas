@@ -161,7 +161,7 @@ export function ConfirmacionesDashboard() {
   if (!encuentro) {
     return (
       <p className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">
-        No se encontró el encuentro regional de dinamizadores 2026.
+        No se encontró el Encuentro Regional de Dinamizadores 2026.
       </p>
     );
   }

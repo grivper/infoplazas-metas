@@ -15,7 +15,7 @@ Crear el módulo Encuentros para administrar dinamizadores y, en iteraciones pos
 - [x] Separar en dos tablas las infoplazas con dinamizador asignado y las vacantes.
 - [x] Ocultar las infoplazas cerradas/inactivas de la vista Encuentros.
 - [x] Permitir asignar un dinamizador directamente desde la tabla de vacantes.
-- [x] Registrar el Encuentro regional de dinamizadores (29–30 de octubre de 2026, Gran Hotel Azuero) y generar sus 104 confirmaciones iniciales.
+- [x] Registrar el Encuentro Regional de Dinamizadores (29–30 de octubre de 2026, Gran Hotel Azuero) y generar sus 104 confirmaciones iniciales.
 - [x] Añadir tablero de confirmaciones, plantilla editable y tablas de estado.
 - [x] Mover la gestión de dinamizadores a Gestión de Infoplazas, junto a Catálogo y Rutas.
 - [x] Añadir formulario público de autoconfirmación (/confirmar/:token).

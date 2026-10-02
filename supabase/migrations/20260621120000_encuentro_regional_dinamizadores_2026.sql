@@ -1,5 +1,5 @@
 -- =============================================================================
--- Encuentro regional de dinamizadores | 29–30 octubre 2026 | Gran Hotel Azuero
+-- Encuentro Regional de Dinamizadores | 29–30 octubre 2026 | Gran Hotel Azuero
 -- =============================================================================
 -- Añade soporte para rango de fechas y mensaje editable, registra el encuentro
 -- regional 2026 y genera una confirmación pendiente por cada infoplaza activa
@@ -28,7 +28,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_encuentros_clave_unique
   WHERE clave IS NOT NULL;
 
 -- -----------------------------------------------------------------------------
--- 2. Evento activo: Encuentro regional de dinamizadores 2026
+-- 2. Evento activo: Encuentro Regional de Dinamizadores 2026
 -- -----------------------------------------------------------------------------
 INSERT INTO encuentros (
   clave,
@@ -41,12 +41,12 @@ INSERT INTO encuentros (
 )
 VALUES (
   'encuentro-regional-dinamizadores-2026',
-  'Encuentro regional de dinamizadores: Infoplazas, hubs regionales de alfabetización digital y en IA',
+  'Encuentro Regional de Dinamizadores: «Infoplazas: Hubs Regionales de Alfabetización Digital y en IA»',
   '2026-10-29',
   '2026-10-29',
   '2026-10-30',
   'Gran Hotel Azuero',
-  'Hola {nombre}, te invitamos al Encuentro regional de dinamizadores: Infoplazas, hubs regionales de alfabetización digital y en IA, los días 29 y 30 de octubre de 2026 en el Gran Hotel Azuero. Por favor, confirma tu asistencia aquí: {link}'
+  'Hola {nombre}, te invitamos al Encuentro Regional de Dinamizadores: «Infoplazas: Hubs Regionales de Alfabetización Digital y en IA», los días 29 y 30 de octubre de 2026 en el Gran Hotel Azuero. Por favor, confirma tu asistencia aquí: {link}'
 )
 ON CONFLICT (clave) WHERE clave IS NOT NULL DO NOTHING;
 
