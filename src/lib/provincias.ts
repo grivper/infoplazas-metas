@@ -1,11 +1,11 @@
-const SIN_PROVINCIA = 'Sin provincia';
+const SIN_PROVINCIA = "Sin provincia";
 
 /**
  * Agrupa elementos por provincia (región). `obtenerProvincia` indica de dónde
  * sale la provincia de cada elemento. Las provincias salen en orden alfabético
  * y "Sin provincia" siempre al final.
  */
-export const agruparPorProvincia = <T,>(
+export const agruparPorProvincia = <T>(
   elementos: T[],
   obtenerProvincia: (elemento: T) => string | null | undefined,
 ): Array<{ provincia: string; elementos: T[] }> => {
@@ -21,6 +21,20 @@ export const agruparPorProvincia = <T,>(
     .sort((a, b) => {
       if (a.provincia === SIN_PROVINCIA) return 1;
       if (b.provincia === SIN_PROVINCIA) return -1;
-      return a.provincia.localeCompare(b.provincia, 'es');
+      return a.provincia.localeCompare(b.provincia, "es");
     });
 };
+
+/** Provincias distintas presentes en los elementos, en orden alfabético. */
+export const obtenerProvincias = <T>(
+  elementos: T[],
+  obtenerProvincia: (elemento: T) => string | null | undefined,
+): string[] =>
+  [
+    ...new Set(
+      elementos.flatMap((elemento) => {
+        const provincia = obtenerProvincia(elemento)?.trim();
+        return provincia ? [provincia] : [];
+      }),
+    ),
+  ].sort((a, b) => a.localeCompare(b, "es"));

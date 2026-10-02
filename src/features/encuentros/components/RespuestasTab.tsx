@@ -9,7 +9,8 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { FilaProvincia } from '@/components/FilaProvincia';
-import { agruparPorProvincia } from '@/lib/provincias';
+import { FiltroProvincia, TODAS_LAS_PROVINCIAS } from '@/components/FiltroProvincia';
+import { agruparPorProvincia, obtenerProvincias } from '@/lib/provincias';
 import type { Confirmacion } from '../services/confirmacionesService';
 import { ModalEditarRespuesta } from './ModalEditarRespuesta';
 
@@ -31,16 +32,30 @@ const formatFechaHora = (fecha: string): string => new Intl.DateTimeFormat('es-P
 /** Pestaña con las respuestas ya recibidas: conteos y tabla editable. */
 export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabProps) {
   const [confirmacionEnEdicion, setConfirmacionEnEdicion] = useState<Confirmacion | null>(null);
+  const [provincia, setProvincia] = useState(TODAS_LAS_PROVINCIAS);
 
   const respondidas = useMemo(
     () => confirmaciones.filter((confirmacion) => confirmacion.confirmado_at !== null),
     [confirmaciones],
   );
 
+  const provincias = useMemo(
+    () => obtenerProvincias(respondidas, (c) => c.dinamizador.infoplaza?.region),
+    [respondidas],
+  );
+
+  // El filtro solo afecta a la tabla: los contadores y cupos siguen siendo globales.
+  const visibles = useMemo(
+    () => (provincia === TODAS_LAS_PROVINCIAS
+      ? respondidas
+      : respondidas.filter((c) => c.dinamizador.infoplaza?.region === provincia)),
+    [respondidas, provincia],
+  );
+
   // Agrupa las respuestas por la provincia de la infoplaza.
   const grupos = useMemo(
-    () => agruparPorProvincia(respondidas, (confirmacion) => confirmacion.dinamizador.infoplaza?.region),
-    [respondidas],
+    () => agruparPorProvincia(visibles, (confirmacion) => confirmacion.dinamizador.infoplaza?.region),
+    [visibles],
   );
 
   const contadores = useMemo(() => ({
@@ -61,6 +76,13 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
         <Contador titulo="Cenan" valor={`${contadores.cenan} / ${CUPO_CENA}`} alerta={contadores.cenan >= CUPO_CENA} />
       </div>
 
+      <FiltroProvincia
+        value={provincia}
+        onChange={setProvincia}
+        provincias={provincias}
+        className="sm:w-56"
+      />
+
       <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
         <Table>
           <TableHeader>
@@ -76,10 +98,12 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
             </TableRow>
           </TableHeader>
           <TableBody>
-            {respondidas.length === 0 ? (
+            {visibles.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={8} className="text-center text-slate-600">
-                  Todavía no hay respuestas registradas.
+                  {respondidas.length === 0
+                    ? 'Todavía no hay respuestas registradas.'
+                    : 'No hay respuestas en esta provincia.'}
                 </TableCell>
               </TableRow>
             ) : grupos.flatMap(({ provincia, elementos }) => [

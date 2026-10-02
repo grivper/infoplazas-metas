@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Pencil, Plus, Search } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ModalDinamizador } from "./ModalDinamizador";
 import { RosterTable } from "./RosterTable";
+import { BarraFiltrosRoster } from "./BarraFiltrosRoster";
+import { TODAS_LAS_PROVINCIAS } from "@/components/FiltroProvincia";
 import { FilaProvincia } from "@/components/FilaProvincia";
-import { agruparPorProvincia } from "@/lib/provincias";
+import { agruparPorProvincia, obtenerProvincias } from "@/lib/provincias";
 import { TableCell, TableRow } from "@/components/ui/table";
 import {
   buildEncuentroViewRows,
@@ -24,6 +25,7 @@ export function DinamizadoresRoster() {
   const [dinamizadores, setDinamizadores] = useState<Dinamizador[]>([]);
   const [infoplazas, setInfoplazas] = useState<InfoplazaCatalogo[]>([]);
   const [busqueda, setBusqueda] = useState("");
+  const [provincia, setProvincia] = useState(TODAS_LAS_PROVINCIAS);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -62,21 +64,33 @@ export function DinamizadoresRoster() {
     () => infoplazas.filter((infoplaza) => !infoplaza.cerrada),
     [infoplazas],
   );
+  // Provincias que existen entre las infoplazas abiertas, para el filtro.
+  const provinciasDisponibles = useMemo(
+    () => obtenerProvincias(infoplazasActivas, ({ region }) => region),
+    [infoplazasActivas],
+  );
   const filasEncuentros = useMemo(
     () => buildEncuentroViewRows(infoplazasActivas, dinamizadores),
     [dinamizadores, infoplazasActivas],
   );
   const filasFiltradas = useMemo(() => {
     const termino = busqueda.trim().toLocaleLowerCase();
-    if (!termino) return filasEncuentros;
-    return filasEncuentros.filter(
+    // Primero se restringe por provincia y luego por texto.
+    const filasDeProvincia =
+      provincia === TODAS_LAS_PROVINCIAS
+        ? filasEncuentros
+        : filasEncuentros.filter(
+            ({ infoplaza }) => infoplaza.region === provincia,
+          );
+    if (!termino) return filasDeProvincia;
+    return filasDeProvincia.filter(
       ({ infoplaza, dinamizador }) =>
         infoplaza.nombre.toLocaleLowerCase().includes(termino) ||
         infoplaza.codigo.toLocaleLowerCase().includes(termino) ||
         dinamizador?.nombre.toLocaleLowerCase().includes(termino) ||
         dinamizador?.cedula?.toLocaleLowerCase().includes(termino),
     );
-  }, [busqueda, filasEncuentros]);
+  }, [busqueda, provincia, filasEncuentros]);
   const filasAsignadas = useMemo(
     () => filasFiltradas.filter(tieneDinamizador),
     [filasFiltradas],
@@ -130,17 +144,14 @@ export function DinamizadoresRoster() {
           Agregar dinamizador
         </Button>
       </div>
-      <div className="relative max-w-md">
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
-        <Input
-          value={busqueda}
-          onChange={(event) => setBusqueda(event.target.value)}
-          placeholder="Buscar por nombre, cédula o código"
-          className="pl-9"
-          aria-label="Buscar dinamizadores"
-          disabled={cargando || Boolean(error)}
-        />
-      </div>
+      <BarraFiltrosRoster
+        busqueda={busqueda}
+        onBusquedaChange={setBusqueda}
+        provincia={provincia}
+        onProvinciaChange={setProvincia}
+        provincias={provinciasDisponibles}
+        disabled={cargando || Boolean(error)}
+      />
       {cargando ? (
         <p className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">
           Cargando dinamizadores...
