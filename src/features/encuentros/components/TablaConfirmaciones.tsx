@@ -1,4 +1,7 @@
+import { useMemo, useState } from 'react';
+import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -8,6 +11,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import type { Confirmacion } from '../services/confirmacionesService';
+
+/** Minúsculas y sin tildes, para que "nata" encuentre "Natá". */
+const normalizar = (texto: string): string => texto
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase();
 
 interface TablaConfirmacionesProps {
   titulo: string;
@@ -27,14 +36,41 @@ export function TablaConfirmaciones({
   onEnviarWhatsapp,
   textoWhatsapp = 'Enviar WhatsApp',
 }: TablaConfirmacionesProps) {
+  const [busqueda, setBusqueda] = useState('');
   const conAcciones = Boolean(onRegistrar || onEnviarWhatsapp);
+
+  // Filtra por infoplaza, dinamizador o celular.
+  const visibles = useMemo(() => {
+    const termino = normalizar(busqueda.trim());
+    if (!termino) return confirmaciones;
+
+    return confirmaciones.filter(({ dinamizador }) => normalizar(
+      `${dinamizador.infoplaza?.nombre ?? ''} ${dinamizador.nombre} ${dinamizador.celular ?? ''}`,
+    ).includes(termino));
+  }, [confirmaciones, busqueda]);
+
   const columnas = conAcciones ? 4 : 3;
 
   return (
     <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
       <div className="border-b border-slate-200 px-4 py-3">
         <h2 className="font-semibold text-slate-900">{titulo}</h2>
-        <p className="mt-1 text-sm text-slate-600">{confirmaciones.length} en total</p>
+        <p className="mt-1 text-sm text-slate-600">
+          {busqueda.trim()
+            ? `${visibles.length} de ${confirmaciones.length}`
+            : `${confirmaciones.length} en total`}
+        </p>
+        <div className="relative mt-3">
+          <Search className="pointer-events-none absolute left-2.5 top-2.5 size-4 text-slate-400" aria-hidden="true" />
+          <Input
+            type="search"
+            value={busqueda}
+            onChange={(event) => setBusqueda(event.target.value)}
+            placeholder="Buscar por infoplaza, nombre o celular"
+            aria-label={`Buscar en ${titulo}`}
+            className="pl-8"
+          />
+        </div>
       </div>
       <Table>
         <TableHeader>
@@ -46,11 +82,13 @@ export function TablaConfirmaciones({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {confirmaciones.length === 0 ? (
+          {visibles.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={columnas} className="text-center text-slate-600">{vacio}</TableCell>
+              <TableCell colSpan={columnas} className="text-center text-slate-600">
+                {confirmaciones.length === 0 ? vacio : 'Sin resultados para la búsqueda.'}
+              </TableCell>
             </TableRow>
-          ) : confirmaciones.map((confirmacion) => (
+          ) : visibles.map((confirmacion) => (
             <TableRow key={confirmacion.id}>
               <TableCell className="font-medium">{confirmacion.dinamizador.infoplaza?.nombre ?? 'Sin infoplaza'}</TableCell>
               <TableCell>{confirmacion.dinamizador.nombre}</TableCell>
