@@ -17,7 +17,7 @@ export function EncabezadoConfirmacion({ confirmacion, titulo }: { confirmacion:
       <div className="relative">
         <p className="inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-emerald-800">Confirmación de asistencia</p>
         <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl">{titulo}</h1>
-        <p className="mt-2 text-sm leading-6 text-slate-600">Te esperamos en <span className="font-semibold text-slate-800">{confirmacion.encuentroNombre}</span></p>
+        <p className="mt-2 text-sm leading-6 text-slate-600">Te esperamos en el <span className="font-semibold text-slate-800">{confirmacion.encuentroNombre}</span></p>
         <div className="mt-5 flex flex-wrap gap-2 text-xs font-medium text-slate-700">
           <span className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white/90 px-3 py-2 shadow-sm"><CalendarDays className="size-3.5 text-emerald-700" aria-hidden="true" />{formatRangoFechas(confirmacion)}</span>
           <span className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white/90 px-3 py-2 shadow-sm"><MapPin className="size-3.5 text-emerald-700" aria-hidden="true" />{confirmacion.sede}</span>
