@@ -63,25 +63,3 @@ export function RosterTable({
     </div>
   );
 }
-
-/** Fila separadora con el nombre de la provincia y su cantidad de filas. */
-export function FilaProvincia({
-  provincia,
-  cantidad,
-  columnas,
-}: {
-  provincia: string;
-  cantidad: number;
-  columnas: number;
-}) {
-  return (
-    <TableRow className="bg-slate-50 hover:bg-slate-50">
-      <TableCell
-        colSpan={columnas + 1}
-        className="py-2 text-xs font-semibold uppercase tracking-wide text-slate-600"
-      >
-        {provincia} · {cantidad}
-      </TableCell>
-    </TableRow>
-  );
-}
