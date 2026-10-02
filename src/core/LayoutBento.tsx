@@ -17,7 +17,12 @@ const LayoutBento: React.FC = () => {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar oscura */}
-      <aside className="bg-slate-900 h-screen w-64 fixed left-0 top-0 overflow-y-auto z-50 flex flex-col py-6 shadow-2xl transition-transform duration-300 lg:translate-x-0 -translate-x-full">
+      <aside
+        className={`bg-slate-900 h-screen w-64 fixed left-0 top-0 overflow-y-auto z-50 flex flex-col py-6 shadow-2xl transition-transform duration-300 lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+        aria-label="Menú principal"
+      >
         {/* Logo */}
         <div className="px-6 mb-10">
           <div className="flex items-center gap-3">
@@ -104,6 +109,8 @@ const LayoutBento: React.FC = () => {
               <button 
                 className="lg:hidden p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
+                aria-label={sidebarOpen ? 'Cerrar menú' : 'Abrir menú'}
+                aria-expanded={sidebarOpen}
               >
                 <Menu className="w-6 h-6" />
               </button>
