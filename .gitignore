@@ -13,3 +13,5 @@ src/secrets
 .vercel
 .claude/skills/exceljs
 skills-lock.json
+# Local Pi runtime state
+.atl/
