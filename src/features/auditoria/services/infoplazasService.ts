@@ -7,7 +7,11 @@ export interface Infoplaza {
   id?: string;
   codigo: string;
   nombre: string;
+  /** Provincia de la infoplaza. */
   region: string;
+  /** División territorial; puede faltar en registros aún no reconciliados. */
+  distrito?: string | null;
+  corregimiento?: string | null;
   cerrada?: boolean;
   fecha_cierre?: string | null;
   created_at?: string;
@@ -108,6 +112,7 @@ export const fetchInfoplazasEnlaceMap = async (): Promise<Record<string, Infopla
 
   const map: Record<string, InfoplazaEnlace> = {};
   
+  // SAFETY: the joined Supabase selection has the fields declared in ItinerarioEnlaceRow.
   (data as unknown as ItinerarioEnlaceRow[] | null)?.forEach((item) => {
     const codigoCompleto = item.catalogo_infoplazas?.codigo;
     if (codigoCompleto) {

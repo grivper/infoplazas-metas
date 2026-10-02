@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Route, Plus, ToggleLeft, ToggleRight, Trash2, Edit3, Search, Users } from 'lucide-react';
+import { MapPin, Route, Plus, Trash2, Edit3, Search, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,7 @@ import { ModalEditarRuta } from './components/ModalEditarRuta';
 import { RutaUploader } from './components/RutaUploader';
 import { CatalogoUploader } from './components/CatalogoUploader';
 import { DinamizadoresRoster } from './components/DinamizadoresRoster';
+import { InfoplazasCatalogTable } from './components/InfoplazasCatalogTable';
 
 type TabType = 'catalogo' | 'rutas' | 'dinamizadores';
 type FiltroEstado = 'todas' | 'abiertas' | 'cerradas';
@@ -138,87 +139,7 @@ export const GestionInfoplazasView: React.FC = () => {
             </div>
           </div>
           
-          {/* Agrupar por estado: Abiertas primero, luego Cerradas */}
-          {(() => {
-            const abiertas = filtradas.filter(ip => !ip.cerrada);
-            const cerradas = filtradas.filter(ip => ip.cerrada);
-            
-            return (
-              <>
-                {/* Grupo Abiertas */}
-                {abiertas.length > 0 && (
-                  <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                    <div className="bg-emerald-100 px-4 py-3 border-b border-slate-200">
-                      <h3 className="font-semibold text-emerald-800">Infoplazas Abiertas</h3>
-                      <p className="text-xs text-emerald-600">{abiertas.length} {abiertas.length === 1 ? 'infoplaza' : 'infoplazas'}</p>
-                    </div>
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="hover:bg-slate-50">
-                          <TableHead className="text-xs font-bold text-slate-600 uppercase tracking-wider py-3 px-4">Nombre</TableHead>
-                          <TableHead className="text-xs font-bold text-slate-600 uppercase tracking-wider py-3 px-4">Región</TableHead>
-                          <TableHead className="text-xs font-bold text-slate-600 uppercase tracking-wider py-3 px-4">Estado</TableHead>
-                          <TableHead className="text-xs font-bold text-slate-600 uppercase tracking-wider py-3 px-4">Fecha Cierre</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {abiertas.map(ip => (
-                          <TableRow key={ip.id} className="hover:bg-indigo-50 transition-colors cursor-pointer group border-b border-slate-100 last:border-b-0">
-                            <TableCell className="py-3 px-4 font-medium text-sm text-slate-800 group-hover:text-indigo-800">{ip.nombre}</TableCell>
-                            <TableCell className="py-3 px-4 text-sm text-slate-500 group-hover:text-slate-700">{ip.region}</TableCell>
-                            <TableCell className="py-3 px-4">
-                              <button onClick={() => handleToggle(ip)} className="flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700">
-                                <ToggleRight className="w-5 h-5" />Abierta
-                              </button>
-                            </TableCell>
-                            <TableCell className="py-3 px-4 text-sm text-slate-500">{ip.fecha_cierre || '-'}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-                
-                {/* Grupo Cerradas */}
-                {cerradas.length > 0 && (
-                  <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                    <div className="bg-rose-100 px-4 py-3 border-b border-slate-200">
-                      <h3 className="font-semibold text-rose-800">Infoplazas Cerradas</h3>
-                      <p className="text-xs text-rose-600">{cerradas.length} {cerradas.length === 1 ? 'infoplaza' : 'infoplazas'}</p>
-                    </div>
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="hover:bg-slate-50">
-                          <TableHead className="text-xs font-bold text-slate-600 uppercase tracking-wider py-3 px-4">Nombre</TableHead>
-                          <TableHead className="text-xs font-bold text-slate-600 uppercase tracking-wider py-3 px-4">Región</TableHead>
-                          <TableHead className="text-xs font-bold text-slate-600 uppercase tracking-wider py-3 px-4">Estado</TableHead>
-                          <TableHead className="text-xs font-bold text-slate-600 uppercase tracking-wider py-3 px-4">Fecha Cierre</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {cerradas.map(ip => (
-                          <TableRow key={ip.id} className="hover:bg-indigo-50 transition-colors cursor-pointer group border-b border-slate-100 last:border-b-0">
-                            <TableCell className="py-3 px-4 font-medium text-sm text-slate-800 group-hover:text-indigo-800">{ip.nombre}</TableCell>
-                            <TableCell className="py-3 px-4 text-sm text-slate-500 group-hover:text-slate-700">{ip.region}</TableCell>
-                            <TableCell className="py-3 px-4">
-                              <button onClick={() => handleToggle(ip)} className="flex items-center gap-1 text-sm font-medium text-rose-600 hover:text-rose-700">
-                                <ToggleLeft className="w-5 h-5" />Cerrada
-                              </button>
-                            </TableCell>
-                            <TableCell className="py-3 px-4 text-sm text-slate-500">{ip.fecha_cierre || '-'}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-                
-                {filtradas.length === 0 && (
-                  <div className="text-center py-12 text-slate-500">No hay infoplazas que mostrar</div>
-                )}
-              </>
-            );
-          })()}
+          <InfoplazasCatalogTable infoplazas={filtradas} onToggle={handleToggle} />
         </div>
       )}
 
