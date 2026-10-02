@@ -15,6 +15,7 @@ import type { Confirmacion } from '../services/confirmacionesService';
 import { DescargarConfirmacionesButton } from './DescargarConfirmacionesButton';
 import { ModalEditarRespuesta } from './ModalEditarRespuesta';
 import { LIMITE_CENA_EXTRA, LIMITE_HOSPEDAJE, totalCenasACobrar } from '../utils/cuposCena';
+import { contarHospedadosPorSexo } from '../utils/hospedadosPorSexo';
 
 interface RespuestasTabProps {
   confirmaciones: Confirmacion[];
@@ -62,6 +63,7 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
     const cenanExtra = respondidas.filter(
       (confirmacion) => confirmacion.se_hospeda === false && confirmacion.cena === true,
     ).length;
+    const hospedadosPorSexo = contarHospedadosPorSexo(respondidas);
     return {
       asisten: respondidas.filter((confirmacion) => confirmacion.asiste === true).length,
       noAsisten: respondidas.filter((confirmacion) => confirmacion.asiste === false).length,
@@ -69,19 +71,27 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
       seHospedan,
       cenanExtra,
       cenasACobrar: totalCenasACobrar(seHospedan, cenanExtra),
+      hospedadosPorSexo,
     };
   }, [confirmaciones, respondidas]);
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8">
         <Contador titulo="Asisten" valor={`${contadores.asisten} / ${confirmaciones.length}`} />
         <Contador titulo="No asisten" valor={contadores.noAsisten} />
         <Contador titulo="Sin responder" valor={contadores.sinResponder} />
         <Contador titulo="Se hospedan" valor={`${contadores.seHospedan} / ${LIMITE_HOSPEDAJE}`} alerta={contadores.seHospedan >= LIMITE_HOSPEDAJE} />
+        <Contador titulo="Hospedadas (mujeres)" valor={contadores.hospedadosPorSexo.mujeres} />
+        <Contador titulo="Hospedados (hombres)" valor={contadores.hospedadosPorSexo.hombres} />
         <Contador titulo="Cenas extra (no hospedados)" valor={`${contadores.cenanExtra} / ${LIMITE_CENA_EXTRA}`} alerta={contadores.cenanExtra >= LIMITE_CENA_EXTRA} />
         <Contador titulo="Cenas a cobrar" valor={contadores.cenasACobrar} />
       </div>
+      {contadores.hospedadosPorSexo.sinDato > 0 && (
+        <p className="text-sm text-slate-600">
+          {contadores.hospedadosPorSexo.sinDato} hospedado(s) sin dato de sexo registrado.
+        </p>
+      )}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <FiltroProvincia
