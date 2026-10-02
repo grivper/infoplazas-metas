@@ -3,17 +3,10 @@ import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import {
   getConfirmacionesByEncuentro,
+  marcarConfirmacionEnviada,
   type Confirmacion,
   type EstadoEnvio,
 } from '../services/confirmacionesService';
@@ -22,23 +15,27 @@ import {
   updateMensajeTemplate,
   type Encuentro,
 } from '../services/encuentrosService';
+import { TablaConfirmaciones } from './TablaConfirmaciones';
+import { buildWhatsappUrl } from '../utils/whatsapp';
 import { RespuestasTab } from './RespuestasTab';
 import { ModalEditarRespuesta } from './ModalEditarRespuesta';
 
 const ENCUENTRO_CLAVE = 'encuentro-regional-dinamizadores-2026';
 
-const estados: Array<{ estado: EstadoEnvio; titulo: string; vacio: string; conAccion: boolean }> = [
+const estados: Array<{ estado: EstadoEnvio; titulo: string; vacio: string; conAccion: boolean; whatsapp: string | null }> = [
   {
     estado: 'pendiente',
     titulo: 'Pendientes de envío',
     vacio: 'No hay confirmaciones pendientes de envío.',
     conAccion: false,
+    whatsapp: 'Enviar WhatsApp',
   },
   {
     estado: 'enviado',
     titulo: 'Enviados sin responder',
     vacio: 'No hay confirmaciones enviadas sin respuesta.',
     conAccion: true,
+    whatsapp: 'Reenviar WhatsApp',
   },
 ];
 
@@ -108,6 +105,30 @@ export function ConfirmacionesDashboard() {
     ]),
   ), [confirmaciones]);
 
+  // Abre WhatsApp con el mensaje personalizado y marca la confirmación como
+  // enviada. La ventana se abre primero (dentro del clic) para que el
+  // navegador no la bloquee como popup.
+  const enviarWhatsapp = async (confirmacion: Confirmacion) => {
+    const url = buildWhatsappUrl(confirmacion, mensajeTemplate);
+    if (!url) {
+      setError('Esta confirmación no tiene un celular válido.');
+      return;
+    }
+
+    setError('');
+    window.open(url, '_blank', 'noopener,noreferrer');
+
+    try {
+      await marcarConfirmacionEnviada(confirmacion.id);
+      await recargarConfirmaciones();
+    } catch (sendError) {
+      const mensaje = sendError instanceof Error
+        ? sendError.message
+        : 'No se pudo marcar la confirmación como enviada.';
+      setError(mensaje);
+    }
+  };
+
   const guardarMensaje = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!encuentro) return;
@@ -166,13 +187,15 @@ export function ConfirmacionesDashboard() {
 
         <TabsContent value="seguimiento" className="mt-6">
           <div className="grid gap-4 lg:grid-cols-2">
-            {estados.map(({ estado, titulo, vacio, conAccion }) => (
+            {estados.map(({ estado, titulo, vacio, conAccion, whatsapp }) => (
               <TablaConfirmaciones
                 key={estado}
                 titulo={titulo}
                 confirmaciones={confirmacionesPorEstado.get(estado) ?? []}
                 vacio={vacio}
                 onRegistrar={conAccion ? setConfirmacionARegistrar : undefined}
+                onEnviarWhatsapp={enviarWhatsapp}
+                textoWhatsapp={whatsapp ?? undefined}
               />
             ))}
           </div>
@@ -216,61 +239,6 @@ export function ConfirmacionesDashboard() {
         onGuardado={recargarConfirmaciones}
       />
     </section>
-  );
-}
-
-interface TablaConfirmacionesProps {
-  titulo: string;
-  confirmaciones: Confirmacion[];
-  vacio: string;
-  onRegistrar?: (confirmacion: Confirmacion) => void;
-}
-
-function TablaConfirmaciones({
-  titulo,
-  confirmaciones,
-  vacio,
-  onRegistrar,
-}: TablaConfirmacionesProps) {
-  const columnas = onRegistrar ? 4 : 3;
-
-  return (
-    <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
-      <div className="border-b border-slate-200 px-4 py-3">
-        <h2 className="font-semibold text-slate-900">{titulo}</h2>
-        <p className="mt-1 text-sm text-slate-600">{confirmaciones.length} en total</p>
-      </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Infoplaza</TableHead>
-            <TableHead>Dinamizador</TableHead>
-            <TableHead>Celular</TableHead>
-            {onRegistrar && <TableHead />}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {confirmaciones.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={columnas} className="text-center text-slate-600">{vacio}</TableCell>
-            </TableRow>
-          ) : confirmaciones.map((confirmacion) => (
-            <TableRow key={confirmacion.id}>
-              <TableCell className="font-medium">{confirmacion.dinamizador.infoplaza?.nombre ?? 'Sin infoplaza'}</TableCell>
-              <TableCell>{confirmacion.dinamizador.nombre}</TableCell>
-              <TableCell>{confirmacion.dinamizador.celular ?? '—'}</TableCell>
-              {onRegistrar && (
-                <TableCell>
-                  <Button variant="outline" size="sm" onClick={() => onRegistrar(confirmacion)}>
-                    Registrar respuesta
-                  </Button>
-                </TableCell>
-              )}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
   );
 }
 

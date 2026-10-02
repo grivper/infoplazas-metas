@@ -4,6 +4,7 @@ export type EstadoEnvio = 'pendiente' | 'enviado' | 'confirmado';
 
 export interface Confirmacion {
   id: string;
+  token: string;
   estado_envio: EstadoEnvio;
   asiste: boolean | null;
   se_hospeda: boolean | null;
@@ -26,6 +27,7 @@ export interface RespuestaConfirmacionInput {
 
 type ConfirmacionQueryRow = {
   id: string;
+  token: string;
   estado_envio: EstadoEnvio;
   asiste: boolean | null;
   se_hospeda: boolean | null;
@@ -49,6 +51,7 @@ export const getConfirmacionesByEncuentro = async (
     .from('confirmaciones')
     .select(`
       id,
+      token,
       estado_envio,
       asiste,
       se_hospeda,
@@ -76,6 +79,7 @@ export const getConfirmacionesByEncuentro = async (
 
     return [{
       id: confirmacion.id,
+      token: confirmacion.token,
       estado_envio: confirmacion.estado_envio,
       asiste: confirmacion.asiste,
       se_hospeda: confirmacion.se_hospeda,
@@ -88,6 +92,19 @@ export const getConfirmacionesByEncuentro = async (
       },
     }];
   });
+};
+
+/** Marca la confirmación como enviada al abrir su acción de WhatsApp. */
+export const marcarConfirmacionEnviada = async (id: string): Promise<void> => {
+  const { error } = await supabase
+    .from('confirmaciones')
+    .update({
+      estado_envio: 'enviado',
+      enviado_at: new Date().toISOString(),
+    })
+    .eq('id', id);
+
+  if (error) throw error;
 };
 
 /**
