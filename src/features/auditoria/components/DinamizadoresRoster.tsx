@@ -2,16 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pencil, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { ModalDinamizador } from "./ModalDinamizador";
+import { FilaProvincia, RosterTable } from "./RosterTable";
+import { TableCell, TableRow } from "@/components/ui/table";
 import {
+  agruparPorProvincia,
   buildEncuentroViewRows,
   getCatalogoInfoplazas,
   getDinamizadores,
@@ -88,6 +83,15 @@ export function DinamizadoresRoster() {
   const filasSinAsignar = useMemo(
     () => filasFiltradas.filter((fila) => !tieneDinamizador(fila)),
     [filasFiltradas],
+  );
+
+  const gruposAsignados = useMemo(
+    () => agruparPorProvincia(filasAsignadas),
+    [filasAsignadas],
+  );
+  const gruposSinAsignar = useMemo(
+    () => agruparPorProvincia(filasSinAsignar),
+    [filasSinAsignar],
   );
 
   const abrirCreacion = (codigoInfoplaza: string | null = null) => {
@@ -171,66 +175,84 @@ export function DinamizadoresRoster() {
               "Estatus",
             ]}
             vacio="No hay dinamizadores asignados que coincidan con la búsqueda."
+            sinFilas={filasAsignadas.length === 0}
           >
-            {filasAsignadas.map(({ infoplaza, dinamizador }) => (
-              <TableRow key={infoplaza.codigo}>
-                <TableCell className="font-medium">
-                  {infoplaza.nombre}
-                </TableCell>
-                <TableCell>{dinamizador.nombre}</TableCell>
-                <TableCell>{dinamizador.cedula || "—"}</TableCell>
-                <TableCell>{dinamizador.celular || "—"}</TableCell>
-                <TableCell>
-                  <span
-                    className={
-                      dinamizador.estatus === "Activo"
-                        ? "font-medium text-emerald-700"
-                        : "font-medium text-slate-500"
-                    }
-                  >
-                    {dinamizador.estatus}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => abrirEdicion(dinamizador)}
-                  >
-                    <Pencil />
-                    Editar
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+            {gruposAsignados.map(({ provincia, filas }) => [
+              <FilaProvincia
+                key={`provincia-${provincia}`}
+                provincia={provincia}
+                cantidad={filas.length}
+                columnas={5}
+              />,
+              ...filas.map(({ infoplaza, dinamizador }) => (
+                <TableRow key={infoplaza.codigo}>
+                  <TableCell className="font-medium">
+                    {infoplaza.nombre}
+                  </TableCell>
+                  <TableCell>{dinamizador.nombre}</TableCell>
+                  <TableCell>{dinamizador.cedula || "—"}</TableCell>
+                  <TableCell>{dinamizador.celular || "—"}</TableCell>
+                  <TableCell>
+                    <span
+                      className={
+                        dinamizador.estatus === "Activo"
+                          ? "font-medium text-emerald-700"
+                          : "font-medium text-slate-500"
+                      }
+                    >
+                      {dinamizador.estatus}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => abrirEdicion(dinamizador)}
+                    >
+                      <Pencil />
+                      Editar
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )),
+            ])}
           </RosterTable>
           <RosterTable
             titulo="Sin dinamizador asignado"
             descripcion={`Mostrando ${filasSinAsignar.length} infoplazas`}
             columnas={["Infoplaza", "Estatus"]}
             vacio="No hay infoplazas sin dinamizador que coincidan con la búsqueda."
+            sinFilas={filasSinAsignar.length === 0}
           >
-            {filasSinAsignar.map(({ infoplaza }) => (
-              <TableRow key={infoplaza.codigo}>
-                <TableCell className="font-medium">
-                  {infoplaza.nombre}
-                </TableCell>
-                <TableCell>
-                  <span className="font-semibold text-amber-700">
-                    Sin dinamizador asignado
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => abrirCreacion(infoplaza.codigo)}
-                  >
-                    Asignar dinamizador
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+            {gruposSinAsignar.map(({ provincia, filas }) => [
+              <FilaProvincia
+                key={`provincia-${provincia}`}
+                provincia={provincia}
+                cantidad={filas.length}
+                columnas={2}
+              />,
+              ...filas.map(({ infoplaza }) => (
+                <TableRow key={infoplaza.codigo}>
+                  <TableCell className="font-medium">
+                    {infoplaza.nombre}
+                  </TableCell>
+                  <TableCell>
+                    <span className="font-semibold text-amber-700">
+                      Sin dinamizador asignado
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => abrirCreacion(infoplaza.codigo)}
+                    >
+                      Asignar dinamizador
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )),
+            ])}
           </RosterTable>
         </div>
       )}
@@ -243,58 +265,5 @@ export function DinamizadoresRoster() {
         onGuardado={cargarDatos}
       />
     </section>
-  );
-}
-
-interface RosterTableProps {
-  titulo: string;
-  descripcion: string;
-  columnas: string[];
-  vacio: string;
-  children: React.ReactNode;
-}
-
-function RosterTable({
-  titulo,
-  descripcion,
-  columnas,
-  vacio,
-  children,
-}: RosterTableProps) {
-  const cantidadColumnas = columnas.length + 1;
-  const tieneFilas = Array.isArray(children) && children.length > 0;
-  return (
-    <div className="rounded-md border border-slate-200 bg-white">
-      <div className="border-b border-slate-200 px-4 py-3">
-        <h3 className="font-semibold text-slate-900">{titulo}</h3>
-        <p className="mt-1 text-sm text-slate-600">{descripcion}</p>
-      </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {columnas.map((columna) => (
-              <TableHead key={columna}>{columna}</TableHead>
-            ))}
-            <TableHead>
-              <span className="sr-only">Acciones</span>
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {tieneFilas ? (
-            children
-          ) : (
-            <TableRow>
-              <TableCell
-                colSpan={cantidadColumnas}
-                className="text-center text-slate-600"
-              >
-                {vacio}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
   );
 }

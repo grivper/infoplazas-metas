@@ -31,6 +31,7 @@ export interface DinamizadorInput {
 export interface InfoplazaCatalogo {
   codigo: string;
   nombre: string;
+  region: string | null;
   cerrada: boolean;
 }
 
@@ -74,7 +75,7 @@ export const getDinamizadores = async (): Promise<Dinamizador[]> => {
 export const getCatalogoInfoplazas = async (): Promise<InfoplazaCatalogo[]> => {
   const { data, error } = await supabase
     .from('catalogo_infoplazas')
-    .select('codigo, nombre, cerrada')
+    .select('codigo, nombre, region, cerrada')
     .order('nombre', { ascending: true });
 
   if (error) throw error;
@@ -95,6 +96,31 @@ export const buildEncuentroViewRows = (
     infoplaza,
     dinamizador: dinamizadorPorInfoplaza.get(infoplaza.codigo) ?? null,
   }));
+};
+
+const SIN_PROVINCIA = 'Sin provincia';
+
+/**
+ * Agrupa filas por la provincia (región) de su infoplaza. Las provincias salen
+ * en orden alfabético y "Sin provincia" siempre al final.
+ */
+export const agruparPorProvincia = <T extends { infoplaza: InfoplazaCatalogo }>(
+  filas: T[],
+): Array<{ provincia: string; filas: T[] }> => {
+  const grupos = new Map<string, T[]>();
+
+  for (const fila of filas) {
+    const provincia = fila.infoplaza.region?.trim() || SIN_PROVINCIA;
+    grupos.set(provincia, [...(grupos.get(provincia) ?? []), fila]);
+  }
+
+  return [...grupos.entries()]
+    .map(([provincia, filasDeProvincia]) => ({ provincia, filas: filasDeProvincia }))
+    .sort((a, b) => {
+      if (a.provincia === SIN_PROVINCIA) return 1;
+      if (b.provincia === SIN_PROVINCIA) return -1;
+      return a.provincia.localeCompare(b.provincia, 'es');
+    });
 };
 
 /** Crea un dinamizador nuevo y su confirmación pendiente para el encuentro vigente. */
