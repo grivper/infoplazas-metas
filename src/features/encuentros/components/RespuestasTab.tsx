@@ -12,6 +12,7 @@ import { FilaProvincia } from '@/components/FilaProvincia';
 import { FiltroProvincia, TODAS_LAS_PROVINCIAS } from '@/components/FiltroProvincia';
 import { agruparPorProvincia, obtenerProvincias } from '@/lib/provincias';
 import type { Confirmacion } from '../services/confirmacionesService';
+import { DescargarConfirmacionesButton } from './DescargarConfirmacionesButton';
 import { ModalEditarRespuesta } from './ModalEditarRespuesta';
 
 interface RespuestasTabProps {
@@ -76,12 +77,15 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
         <Contador titulo="Cenan" valor={`${contadores.cenan} / ${CUPO_CENA}`} alerta={contadores.cenan >= CUPO_CENA} />
       </div>
 
-      <FiltroProvincia
-        value={provincia}
-        onChange={setProvincia}
-        provincias={provincias}
-        className="sm:w-56"
-      />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <FiltroProvincia
+          value={provincia}
+          onChange={setProvincia}
+          provincias={provincias}
+          className="sm:w-56"
+        />
+        <DescargarConfirmacionesButton />
+      </div>
 
       <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
         <Table>
