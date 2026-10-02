@@ -2,6 +2,17 @@ import type { Confirmacion } from '../services/confirmacionesService';
 
 const CODIGO_PAIS = '507';
 
+/**
+ * Dominio público para los enlaces de confirmación. Se toma de
+ * VITE_PUBLIC_BASE_URL para que el enlace sea siempre el de producción,
+ * aunque el tablero se abra desde otro origen (p. ej. localhost). Sin la
+ * variable, usa el origen actual.
+ */
+const getBaseUrl = (): string => {
+  const configurada = import.meta.env.VITE_PUBLIC_BASE_URL?.trim();
+  return (configurada || window.location.origin).replace(/\/+$/, '');
+};
+
 /** Deja solo dígitos y antepone el código de país si el número es local (8 dígitos). */
 const normalizarCelular = (celular: string): string => {
   const digitos = celular.replace(/\D/g, '');
@@ -22,7 +33,7 @@ export const buildWhatsappUrl = (
   const numero = normalizarCelular(celular);
   if (!numero) return null;
 
-  const link = `${window.location.origin}/confirmar/${confirmacion.token}`;
+  const link = `${getBaseUrl()}/confirmar/${confirmacion.token}`;
   const mensaje = plantilla.replaceAll('{nombre}', nombre).replaceAll('{link}', link);
 
   return `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
