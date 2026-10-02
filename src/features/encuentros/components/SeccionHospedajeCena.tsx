@@ -2,7 +2,7 @@ import { Aviso } from './Aviso';
 import { OpcionSiNo } from './OpcionSiNo';
 
 const AVISO_HORARIO_CENA = (
-  <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-950 shadow-sm">
+  <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-base font-semibold text-amber-950 shadow-sm">
     🕐 La cena será de 7:00 p. m. a 8:00 p. m.
   </p>
 );
@@ -41,7 +41,7 @@ export function SeccionHospedajeCena({
       <Aviso tipo="advertencia">
         <p className="font-medium">😔 Lamentablemente los cupos de hospedaje y cena ya fueron completados.</p>
         <p className="mt-1">¡Igual puedes asistir al evento viajando desde tu Infoplaza!</p>
-        <p className="mt-1 text-xs">No hay hospedaje ni cena disponibles para esta modalidad.</p>
+        <p className="mt-1 text-sm">No hay hospedaje ni cena disponibles para esta modalidad.</p>
       </Aviso>
     );
   }
@@ -71,7 +71,7 @@ export function SeccionHospedajeCena({
           <Aviso tipo="advertencia">
             <p className="font-medium">😔 Los cupos de cena ya fueron completados.</p>
             <p className="mt-1">Puedes confirmar tu asistencia y viajar desde tu Infoplaza.</p>
-            <p className="mt-1 text-xs">No hay cena disponible para esta modalidad.</p>
+            <p className="mt-1 text-sm">No hay cena disponible para esta modalidad.</p>
           </Aviso>
         )}
       </>
