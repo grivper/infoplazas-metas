@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { crearConfirmacionPendiente } from '@/features/encuentros/services/confirmacionesService';
 
 export type DinamizadorEstatus = 'Activo' | 'Inactivo';
 
@@ -96,13 +97,18 @@ export const buildEncuentroViewRows = (
   }));
 };
 
-/** Crea un dinamizador nuevo. */
+/** Crea un dinamizador nuevo y su confirmación pendiente para el encuentro vigente. */
 export const createDinamizador = async (input: DinamizadorInput): Promise<void> => {
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('dinamizadores')
-    .insert(mapInputToRow(input));
+    .insert(mapInputToRow(input))
+    .select('id')
+    .single();
 
   if (error) throw error;
+
+  // Solo los activos participan del encuentro.
+  if (input.estatus === 'Activo') await crearConfirmacionPendiente(data.id);
 };
 
 /** Actualiza los datos de un dinamizador existente. */

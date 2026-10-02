@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { ENCUENTRO_CLAVE, getEncuentroByClave } from './encuentrosService';
 
 export type EstadoEnvio = 'pendiente' | 'enviado' | 'confirmado';
 
@@ -92,6 +93,26 @@ export const getConfirmacionesByEncuentro = async (
       },
     }];
   });
+};
+
+/**
+ * Crea la confirmación pendiente de un dinamizador para el encuentro vigente.
+ * Las confirmaciones iniciales se generaron una sola vez por migración, así que
+ * cada dinamizador agregado después necesita la suya. Es idempotente: si ya
+ * existe, no hace nada.
+ */
+export const crearConfirmacionPendiente = async (dinamizadorId: string): Promise<void> => {
+  const encuentro = await getEncuentroByClave(ENCUENTRO_CLAVE);
+  if (!encuentro) return;
+
+  const { error } = await supabase
+    .from('confirmaciones')
+    .upsert(
+      { encuentro_id: encuentro.id, dinamizador_id: dinamizadorId, estado_envio: 'pendiente' },
+      { onConflict: 'encuentro_id,dinamizador_id', ignoreDuplicates: true },
+    );
+
+  if (error) throw error;
 };
 
 /** Marca la confirmación como enviada al abrir su acción de WhatsApp. */

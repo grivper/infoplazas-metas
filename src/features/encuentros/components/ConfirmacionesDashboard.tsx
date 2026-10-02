@@ -11,6 +11,7 @@ import {
   type EstadoEnvio,
 } from '../services/confirmacionesService';
 import {
+  ENCUENTRO_CLAVE,
   getEncuentroByClave,
   updateMensajeTemplate,
   type Encuentro,
@@ -19,8 +20,6 @@ import { TablaConfirmaciones } from './TablaConfirmaciones';
 import { buildWhatsappUrl } from '../utils/whatsapp';
 import { RespuestasTab } from './RespuestasTab';
 import { ModalEditarRespuesta } from './ModalEditarRespuesta';
-
-const ENCUENTRO_CLAVE = 'encuentro-regional-dinamizadores-2026';
 
 const estados: Array<{ estado: EstadoEnvio; titulo: string; vacio: string; conAccion: boolean; whatsapp: string | null }> = [
   {
