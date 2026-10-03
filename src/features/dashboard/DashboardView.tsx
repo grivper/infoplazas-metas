@@ -73,7 +73,7 @@ export const DashboardView: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-end justify-between">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h3 className="text-3xl font-black font-headline text-on-surface tracking-tight">
             Estado General de Metas

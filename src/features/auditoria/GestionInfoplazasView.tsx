@@ -113,13 +113,13 @@ export const GestionInfoplazasView: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard title="Total" value={stats.total} color="slate" />
         <StatCard title="Abiertas" value={stats.abiertas} color="emerald" />
         <StatCard title="Cerradas" value={stats.cerradas} color="rose" />
       </div>
 
-      <div className="flex gap-2 border-b border-border">
+      <div className="flex gap-2 overflow-x-auto border-b border-border">
         <button onClick={() => setActiveTab('catalogo')} className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === 'catalogo' ? 'border-blue-600 text-blue-600' : 'border-transparent text-on-surface-variant'}`}><MapPin className="w-4 h-4 inline mr-2" />Catálogo</button>
         <button onClick={() => setActiveTab('rutas')} className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === 'rutas' ? 'border-blue-600 text-blue-600' : 'border-transparent text-on-surface-variant'}`}><Route className="w-4 h-4 inline mr-2" />Rutas</button>
         <button onClick={() => setActiveTab('dinamizadores')} className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === 'dinamizadores' ? 'border-blue-600 text-blue-600' : 'border-transparent text-on-surface-variant'}`}><Users className="w-4 h-4 inline mr-2" />Dinamizadores</button>
@@ -127,9 +127,9 @@ export const GestionInfoplazasView: React.FC = () => {
 
       {activeTab === 'catalogo' && (
         <div className="space-y-4">
-          <div className="flex justify-between">
-            <div className="flex gap-2">
-              <div className="relative"><Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-outline" /><Input placeholder="Buscar..." className="pl-9 w-64" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} /></div>
+          <div className="flex flex-col gap-3 lg:flex-row lg:justify-between">
+            <div className="flex flex-wrap gap-2">
+              <div className="relative w-full sm:w-auto"><Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-outline" /><Input placeholder="Buscar..." className="pl-9 w-full sm:w-64" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} /></div>
               <Select value={filtroEstado} onValueChange={v => setFiltroEstado(v as FiltroEstado)}><SelectTrigger className="w-40"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="todas">Todas</SelectItem><SelectItem value="abiertas">Abiertas</SelectItem><SelectItem value="cerradas">Cerradas</SelectItem></SelectContent></Select>
             </div>
             <div className="flex flex-wrap items-center gap-3">

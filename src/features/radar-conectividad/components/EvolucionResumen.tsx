@@ -38,7 +38,7 @@ export const EvolucionResumen: React.FC<EvolucionResumenProps> = ({ actual, ante
   }
 
   return (
-    <div className="grid grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <StatCard
         title="Mes"
         value={formatMes(actual.mes)}

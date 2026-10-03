@@ -167,6 +167,7 @@ export function RenderCuatrimestre({ meses, chartData, rows, kpis, lastMonth, UN
                     </Badge>
                   </div>
                 </div>
+                <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left">
                   <thead className="text-xs text-on-surface-variant uppercase bg-surface-container-low">
                     <tr>
@@ -192,6 +193,7 @@ export function RenderCuatrimestre({ meses, chartData, rows, kpis, lastMonth, UN
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
               );
             })}
