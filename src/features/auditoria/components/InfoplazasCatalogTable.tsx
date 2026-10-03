@@ -65,31 +65,31 @@ function CatalogGroup({ infoplazas, abierta, onToggle }: CatalogGroupProps) {
         </p>
       </div>
       <div className="overflow-x-auto">
-        <Table className="min-w-[850px]">
+        <Table>
           <TableHeader>
             <TableRow className="hover:bg-surface-container-low">
               <TableHead className={tableHeadClassName}>Nombre</TableHead>
-              <TableHead className={tableHeadClassName}>Provincia</TableHead>
-              <TableHead className={tableHeadClassName}>Distrito</TableHead>
-              <TableHead className={tableHeadClassName}>Corregimiento</TableHead>
+              <TableHead className={`hidden sm:table-cell ${tableHeadClassName}`}>Provincia</TableHead>
+              <TableHead className={`hidden md:table-cell ${tableHeadClassName}`}>Distrito</TableHead>
+              <TableHead className={`hidden lg:table-cell ${tableHeadClassName}`}>Corregimiento</TableHead>
               <TableHead className={tableHeadClassName}>Estado</TableHead>
-              <TableHead className={tableHeadClassName}>Fecha Cierre</TableHead>
+              <TableHead className={`hidden md:table-cell ${tableHeadClassName}`}>Fecha Cierre</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {infoplazas.map((infoplaza) => (
               <TableRow key={infoplaza.id} className="hover:bg-indigo-50 transition-colors cursor-pointer group border-b border-border/50 last:border-b-0">
                 <TableCell className="py-3 px-4 font-medium text-sm text-on-surface group-hover:text-indigo-800">{infoplaza.nombre}</TableCell>
-                <TableCell className="py-3 px-4 text-sm text-on-surface-variant group-hover:text-on-surface">{infoplaza.region}</TableCell>
-                <TableCell className="py-3 px-4 text-sm text-on-surface-variant">{infoplaza.distrito || 'Sin distrito'}</TableCell>
-                <TableCell className="py-3 px-4 text-sm text-on-surface-variant">{infoplaza.corregimiento || 'Sin corregimiento'}</TableCell>
+                <TableCell className="hidden sm:table-cell py-3 px-4 text-sm text-on-surface-variant group-hover:text-on-surface">{infoplaza.region}</TableCell>
+                <TableCell className="hidden md:table-cell py-3 px-4 text-sm text-on-surface-variant">{infoplaza.distrito || 'Sin distrito'}</TableCell>
+                <TableCell className="hidden lg:table-cell py-3 px-4 text-sm text-on-surface-variant">{infoplaza.corregimiento || 'Sin corregimiento'}</TableCell>
                 <TableCell className="py-3 px-4">
                   <button onClick={() => onToggle(infoplaza)} className={`flex items-center gap-1 text-sm font-medium ${status.buttonColor}`}>
                     {abierta ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
                     {abierta ? 'Abierta' : 'Cerrada'}
                   </button>
                 </TableCell>
-                <TableCell className="py-3 px-4 text-sm text-on-surface-variant">{infoplaza.fecha_cierre || '-'}</TableCell>
+                <TableCell className="hidden md:table-cell py-3 px-4 text-sm text-on-surface-variant">{infoplaza.fecha_cierre || '-'}</TableCell>
               </TableRow>
             ))}
           </TableBody>

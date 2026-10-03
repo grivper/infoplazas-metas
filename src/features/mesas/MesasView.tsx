@@ -41,16 +41,16 @@ const MesaRow: React.FC<{
     <tr className="hover:bg-surface-container-low/50 transition-colors">
       <td className="px-4 py-3 font-medium text-on-surface">{m.infoplaza}</td>
       <td className="px-4 py-3 text-on-surface">Mesa {m.mesa}</td>
-      <td className="px-4 py-3">
+      <td className="hidden md:table-cell px-4 py-3">
         <span className="font-bold text-indigo-600">{m.sesionActual}</span>
         <span className="text-outline"> / 10</span>
       </td>
-      <td className="px-4 py-3 text-on-surface">{m.participantes}</td>
-      <td className="px-4 py-3 text-on-surface-variant">{m.dinamizador || '—'}</td>
-      <td className="px-4 py-3 text-on-surface-variant">{m.email || '—'}</td>
-      <td className="px-4 py-3 text-on-surface-variant">{m.fechaInicio || '—'}</td>
-      <td className="px-4 py-3 text-on-surface-variant">{m.fechaFin || '—'}</td>
-      <td className="px-4 py-3 text-on-surface-variant">{m.fechaGraduacion || '—'}</td>
+      <td className="hidden sm:table-cell px-4 py-3 text-on-surface">{m.participantes}</td>
+      <td className="hidden md:table-cell px-4 py-3 text-on-surface-variant">{m.dinamizador || '—'}</td>
+      <td className="hidden lg:table-cell px-4 py-3 text-on-surface-variant">{m.email || '—'}</td>
+      <td className="hidden md:table-cell px-4 py-3 text-on-surface-variant">{m.fechaInicio || '—'}</td>
+      <td className="hidden md:table-cell px-4 py-3 text-on-surface-variant">{m.fechaFin || '—'}</td>
+      <td className="hidden lg:table-cell px-4 py-3 text-on-surface-variant">{m.fechaGraduacion || '—'}</td>
       <td className="px-4 py-3">
         <Badge variant="secondary" className={`gap-1 ${est.color}`}>{est.icon} {est.label}</Badge>
       </td>
@@ -115,7 +115,20 @@ const MesasView: React.FC = () => {
   const enProgreso = mesas.filter(m => m.estado === 'en_progreso').length;
 
   // Headers (sin Región porque va como agrupador)
-  const headers = ['Infoplaza', 'Mesa', 'Sesión', 'Participantes', 'Dinamizador', 'Email', 'Inicio', 'Fin', 'Graduación', 'Estado', ''];
+  // `oculta` esconde la columna en pantallas pequeñas (misma clase que usa su celda en MesaRow)
+  const headers = [
+    { label: 'Infoplaza' },
+    { label: 'Mesa' },
+    { label: 'Sesión', oculta: 'hidden md:table-cell' },
+    { label: 'Participantes', oculta: 'hidden sm:table-cell' },
+    { label: 'Dinamizador', oculta: 'hidden md:table-cell' },
+    { label: 'Email', oculta: 'hidden lg:table-cell' },
+    { label: 'Inicio', oculta: 'hidden md:table-cell' },
+    { label: 'Fin', oculta: 'hidden md:table-cell' },
+    { label: 'Graduación', oculta: 'hidden lg:table-cell' },
+    { label: 'Estado' },
+    { label: '' },
+  ];
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -166,8 +179,8 @@ const MesasView: React.FC = () => {
             <table className="w-full text-sm">
               <thead className="text-xs text-on-surface-variant uppercase bg-surface-container-low border-b border-border/50">
                 <tr>
-                  {headers.map(h => (
-                    <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
+                  {headers.map((h, i) => (
+                    <th key={i} className={`${h.oculta ?? ''} px-4 py-3 text-left font-medium`}>{h.label}</th>
                   ))}
                 </tr>
               </thead>

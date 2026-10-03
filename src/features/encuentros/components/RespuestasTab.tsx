@@ -74,12 +74,12 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
           <TableHeader>
             <TableRow>
               <TableHead>Infoplaza</TableHead>
-              <TableHead>Dinamizador</TableHead>
-              <TableHead>Celular</TableHead>
+              <TableHead className="hidden sm:table-cell">Dinamizador</TableHead>
+              <TableHead className="hidden md:table-cell">Celular</TableHead>
               <TableHead>Asistencia</TableHead>
-              <TableHead>Hospedaje</TableHead>
-              <TableHead>Cena</TableHead>
-              <TableHead>Respondió</TableHead>
+              <TableHead className="hidden md:table-cell">Hospedaje</TableHead>
+              <TableHead className="hidden md:table-cell">Cena</TableHead>
+              <TableHead className="hidden sm:table-cell">Respondió</TableHead>
               <TableHead />
             </TableRow>
           </TableHeader>
@@ -104,12 +104,12 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
                 <TableCell className="font-medium">
                   {confirmacion.dinamizador.infoplaza?.nombre ?? 'Sin infoplaza'}
                 </TableCell>
-                <TableCell>{confirmacion.dinamizador.nombre}</TableCell>
-                <TableCell>{confirmacion.dinamizador.celular ?? '—'}</TableCell>
+                <TableCell className="hidden sm:table-cell">{confirmacion.dinamizador.nombre}</TableCell>
+                <TableCell className="hidden md:table-cell">{confirmacion.dinamizador.celular ?? '—'}</TableCell>
                 <TableCell>{confirmacion.asiste ? 'Sí' : 'No'}</TableCell>
-                <TableCell>{confirmacion.asiste ? (confirmacion.se_hospeda ? 'Sí' : 'No') : '—'}</TableCell>
-                <TableCell>{confirmacion.asiste ? (confirmacion.cena ? 'Sí' : 'No') : '—'}</TableCell>
-                <TableCell>
+                <TableCell className="hidden md:table-cell">{confirmacion.asiste ? (confirmacion.se_hospeda ? 'Sí' : 'No') : '—'}</TableCell>
+                <TableCell className="hidden md:table-cell">{confirmacion.asiste ? (confirmacion.cena ? 'Sí' : 'No') : '—'}</TableCell>
+                <TableCell className="hidden sm:table-cell">
                   {confirmacion.confirmado_at ? formatFechaHora(confirmacion.confirmado_at) : '—'}
                 </TableCell>
                 <TableCell>

@@ -101,8 +101,8 @@ export function TablaConfirmaciones({
         <TableHeader>
           <TableRow>
             <TableHead>Infoplaza</TableHead>
-            <TableHead>Dinamizador</TableHead>
-            <TableHead>Celular</TableHead>
+            <TableHead className="hidden sm:table-cell">Dinamizador</TableHead>
+            <TableHead className="hidden md:table-cell">Celular</TableHead>
             {conAcciones && <TableHead />}
           </TableRow>
         </TableHeader>
@@ -123,10 +123,10 @@ export function TablaConfirmaciones({
             ...elementos.map((confirmacion) => (
             <TableRow key={confirmacion.id}>
               <TableCell className="font-medium">{confirmacion.dinamizador.infoplaza?.nombre ?? 'Sin infoplaza'}</TableCell>
-              <TableCell>{confirmacion.dinamizador.nombre}</TableCell>
-              <TableCell>{confirmacion.dinamizador.celular ?? '—'}</TableCell>
+              <TableCell className="hidden sm:table-cell">{confirmacion.dinamizador.nombre}</TableCell>
+              <TableCell className="hidden md:table-cell">{confirmacion.dinamizador.celular ?? '—'}</TableCell>
               {conAcciones && (
-                <TableCell className="space-x-2 whitespace-nowrap">
+                <TableCell className="space-x-2 sm:whitespace-nowrap">
                   {onEnviarWhatsapp && (
                     <Button
                       variant="outline"

@@ -56,7 +56,7 @@ export const ReporteView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header con stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard 
           title="Pendientes de Atención" 
           value={totalCriticos} 

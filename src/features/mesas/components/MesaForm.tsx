@@ -65,7 +65,7 @@ export const MesaForm: React.FC<MesaFormProps> = ({ registro, catalogo, onSave, 
 
   return (
     <form onSubmit={handleSubmit} className="bg-surface-container-lowest border border-border rounded-xl p-5 space-y-4 shadow-sm">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <div>
           <label className={labelCls}>Infoplaza</label>
           {registro.mesa_id ? (

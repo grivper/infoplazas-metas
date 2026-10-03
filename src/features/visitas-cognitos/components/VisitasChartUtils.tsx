@@ -167,12 +167,13 @@ export function RenderCuatrimestre({ meses, chartData, rows, kpis, lastMonth, UN
                     </Badge>
                   </div>
                 </div>
+                <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left">
                   <thead className="text-xs text-on-surface-variant uppercase bg-surface-container-low">
                     <tr>
                       <th className="px-4 py-3 font-medium">Infoplaza</th>
-                      {meses.map((mes) => (
-                        <th key={mes} className="px-4 py-3 font-medium text-center">{mes.substring(0, 3)}</th>
+                      {meses.map((mes, i) => (
+                        <th key={mes} className={`${i < meses.length - 2 ? 'hidden sm:table-cell ' : ''}px-4 py-3 font-medium text-center`}>{mes.substring(0, 3)}</th>
                       ))}
                     </tr>
                   </thead>
@@ -181,7 +182,7 @@ export function RenderCuatrimestre({ meses, chartData, rows, kpis, lastMonth, UN
                       <tr key={row.name} className="hover:bg-surface-container-low/50 transition-colors">
                         <td className="px-4 py-2 font-medium text-on-surface">{row.name}</td>
                         {row.cells.map((cell, i) => (
-                          <td key={i} className="px-4 py-2 text-center">
+                          <td key={i} className={`${i < row.cells.length - 2 ? 'hidden sm:table-cell ' : ''}px-4 py-2 text-center`}>
                             <div className="flex flex-col items-center">
                               <span className="font-medium">{cell.visitas ?? '—'}</span>
                               {cell.incremento !== null && <Inc v={cell.incremento} />}
@@ -192,6 +193,7 @@ export function RenderCuatrimestre({ meses, chartData, rows, kpis, lastMonth, UN
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
               );
             })}

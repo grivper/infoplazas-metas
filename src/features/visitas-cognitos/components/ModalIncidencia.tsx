@@ -75,11 +75,11 @@ export const ModalIncidencia: React.FC<ModalIncidenciaProps> = ({ children, onSu
           <div className="grid gap-4 py-4">
             
             {/* Campo: Infoplaza */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="infoplaza" className="text-right">
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <Label htmlFor="infoplaza" className="sm:text-right">
                 Infoplaza
               </Label>
-              <div className="col-span-3">
+              <div className="sm:col-span-3">
                 <Select name="infoplaza" required>
                   <SelectTrigger id="infoplaza">
                     <SelectValue placeholder="Seleccione una Infoplaza..." />
@@ -96,11 +96,11 @@ export const ModalIncidencia: React.FC<ModalIncidenciaProps> = ({ children, onSu
             </div>
 
             {/* Campo: Categoría */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="categoria" className="text-right">
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <Label htmlFor="categoria" className="sm:text-right">
                 Categoría
               </Label>
-              <div className="col-span-3">
+              <div className="sm:col-span-3">
                 <Select name="categoria" required>
                   <SelectTrigger id="categoria">
                     <SelectValue placeholder="Seleccione una categoría..." />
@@ -117,11 +117,11 @@ export const ModalIncidencia: React.FC<ModalIncidenciaProps> = ({ children, onSu
             </div>
 
             {/* Campo: nivel de Urgencia */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="urgencia" className="text-right">
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 sm:gap-4">
+              <Label htmlFor="urgencia" className="sm:text-right">
                 Urgencia
               </Label>
-              <div className="col-span-3">
+              <div className="sm:col-span-3">
                 <Select name="urgencia" required>
                   <SelectTrigger id="urgencia">
                     <SelectValue placeholder="Seleccione la urgencia..." />
@@ -136,14 +136,14 @@ export const ModalIncidencia: React.FC<ModalIncidenciaProps> = ({ children, onSu
             </div>
 
             {/* Campo: Descripción */}
-            <div className="grid grid-cols-4 items-start gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 items-start gap-2 sm:gap-4">
               <Label htmlFor="descripcion" className="text-right mt-2">
                 Descripción
               </Label>
               <Textarea 
                 name="descripcion" 
                 id="descripcion"
-                className="col-span-3 min-h-[100px]" 
+                className="sm:col-span-3 min-h-[100px]" 
                 placeholder="Describa el problema detalladamente..."
                 required
               />
