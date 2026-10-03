@@ -31,13 +31,13 @@ export const SnapshotsHistorialTable: React.FC<SnapshotsHistorialTableProps> = (
         </p>
       </div>
       <Card className="border-none shadow-sm">
-        <CardContent className="p-0">
+        <CardContent className="p-0 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border/50 bg-surface-container-low">
                 <th className="text-left py-3 px-4 font-semibold text-on-surface-variant">Mes</th>
-                <th className="text-right py-3 px-4 font-semibold text-on-surface-variant">Total</th>
-                <th className="text-right py-3 px-4 font-semibold text-on-surface-variant">Online</th>
+                <th className="hidden sm:table-cell text-right py-3 px-4 font-semibold text-on-surface-variant">Total</th>
+                <th className="hidden sm:table-cell text-right py-3 px-4 font-semibold text-on-surface-variant">Online</th>
                 <th className="text-right py-3 px-4 font-semibold text-on-surface-variant">Crítico</th>
                 <th className="text-right py-3 px-4 font-semibold text-on-surface-variant">Efectividad</th>
               </tr>
@@ -46,8 +46,8 @@ export const SnapshotsHistorialTable: React.FC<SnapshotsHistorialTableProps> = (
               {snapshots.map((s) => (
                 <tr key={s.id} className="hover:bg-surface-container-low">
                   <td className="py-3 px-4 font-medium text-on-surface">{formatMes(s.mes)}</td>
-                  <td className="py-3 px-4 text-right text-on-surface-variant">{s.total_dispositivos}</td>
-                  <td className="py-3 px-4 text-right text-emerald-600 font-medium">{s.online}</td>
+                  <td className="hidden sm:table-cell py-3 px-4 text-right text-on-surface-variant">{s.total_dispositivos}</td>
+                  <td className="hidden sm:table-cell py-3 px-4 text-right text-emerald-600 font-medium">{s.online}</td>
                   <td className="py-3 px-4 text-right text-rose-600 font-medium">{s.critico}</td>
                   <td className="py-3 px-4 text-right">
                     <Badge variant="outline" className={claseEfectividad(s.tasa_disponibilidad)}>

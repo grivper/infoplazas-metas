@@ -11,9 +11,19 @@ import { RadarKpaxView } from './components/RadarKpaxView';
 import { ReporteView } from './components/ReporteView';
 import { RadarEvolucionView } from './components/RadarEvolucionView';
 
+type TabId = 'kpax' | 'agentes' | 'historial' | 'evolucion';
+
+// Pestañas de la vista: se dibujan con un solo botón en lugar de uno copiado por pestaña
+const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
+  { id: 'kpax', label: 'KPAX', icon: Activity },
+  { id: 'agentes', label: 'Reporte', icon: Server },
+  { id: 'historial', label: 'Historial', icon: History },
+  { id: 'evolucion', label: 'Evolución', icon: TrendingUp },
+];
+
 const MonitoreoConectividadView: React.FC = () => {
   const [historial, setHistorial] = useState<HistorialFalla[]>([]);
-  const [activeTab, setActiveTab] = useState<'kpax' | 'agentes' | 'historial' | 'evolucion'>('kpax');
+  const [activeTab, setActiveTab] = useState<TabId>('kpax');
 
   // Cargar datos según tab activa
   useEffect(() => {
@@ -48,24 +58,24 @@ const MonitoreoConectividadView: React.FC = () => {
     // Tab Historial
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatCard title="Total Fallas Registradas" value={historial.length} color="indigo" />
           <StatCard title="Fallas Activas" value={historial.filter(h => h.activo).length} color="rose" />
           <StatCard title="Fallas Resueltas" value={historial.filter(h => !h.activo).length} color="emerald" />
         </div>
 
         {historial.length > 0 ? (
-          <div className="rounded-xl bg-surface-container-lowest shadow-card overflow-hidden">
+          <div className="rounded-xl bg-surface-container-lowest shadow-card overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-surface-container-low">
                 <tr>
-                  <th className="text-left px-4 py-3 font-semibold text-on-surface-variant">Fecha Registro</th>
-                  <th className="text-left px-4 py-3 font-semibold text-on-surface-variant">Agente</th>
+                  <th className="hidden sm:table-cell text-left px-4 py-3 font-semibold text-on-surface-variant">Fecha Registro</th>
+                  <th className="hidden md:table-cell text-left px-4 py-3 font-semibold text-on-surface-variant">Agente</th>
                   <th className="text-left px-4 py-3 font-semibold text-on-surface-variant">Infoplaza</th>
                   <th className="text-left px-4 py-3 font-semibold text-on-surface-variant">Motivo</th>
                   <th className="text-left px-4 py-3 font-semibold text-on-surface-variant">Estado</th>
-                  <th className="text-left px-4 py-3 font-semibold text-on-surface-variant">Fecha Arreglo</th>
-                  <th className="text-left px-4 py-3 font-semibold text-on-surface-variant">Duración</th>
+                  <th className="hidden md:table-cell text-left px-4 py-3 font-semibold text-on-surface-variant">Fecha Arreglo</th>
+                  <th className="hidden md:table-cell text-left px-4 py-3 font-semibold text-on-surface-variant">Duración</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
@@ -80,10 +90,10 @@ const MonitoreoConectividadView: React.FC = () => {
 
                   return (
                     <tr key={h.id || idx} className="hover:bg-surface-container-low">
-                      <td className="px-4 py-3 text-on-surface">
+                      <td className="hidden sm:table-cell px-4 py-3 text-on-surface">
                         {fechaRegistro ? fechaRegistro.toLocaleDateString('es-PA') : '-'}
                       </td>
-                      <td className="px-4 py-3 font-medium text-on-surface">{h.agente_id}</td>
+                      <td className="hidden md:table-cell px-4 py-3 font-medium text-on-surface">{h.agente_id}</td>
                       <td className="px-4 py-3 text-on-surface-variant">{h.infoplaza || '-'}</td>
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-rose-100 text-rose-700">
@@ -101,10 +111,10 @@ const MonitoreoConectividadView: React.FC = () => {
                           </Badge>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-on-surface-variant">
+                      <td className="hidden md:table-cell px-4 py-3 text-on-surface-variant">
                         {fechaArqueo ? fechaArqueo.toLocaleDateString('es-PA') : '-'}
                       </td>
-                      <td className="px-4 py-3 text-on-surface-variant">
+                      <td className="hidden md:table-cell px-4 py-3 text-on-surface-variant">
                         {duracion > 0 ? `${duracion} día${duracion !== 1 ? 's' : ''}` : '-'}
                       </td>
                     </tr>
@@ -126,7 +136,8 @@ const MonitoreoConectividadView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="flex flex-row justify-between items-start w-full gap-4">
+      {/* En móvil el título va arriba y las pestañas debajo; desde lg quedan a la derecha */}
+      <div className="flex flex-col gap-4 w-full lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h1 className="text-3xl font-black font-headline text-on-surface tracking-tight flex items-center gap-2">
             <Activity className="w-8 h-8 text-amber-500" />
@@ -134,45 +145,26 @@ const MonitoreoConectividadView: React.FC = () => {
           </h1>
           <p className="text-on-surface-variant mt-1">Monitoreo de impresoras y agentes KPAX.</p>
         </div>
-        
-        {/* Tabs */}
-        <div className="flex bg-surface-container rounded-lg p-1">
-          <button
-            onClick={() => setActiveTab('kpax')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              activeTab === 'kpax' ? 'bg-surface-container-lowest text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-          >
-            <Activity className="w-4 h-4 inline mr-2" />
-            KPAX
-          </button>
-          <button
-            onClick={() => setActiveTab('agentes')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              activeTab === 'agentes' ? 'bg-surface-container-lowest text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-          >
-            <Server className="w-4 h-4 inline mr-2" />
-            Reporte
-          </button>
-          <button
-            onClick={() => setActiveTab('historial')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              activeTab === 'historial' ? 'bg-surface-container-lowest text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-          >
-            <History className="w-4 h-4 inline mr-2" />
-            Historial
-          </button>
-          <button
-            onClick={() => setActiveTab('evolucion')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              activeTab === 'evolucion' ? 'bg-surface-container-lowest text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-          >
-            <TrendingUp className="w-4 h-4 inline mr-2" />
-            Evolución
-          </button>
+
+        {/* Menú: en móvil una grilla de 2×2 con el ícono arriba (las 4 secciones siempre visibles);
+            desde lg, una fila de botones redondeados a la derecha */}
+        <div role="tablist" aria-label="Secciones del radar" className="grid grid-cols-2 gap-2 w-full lg:flex lg:w-auto">
+          {TABS.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              role="tab"
+              aria-selected={activeTab === id}
+              onClick={() => setActiveTab(id)}
+              className={`flex flex-col items-center justify-center gap-1 whitespace-nowrap rounded-xl border px-3 py-3 text-sm font-medium transition-all lg:shrink-0 lg:flex-row lg:gap-2 lg:rounded-full lg:px-4 lg:py-2 ${
+                activeTab === id
+                  ? 'bg-primary text-primary-foreground border-primary shadow-sm'
+                  : 'bg-surface-container-lowest text-on-surface-variant border-border hover:bg-surface-container-low hover:text-on-surface'
+              }`}
+            >
+              <Icon className="w-5 h-5 lg:w-4 lg:h-4" />
+              {label}
+            </button>
+          ))}
         </div>
       </div>
 
