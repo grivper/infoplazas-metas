@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { supabase } from './lib/supabase';
 import { useIdleTimeout } from './hooks/useIdleTimeout';
 import { RemeLoader } from '@/components/ui/reme-loader';
 
 // Vistas de Autenticación y Dashboard
 import { LoginView } from './views/LoginView';
+import { NotFoundView } from './views/NotFoundView';
 import { DashboardView } from './features/dashboard/DashboardView';
 
 // Layout Principal estilo "Polished Luminary"
@@ -94,8 +95,8 @@ const App: React.FC = () => {
           <Route path="radar" element={<MonitoreoConectividadView />} />
           <Route path="encuentros" element={<EncuentrosAdminView />} />
           
-          {/* Redirección automática a Dashboard para cualquier ruta no reconocida */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Cualquier ruta no reconocida muestra la página 404 dentro del layout */}
+          <Route path="*" element={<NotFoundView />} />
         </Route>
       </Routes>
     </BrowserRouter>

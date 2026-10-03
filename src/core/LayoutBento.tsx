@@ -127,8 +127,8 @@ const LayoutBento: React.FC = () => {
           </div>
         </header>
 
-        {/* Content Canvas */}
-        <div className="p-6 lg:p-8">
+        {/* Content Canvas: ancho máximo centrado para que no se estire en pantallas anchas */}
+        <div className="mx-auto w-full max-w-screen-2xl p-6 lg:p-8">
           <Outlet />
         </div>
       </main>
