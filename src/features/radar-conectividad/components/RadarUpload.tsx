@@ -29,7 +29,7 @@ export const RadarUpload: React.FC<RadarUploadProps> = ({
         <Button 
           size="sm"
           variant="outline" 
-          className="h-10 border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium shadow-sm transition-all cursor-pointer"
+          className="h-10 border-border bg-surface-container-lowest hover:bg-surface-container-low text-on-surface font-medium shadow-sm transition-all cursor-pointer"
           asChild
           disabled={loading}
         >

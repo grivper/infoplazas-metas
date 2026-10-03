@@ -50,16 +50,16 @@ export const RadarKpis: React.FC<RadarKpisProps> = ({ kpis }) => {
       {cards.map(card => (
         <Card 
           key={card.title} 
-          className="border-none shadow-sm hover:shadow-md transition-all overflow-hidden bg-white"
+          className="border-none shadow-sm hover:shadow-md transition-all overflow-hidden bg-surface-container-lowest"
         >
           <div className={`h-1 ${card.color}`} />
           <CardContent className="pt-4 pb-4">
-            <p className="text-sm text-slate-600 font-semibold flex items-center">
+            <p className="text-sm text-on-surface-variant font-semibold flex items-center">
               {card.icon}
               {card.title}
             </p>
-            <p className="text-2xl font-bold text-slate-900 mt-1">{card.value}</p>
-            <p className="text-xs text-slate-400 mt-1">{card.subtitle}</p>
+            <p className="text-2xl font-bold text-on-surface mt-1">{card.value}</p>
+            <p className="text-xs text-outline mt-1">{card.subtitle}</p>
           </CardContent>
         </Card>
       ))}

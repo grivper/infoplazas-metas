@@ -117,8 +117,8 @@ export const IncidenciasView: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Incidencias</h1>
-          <p className="text-slate-500 mt-1">Gestión de incidencias reportadas en las Infoplazas.</p>
+          <h1 className="text-3xl font-bold text-on-surface tracking-tight">Incidencias</h1>
+          <p className="text-on-surface-variant mt-1">Gestión de incidencias reportadas en las Infoplazas.</p>
         </div>
         <ModalIncidencia onSuccess={handleIncidenciaCreada}>
           <Button className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white">
@@ -137,13 +137,13 @@ export const IncidenciasView: React.FC = () => {
         </CardHeader>
         <CardContent className="p-0">
           {incidencias.length === 0 ? (
-            <div className="text-center py-8 text-slate-500">
+            <div className="text-center py-8 text-on-surface-variant">
               No hay incidencias registradas.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
-                <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
+                <thead className="text-xs text-on-surface-variant uppercase bg-surface-container-low border-b border-border/50">
                   <tr>
                     <th className="px-6 py-3 font-medium">Fecha</th>
                     <th className="px-6 py-3 font-medium">Infoplaza</th>
@@ -154,17 +154,17 @@ export const IncidenciasView: React.FC = () => {
                     <th className="px-6 py-3 font-medium text-right">Estado</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-border/50">
                   {incidencias.map(inc => (
-                    <tr key={inc.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-6 py-3 text-slate-500 text-xs">
+                    <tr key={inc.id} className="hover:bg-surface-container-low/50 transition-colors">
+                      <td className="px-6 py-3 text-on-surface-variant text-xs">
                         {formatFecha(inc.created_at)}
                       </td>
-                      <td className="px-6 py-3 font-medium text-slate-800">
+                      <td className="px-6 py-3 font-medium text-on-surface">
                         {inc.infoplaza_nombre}
                       </td>
                       <td className="px-6 py-3">
-                        <Badge variant="outline" className="text-xs font-normal border-slate-200 capitalize">
+                        <Badge variant="outline" className="text-xs font-normal border-border capitalize">
                           {inc.categoria}
                         </Badge>
                       </td>
@@ -173,7 +173,7 @@ export const IncidenciasView: React.FC = () => {
                           {inc.urgencia}
                         </Badge>
                       </td>
-                      <td className="px-6 py-3 text-slate-600 max-w-xs truncate" title={inc.descripcion}>
+                      <td className="px-6 py-3 text-on-surface-variant max-w-xs truncate" title={inc.descripcion}>
                         {inc.descripcion}
                       </td>
                       <td className="px-6 py-3">

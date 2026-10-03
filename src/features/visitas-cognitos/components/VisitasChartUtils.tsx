@@ -90,8 +90,8 @@ export function RenderCuatrimestre({ meses, chartData, rows, kpis, lastMonth, UN
   return (
     <div className="space-y-8">
       <div>
-        <h3 className="text-xl font-bold text-slate-800">Estado de {lastMonth}</h3>
-        <p className="text-sm text-slate-500 mt-1">
+        <h3 className="text-xl font-bold text-on-surface">Estado de {lastMonth}</h3>
+        <p className="text-sm text-on-surface-variant mt-1">
           Distribución según porcentaje de cumplimiento sobre la meta ({UNIVERSO} visitas)
         </p>
       </div>
@@ -162,13 +162,13 @@ export function RenderCuatrimestre({ meses, chartData, rows, kpis, lastMonth, UN
                 <div className={`${bgColor} px-4 py-2 border-b ${borderColor}`}>
                   <div className="flex items-center justify-between">
                     <h4 className={`font-semibold ${textColor}`}>{grupo.enlace}</h4>
-                    <Badge variant="outline" className={`bg-white ${badgeColor}`}>
+                    <Badge variant="outline" className={`bg-surface-container-lowest ${badgeColor}`}>
                       {grupo.rows.length} infoplazas
                     </Badge>
                   </div>
                 </div>
                 <table className="w-full text-sm text-left">
-                  <thead className="text-xs text-slate-500 uppercase bg-slate-50">
+                  <thead className="text-xs text-on-surface-variant uppercase bg-surface-container-low">
                     <tr>
                       <th className="px-4 py-3 font-medium">Infoplaza</th>
                       {meses.map((mes) => (
@@ -176,10 +176,10 @@ export function RenderCuatrimestre({ meses, chartData, rows, kpis, lastMonth, UN
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-border/50">
                     {grupo.rows.map((row) => (
-                      <tr key={row.name} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-4 py-2 font-medium text-slate-800">{row.name}</td>
+                      <tr key={row.name} className="hover:bg-surface-container-low/50 transition-colors">
+                        <td className="px-4 py-2 font-medium text-on-surface">{row.name}</td>
                         {row.cells.map((cell, i) => (
                           <td key={i} className="px-4 py-2 text-center">
                             <div className="flex flex-col items-center">

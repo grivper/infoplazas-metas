@@ -55,20 +55,20 @@ const MonitoreoConectividadView: React.FC = () => {
         </div>
 
         {historial.length > 0 ? (
-          <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div className="rounded-xl bg-surface-container-lowest shadow-card overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50">
+              <thead className="bg-surface-container-low">
                 <tr>
-                  <th className="text-left px-4 py-3 font-semibold text-slate-600">Fecha Registro</th>
-                  <th className="text-left px-4 py-3 font-semibold text-slate-600">Agente</th>
-                  <th className="text-left px-4 py-3 font-semibold text-slate-600">Infoplaza</th>
-                  <th className="text-left px-4 py-3 font-semibold text-slate-600">Motivo</th>
-                  <th className="text-left px-4 py-3 font-semibold text-slate-600">Estado</th>
-                  <th className="text-left px-4 py-3 font-semibold text-slate-600">Fecha Arreglo</th>
-                  <th className="text-left px-4 py-3 font-semibold text-slate-600">Duración</th>
+                  <th className="text-left px-4 py-3 font-semibold text-on-surface-variant">Fecha Registro</th>
+                  <th className="text-left px-4 py-3 font-semibold text-on-surface-variant">Agente</th>
+                  <th className="text-left px-4 py-3 font-semibold text-on-surface-variant">Infoplaza</th>
+                  <th className="text-left px-4 py-3 font-semibold text-on-surface-variant">Motivo</th>
+                  <th className="text-left px-4 py-3 font-semibold text-on-surface-variant">Estado</th>
+                  <th className="text-left px-4 py-3 font-semibold text-on-surface-variant">Fecha Arreglo</th>
+                  <th className="text-left px-4 py-3 font-semibold text-on-surface-variant">Duración</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-border/50">
                 {historial.map((h, idx) => {
                   const fechaRegistro = h.fecha_registro ? new Date(h.fecha_registro) : null;
                   const fechaArqueo = h.fecha_arqueo ? new Date(h.fecha_arqueo) : null;
@@ -79,12 +79,12 @@ const MonitoreoConectividadView: React.FC = () => {
                       : 0;
 
                   return (
-                    <tr key={h.id || idx} className="hover:bg-slate-50">
-                      <td className="px-4 py-3 text-slate-700">
+                    <tr key={h.id || idx} className="hover:bg-surface-container-low">
+                      <td className="px-4 py-3 text-on-surface">
                         {fechaRegistro ? fechaRegistro.toLocaleDateString('es-PA') : '-'}
                       </td>
-                      <td className="px-4 py-3 font-medium text-slate-900">{h.agente_id}</td>
-                      <td className="px-4 py-3 text-slate-600">{h.infoplaza || '-'}</td>
+                      <td className="px-4 py-3 font-medium text-on-surface">{h.agente_id}</td>
+                      <td className="px-4 py-3 text-on-surface-variant">{h.infoplaza || '-'}</td>
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-rose-100 text-rose-700">
                           {h.motivo_falla}
@@ -101,10 +101,10 @@ const MonitoreoConectividadView: React.FC = () => {
                           </Badge>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-slate-600">
+                      <td className="px-4 py-3 text-on-surface-variant">
                         {fechaArqueo ? fechaArqueo.toLocaleDateString('es-PA') : '-'}
                       </td>
-                      <td className="px-4 py-3 text-slate-500">
+                      <td className="px-4 py-3 text-on-surface-variant">
                         {duracion > 0 ? `${duracion} día${duracion !== 1 ? 's' : ''}` : '-'}
                       </td>
                     </tr>
@@ -114,10 +114,10 @@ const MonitoreoConectividadView: React.FC = () => {
             </table>
           </div>
         ) : (
-          <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
-            <History className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-            <p className="text-slate-500">No hay fallas registradas en el historial</p>
-            <p className="text-sm text-slate-400 mt-1">Las fallas aparecerán aquí cuando registres un motivo</p>
+          <div className="text-center py-12 rounded-xl bg-surface-container-lowest shadow-card">
+            <History className="w-12 h-12 text-outline-variant mx-auto mb-4" />
+            <p className="text-on-surface-variant">No hay fallas registradas en el historial</p>
+            <p className="text-sm text-outline mt-1">Las fallas aparecerán aquí cuando registres un motivo</p>
           </div>
         )}
       </div>
@@ -128,19 +128,19 @@ const MonitoreoConectividadView: React.FC = () => {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-row justify-between items-start w-full gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <h1 className="text-3xl font-black font-headline text-on-surface tracking-tight flex items-center gap-2">
             <Activity className="w-8 h-8 text-amber-500" />
             Radar de Conectividad
           </h1>
-          <p className="text-slate-500 mt-1">Monitoreo de impresoras y agentes KPAX.</p>
+          <p className="text-on-surface-variant mt-1">Monitoreo de impresoras y agentes KPAX.</p>
         </div>
         
         {/* Tabs */}
-        <div className="flex bg-slate-100 rounded-lg p-1">
+        <div className="flex bg-surface-container rounded-lg p-1">
           <button
             onClick={() => setActiveTab('kpax')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              activeTab === 'kpax' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+              activeTab === 'kpax' ? 'bg-surface-container-lowest text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
             <Activity className="w-4 h-4 inline mr-2" />
@@ -149,7 +149,7 @@ const MonitoreoConectividadView: React.FC = () => {
           <button
             onClick={() => setActiveTab('agentes')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              activeTab === 'agentes' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+              activeTab === 'agentes' ? 'bg-surface-container-lowest text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
             <Server className="w-4 h-4 inline mr-2" />
@@ -158,7 +158,7 @@ const MonitoreoConectividadView: React.FC = () => {
           <button
             onClick={() => setActiveTab('historial')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              activeTab === 'historial' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+              activeTab === 'historial' ? 'bg-surface-container-lowest text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
             <History className="w-4 h-4 inline mr-2" />
@@ -167,7 +167,7 @@ const MonitoreoConectividadView: React.FC = () => {
           <button
             onClick={() => setActiveTab('evolucion')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              activeTab === 'evolucion' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+              activeTab === 'evolucion' ? 'bg-surface-container-lowest text-on-surface shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
             <TrendingUp className="w-4 h-4 inline mr-2" />

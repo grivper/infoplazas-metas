@@ -86,7 +86,7 @@ export function StudentTrackingTable({ students, onCambiarEstado, onEditarEstudi
         <Button
           variant="ghost"
           size="sm"
-          className="h-6 px-2 text-xs text-slate-600 hover:text-slate-800 hover:bg-slate-100"
+          className="h-6 px-2 text-xs text-on-surface-variant hover:text-on-surface hover:bg-surface-container"
           onClick={() => onEditarEstudiante({
             id: student.id,
             nombre_estudiante: student.nombre_estudiante,
@@ -154,7 +154,7 @@ export function StudentTrackingTable({ students, onCambiarEstado, onEditarEstudi
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="text-xs text-slate-500 uppercase bg-slate-50">
+            <thead className="text-xs text-on-surface-variant uppercase bg-surface-container-low">
               <tr>
                 <th className="px-4 py-3 font-medium">Estudiante</th>
                 <th className="px-4 py-3 font-medium">Cédula</th>
@@ -167,19 +167,19 @@ export function StudentTrackingTable({ students, onCambiarEstado, onEditarEstudi
                 <th className="px-4 py-3 font-medium">Estado</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-border/50">
               {data.map((student) => (
-                <tr key={student.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-4 py-3 font-medium text-slate-800">{student.nombre_estudiante}</td>
-                  <td className="px-4 py-3 text-slate-600 font-mono text-xs">{student.cedula}</td>
-                  <td className="px-4 py-3 text-slate-600">{student.universidad}</td>
-                  <td className="px-4 py-3 text-slate-600">{student.infoplaza}</td>
-                  <td className="px-4 py-3 text-slate-600">{student.carrera}</td>
-                  <td className="px-4 py-3 text-slate-600">
+                <tr key={student.id} className="hover:bg-surface-container-low/50 transition-colors">
+                  <td className="px-4 py-3 font-medium text-on-surface">{student.nombre_estudiante}</td>
+                  <td className="px-4 py-3 text-on-surface-variant font-mono text-xs">{student.cedula}</td>
+                  <td className="px-4 py-3 text-on-surface-variant">{student.universidad}</td>
+                  <td className="px-4 py-3 text-on-surface-variant">{student.infoplaza}</td>
+                  <td className="px-4 py-3 text-on-surface-variant">{student.carrera}</td>
+                  <td className="px-4 py-3 text-on-surface-variant">
                     {student.anio_cursa ? student.anio_cursa.replace(/[^0-9]/g, '') : '-'}
                   </td>
-                  <td className="px-4 py-3 text-slate-600">{student.talleres}</td>
-                  <td className="px-4 py-3 text-slate-600">{student.fecha_inscripcion}</td>
+                  <td className="px-4 py-3 text-on-surface-variant">{student.talleres}</td>
+                  <td className="px-4 py-3 text-on-surface-variant">{student.fecha_inscripcion}</td>
                   <td className="px-4 py-3">{renderActions(student)}</td>
                 </tr>
               ))}
@@ -200,7 +200,7 @@ export function StudentTrackingTable({ students, onCambiarEstado, onEditarEstudi
       </CardHeader>
       <CardContent>
         {students.length === 0 ? (
-          <div className="text-center py-8 text-slate-500">
+          <div className="text-center py-8 text-on-surface-variant">
             <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
             <p>No hay estudiantes registrados aún.</p>
             <p className="text-sm">Usa el botón "Inscribir Estudiantes" para registrar el primer estudiante.</p>
@@ -210,7 +210,7 @@ export function StudentTrackingTable({ students, onCambiarEstado, onEditarEstudi
             {/* Buscador y filtros */}
             <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <div className="relative flex-1">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-outline" />
                 <Input
                   placeholder="Buscar por nombre, cédula, universidad, infoplaza..."
                   className="pl-9"
@@ -248,7 +248,7 @@ export function StudentTrackingTable({ students, onCambiarEstado, onEditarEstudi
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left">
-                  <thead className="text-xs text-slate-500 uppercase bg-slate-50 rounded-t-lg">
+                  <thead className="text-xs text-on-surface-variant uppercase bg-surface-container-low rounded-t-lg">
                     <tr>
                       <th className="px-4 py-3 font-medium rounded-tl-lg">Estudiante</th>
                       <th className="px-4 py-3 font-medium">Cédula</th>
@@ -261,19 +261,19 @@ export function StudentTrackingTable({ students, onCambiarEstado, onEditarEstudi
                       <th className="px-4 py-3 font-medium rounded-tr-lg">Estado</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-border/50">
                     {estudiantesFiltrados.map((student) => (
-                      <tr key={student.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-4 py-3 font-medium text-slate-800">{student.nombre_estudiante}</td>
-                        <td className="px-4 py-3 text-slate-600 font-mono text-xs">{student.cedula}</td>
-                        <td className="px-4 py-3 text-slate-600">{student.universidad}</td>
-                        <td className="px-4 py-3 text-slate-600">{student.infoplaza}</td>
-                        <td className="px-4 py-3 text-slate-600">{student.carrera}</td>
-                        <td className="px-4 py-3 text-slate-600">
+                      <tr key={student.id} className="hover:bg-surface-container-low/50 transition-colors">
+                        <td className="px-4 py-3 font-medium text-on-surface">{student.nombre_estudiante}</td>
+                        <td className="px-4 py-3 text-on-surface-variant font-mono text-xs">{student.cedula}</td>
+                        <td className="px-4 py-3 text-on-surface-variant">{student.universidad}</td>
+                        <td className="px-4 py-3 text-on-surface-variant">{student.infoplaza}</td>
+                        <td className="px-4 py-3 text-on-surface-variant">{student.carrera}</td>
+                        <td className="px-4 py-3 text-on-surface-variant">
                           {student.anio_cursa ? student.anio_cursa.replace(/[^0-9]/g, '') : '-'}
                         </td>
-                        <td className="px-4 py-3 text-slate-600">{student.talleres}</td>
-                        <td className="px-4 py-3 text-slate-600">{student.fecha_inscripcion}</td>
+                        <td className="px-4 py-3 text-on-surface-variant">{student.talleres}</td>
+                        <td className="px-4 py-3 text-on-surface-variant">{student.fecha_inscripcion}</td>
                         <td className="px-4 py-3">{renderActions(student)}</td>
                       </tr>
                     ))}
@@ -283,7 +283,7 @@ export function StudentTrackingTable({ students, onCambiarEstado, onEditarEstudi
             )}
 
             {estudiantesFiltrados.length === 0 && (
-              <div className="text-center py-8 text-slate-500">
+              <div className="text-center py-8 text-on-surface-variant">
                 <p>No se encontraron estudiantes con ese criterio de búsqueda.</p>
               </div>
             )}

@@ -20,7 +20,7 @@ import {
  * Mapeo de estados de mesa con label, color e icono para UI.
  */
 const ESTADOS: Record<MesaRecord['estado'], { label: string; color: string; icon: React.ReactNode }> = {
-  pendiente:       { label: 'Pendiente',       color: 'bg-slate-100 text-slate-600',         icon: <Clock className="w-3 h-3" /> },
+  pendiente:       { label: 'Pendiente',       color: 'bg-surface-container text-on-surface-variant',         icon: <Clock className="w-3 h-3" /> },
   en_progreso:     { label: 'En Progreso',     color: 'bg-amber-100 text-amber-700',         icon: <AlertCircle className="w-3 h-3" /> },
   completada:      { label: 'Completada',      color: 'bg-emerald-100 text-emerald-700',     icon: <CheckCircle2 className="w-3 h-3" /> },
   por_graduacion:  { label: 'Por Graduación',  color: 'bg-purple-100 text-purple-700',       icon: <GraduationCap className="w-3 h-3" /> },
@@ -38,26 +38,26 @@ const MesaRow: React.FC<{
 }> = ({ m, onEdit, onDelete }) => {
   const est = ESTADOS[m.estado];
   return (
-    <tr className="hover:bg-slate-50/50 transition-colors">
-      <td className="px-4 py-3 font-medium text-slate-800">{m.infoplaza}</td>
-      <td className="px-4 py-3 text-slate-700">Mesa {m.mesa}</td>
+    <tr className="hover:bg-surface-container-low/50 transition-colors">
+      <td className="px-4 py-3 font-medium text-on-surface">{m.infoplaza}</td>
+      <td className="px-4 py-3 text-on-surface">Mesa {m.mesa}</td>
       <td className="px-4 py-3">
         <span className="font-bold text-indigo-600">{m.sesionActual}</span>
-        <span className="text-slate-400"> / 10</span>
+        <span className="text-outline"> / 10</span>
       </td>
-      <td className="px-4 py-3 text-slate-700">{m.participantes}</td>
-      <td className="px-4 py-3 text-slate-600">{m.dinamizador || '—'}</td>
-      <td className="px-4 py-3 text-slate-600">{m.email || '—'}</td>
-      <td className="px-4 py-3 text-slate-600">{m.fechaInicio || '—'}</td>
-      <td className="px-4 py-3 text-slate-600">{m.fechaFin || '—'}</td>
-      <td className="px-4 py-3 text-slate-600">{m.fechaGraduacion || '—'}</td>
+      <td className="px-4 py-3 text-on-surface">{m.participantes}</td>
+      <td className="px-4 py-3 text-on-surface-variant">{m.dinamizador || '—'}</td>
+      <td className="px-4 py-3 text-on-surface-variant">{m.email || '—'}</td>
+      <td className="px-4 py-3 text-on-surface-variant">{m.fechaInicio || '—'}</td>
+      <td className="px-4 py-3 text-on-surface-variant">{m.fechaFin || '—'}</td>
+      <td className="px-4 py-3 text-on-surface-variant">{m.fechaGraduacion || '—'}</td>
       <td className="px-4 py-3">
         <Badge variant="secondary" className={`gap-1 ${est.color}`}>{est.icon} {est.label}</Badge>
       </td>
       <td className="px-4 py-3">
         <div className="flex gap-1">
           <Button variant="ghost" size="sm" onClick={() => onEdit(m)}>
-            <Edit2 className="w-3.5 h-3.5 text-slate-500" />
+            <Edit2 className="w-3.5 h-3.5 text-on-surface-variant" />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => onDelete(m.mesa_id)}>
             <Trash2 className="w-3.5 h-3.5 text-rose-500" />
@@ -122,8 +122,8 @@ const MesasView: React.FC = () => {
       {/* Cabecera */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Mesas de Transformación</h1>
-          <p className="text-slate-500 mt-1">Seguimiento de 21 Infoplazas • 3 Mesas × 10 Sesiones</p>
+          <h1 className="text-3xl font-bold text-on-surface tracking-tight">Mesas de Transformación</h1>
+          <p className="text-on-surface-variant mt-1">Seguimiento de 21 Infoplazas • 3 Mesas × 10 Sesiones</p>
         </div>
         <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2" onClick={handleNewMesa}>
           <Plus className="w-4 h-4" /> Nueva Mesa
@@ -164,14 +164,14 @@ const MesasView: React.FC = () => {
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
+              <thead className="text-xs text-on-surface-variant uppercase bg-surface-container-low border-b border-border/50">
                 <tr>
                   {headers.map(h => (
                     <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y divide-border">
                 {ORDEN_REGIONES.map(region => {
                   const items = agrupadas[region];
                   if (!items || items.length === 0) return null;
@@ -195,7 +195,7 @@ const MesasView: React.FC = () => {
                   );
                 })}
                 {totalMesas === 0 && (
-                  <tr><td colSpan={headers.length} className="px-4 py-12 text-center text-slate-400">
+                  <tr><td colSpan={headers.length} className="px-4 py-12 text-center text-outline">
                     No hay mesas registradas. Presiona "Nueva Mesa" para comenzar.
                   </td></tr>
                 )}

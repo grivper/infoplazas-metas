@@ -60,16 +60,16 @@ export const MesaForm: React.FC<MesaFormProps> = ({ registro, catalogo, onSave, 
     onSave({ ...form, mesa_id } as MesaRecord);
   };
 
-  const inputCls = 'w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300';
-  const labelCls = 'block text-xs font-medium text-slate-500 mb-1';
+  const inputCls = 'w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300';
+  const labelCls = 'block text-xs font-medium text-on-surface-variant mb-1';
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
+    <form onSubmit={handleSubmit} className="bg-surface-container-lowest border border-border rounded-xl p-5 space-y-4 shadow-sm">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div>
           <label className={labelCls}>Infoplaza</label>
           {registro.mesa_id ? (
-            <div className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-700">
+            <div className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface-container-low text-on-surface">
               {form.infoplaza} ({form.region})
             </div>
           ) : (
@@ -87,7 +87,7 @@ export const MesaForm: React.FC<MesaFormProps> = ({ registro, catalogo, onSave, 
         <div>
           <label className={labelCls}>Mesa #</label>
           {registro.mesa_id ? (
-            <div className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-700">
+            <div className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-surface-container-low text-on-surface">
               Mesa {form.mesa}
             </div>
           ) : (

@@ -11,7 +11,7 @@ import { IncidenciasView } from './components/IncidenciasView';
 const VisitasModule: React.FC = () => {
   return (
     <Tabs defaultValue="meta30" className="w-full">
-      <TabsList className="bg-slate-100 p-1 rounded-lg mb-6">
+      <TabsList className="bg-surface-container p-1 rounded-lg mb-6">
         <TabsTrigger value="meta30" className="rounded-md text-sm font-medium">
           Meta del 30%
         </TabsTrigger>

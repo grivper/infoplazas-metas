@@ -3,7 +3,7 @@ export const getUrgenciaColor = (urgencia: string) => {
     case 'alta': return 'bg-rose-100 text-rose-700 hover:bg-rose-100';
     case 'media': return 'bg-amber-100 text-amber-700 hover:bg-amber-100';
     case 'baja': return 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100';
-    default: return 'bg-slate-100 text-slate-700';
+    default: return 'bg-surface-container text-on-surface';
   }
 };
 
@@ -13,7 +13,7 @@ export const getEstadoColor = (estado: string) => {
     case 'en_seguimiento': return 'bg-amber-100 text-amber-700';
     case 'resuelto': return 'bg-emerald-100 text-emerald-700';
     case 'escalado': return 'bg-indigo-100 text-indigo-700';
-    default: return 'bg-slate-100 text-slate-700';
+    default: return 'bg-surface-container text-on-surface';
   }
 };
 

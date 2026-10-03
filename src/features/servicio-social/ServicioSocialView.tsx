@@ -217,15 +217,15 @@ export const ServicioSocialView: React.FC = () => {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Módulo Servicio Social</h1>
-          <p className="text-slate-500 mt-1">Gestión integral de voluntarios y horas de servicio (Meta 1).</p>
+          <h1 className="text-3xl font-bold text-on-surface tracking-tight">Módulo Servicio Social</h1>
+          <p className="text-on-surface-variant mt-1">Gestión integral de voluntarios y horas de servicio (Meta 1).</p>
         </div>
         
         {/* Acciones Rápidas */}
         <div className="flex flex-wrap items-center gap-3">
           <ModalAlianza onSuccess={cargarDatos}>
             <Button variant="outline" className="flex items-center gap-2">
-              <Handshake className="w-4 h-4 text-slate-500" />
+              <Handshake className="w-4 h-4 text-on-surface-variant" />
               Nueva Alianza
             </Button>
           </ModalAlianza>
@@ -246,7 +246,7 @@ export const ServicioSocialView: React.FC = () => {
 
       {/* Top Section: KPIs */}
       <section>
-        <h2 className="text-xl font-semibold text-slate-800 mb-4">Progreso de Indicadores (KPIs)</h2>
+        <h2 className="text-xl font-semibold text-on-surface mb-4">Progreso de Indicadores (KPIs)</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {kpiData.map((kpi, index) => (
             <StatCardWithProgress 
@@ -264,7 +264,7 @@ export const ServicioSocialView: React.FC = () => {
 
       {/* Middle Section: Workflow Timeline */}
       <section>
-        <h2 className="text-xl font-semibold text-slate-800 mb-4">Cronograma de Ejecución</h2>
+        <h2 className="text-xl font-semibold text-on-surface mb-4">Cronograma de Ejecución</h2>
         <WorkflowTimeline workflows={workflows} />
       </section>
 
