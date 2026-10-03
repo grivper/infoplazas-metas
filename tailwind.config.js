@@ -60,6 +60,25 @@ export default {
           DEFAULT: token("card"),
           foreground: token("card-foreground"),
         },
+        // Design system "Polished Luminary" tokens defined in index.css
+        "surface-container": {
+          DEFAULT: token("surface-container"),
+          lowest: token("surface-container-lowest"),
+          low: token("surface-container-low"),
+          high: token("surface-container-high"),
+          highest: token("surface-container-highest"),
+        },
+        // index.css has no --on-surface*; reuse the equivalent shadcn tokens
+        "on-surface": {
+          DEFAULT: token("foreground"),
+          variant: token("muted-foreground"),
+        },
+        outline: {
+          DEFAULT: token("outline"),
+          variant: token("outline-variant"),
+        },
+        tertiary: token("tertiary"),
+        error: token("error"),
       },
       borderRadius: {
         lg: "var(--radius)",
