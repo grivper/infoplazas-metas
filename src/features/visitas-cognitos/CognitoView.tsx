@@ -179,26 +179,26 @@ export const CognitoView: React.FC = () => {
     <div className="space-y-6 w-[90%] max-w-none mx-auto pb-10 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+          <h1 className="text-3xl font-black text-on-surface tracking-tight flex items-center gap-3">
             <div className="p-2 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-200">
               <Database className="w-7 h-7 text-white" />
             </div>
             Consola Cognito
           </h1>
-          <p className="text-slate-500 font-medium ml-1">Sincronización avanzada con validación estricta de duplicados.</p>
+          <p className="text-on-surface-variant font-medium ml-1">Sincronización avanzada con validación estricta de duplicados.</p>
         </div>
       </div>
 
       {/* Area de Carga */}
-      <Card className="border-2 border-dashed border-slate-200 bg-white/50 hover:bg-white hover:border-indigo-400 transition-all duration-300 shadow-sm relative overflow-hidden group">
+      <Card className="border-2 border-dashed border-border bg-surface-container-lowest/50 hover:bg-surface-container-lowest hover:border-indigo-400 transition-all duration-300 shadow-sm relative overflow-hidden group">
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         <CardContent className="flex flex-col items-center justify-center py-10 gap-4 relative z-10">
-          <div className={`p-4 rounded-full ${loading ? 'bg-indigo-100' : 'bg-slate-100'} transition-colors`}>
-            <Upload className={`w-10 h-10 ${loading ? 'text-indigo-600 animate-bounce' : 'text-slate-400'}`} />
+          <div className={`p-4 rounded-full ${loading ? 'bg-indigo-100' : 'bg-surface-container'} transition-colors`}>
+            <Upload className={`w-10 h-10 ${loading ? 'text-indigo-600 animate-bounce' : 'text-outline'}`} />
           </div>
           <div className="text-center space-y-1">
-            <h3 className="text-lg font-bold text-slate-800">Actualizar Registros Mensuales</h3>
-            <p className="text-xs text-slate-400 font-medium">Arrastra el CSV de Cognito o haz clic para buscar</p>
+            <h3 className="text-lg font-bold text-on-surface">Actualizar Registros Mensuales</h3>
+            <p className="text-xs text-outline font-medium">Arrastra el CSV de Cognito o haz clic para buscar</p>
           </div>
           
           <input id="cognito-upload" type="file" accept=".csv" className="hidden" ref={fileInputRef} onChange={handleFileUpload} />
@@ -241,12 +241,12 @@ export const CognitoView: React.FC = () => {
               registros.map((r, idx) => (
                 <div 
                   key={`${enlace}-${idx}`} 
-                  className="bg-white border border-rose-100/50 rounded-lg py-2.5 px-4 flex justify-between items-center shadow-sm"
+                  className="bg-surface-container-lowest border border-rose-100/50 rounded-lg py-2.5 px-4 flex justify-between items-center shadow-sm"
                 >
-                  <span className="font-bold text-slate-700 text-sm">
+                  <span className="font-bold text-on-surface text-sm">
                     {r.enlace}
                   </span>
-                  <span className="italic text-slate-300 text-sm font-medium">
+                  <span className="italic text-outline-variant text-sm font-medium">
                     {r.infoplaza}
                   </span>
                 </div>
@@ -259,16 +259,16 @@ export const CognitoView: React.FC = () => {
       {/* Visualización de Datos */}
       {data.length > 0 && (
         <div className="space-y-6">
-          <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+          <div className="flex items-center gap-3 border-b border-border/50 pb-4">
             <Map className="w-5 h-5 text-indigo-500" />
-            <h2 className="text-xl font-black text-slate-800">Desglose de Impacto Consolidado</h2>
+            <h2 className="text-xl font-black text-on-surface">Desglose de Impacto Consolidado</h2>
           </div>
           
           <Tabs defaultValue="C1" className="w-full">
-            <TabsList className="bg-slate-100/50 p-1 rounded-full mb-6 w-full md:w-auto inline-flex shadow-inner border border-slate-200/50">
-              <TabsTrigger value="C1" className="px-8 py-2 rounded-full text-xs font-black uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-indigo-600 transition-all">C1 (Ene–Abr)</TabsTrigger>
-              <TabsTrigger value="C2" className="px-8 py-2 rounded-full text-xs font-black uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-indigo-600 transition-all">C2 (May–Ago)</TabsTrigger>
-              <TabsTrigger value="C3" className="px-8 py-2 rounded-full text-xs font-black uppercase data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-indigo-600 transition-all">C3 (Sep–Dic)</TabsTrigger>
+            <TabsList className="bg-surface-container/50 p-1 rounded-full mb-6 w-full md:w-auto inline-flex shadow-inner border border-border/50">
+              <TabsTrigger value="C1" className="px-8 py-2 rounded-full text-xs font-black uppercase data-[state=active]:bg-surface-container-lowest data-[state=active]:shadow-sm data-[state=active]:text-indigo-600 transition-all">C1 (Ene–Abr)</TabsTrigger>
+              <TabsTrigger value="C2" className="px-8 py-2 rounded-full text-xs font-black uppercase data-[state=active]:bg-surface-container-lowest data-[state=active]:shadow-sm data-[state=active]:text-indigo-600 transition-all">C2 (May–Ago)</TabsTrigger>
+              <TabsTrigger value="C3" className="px-8 py-2 rounded-full text-xs font-black uppercase data-[state=active]:bg-surface-container-lowest data-[state=active]:shadow-sm data-[state=active]:text-indigo-600 transition-all">C3 (Sep–Dic)</TabsTrigger>
             </TabsList>
             {(Object.entries(CUATRIMESTRES) as [string, number[]][]).map(([key, meses]) => (
               <TabsContent key={key} value={key} className="space-y-8 animate-in slide-in-from-bottom-2 duration-400">

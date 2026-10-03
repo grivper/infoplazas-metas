@@ -49,33 +49,33 @@ export function IncidenciaDetalleModal({
         </DialogHeader>
         
         <div className="space-y-4 mt-4">
-          <div className="bg-slate-50 rounded-lg p-4 space-y-2">
+          <div className="bg-surface-container-low rounded-lg p-4 space-y-2">
             <div className="flex justify-between">
-              <span className="text-sm text-slate-500">Infoplaza:</span>
+              <span className="text-sm text-on-surface-variant">Infoplaza:</span>
               <span className="text-sm font-medium">{incidencia.infoplaza_nombre}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-slate-500">Categoría:</span>
+              <span className="text-sm text-on-surface-variant">Categoría:</span>
               <span className="text-sm font-medium capitalize">{incidencia.categoria}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-slate-500">Urgencia:</span>
+              <span className="text-sm text-on-surface-variant">Urgencia:</span>
               <Badge className={`text-xs font-medium capitalize ${getUrgenciaColor(incidencia.urgencia)}`}>
                 {incidencia.urgencia}
               </Badge>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm text-slate-500">Fecha:</span>
+              <span className="text-sm text-on-surface-variant">Fecha:</span>
               <span className="text-sm font-medium">{formatFecha(incidencia.created_at)}</span>
             </div>
             <div>
-              <span className="text-sm text-slate-500">Descripción:</span>
-              <p className="text-sm mt-1 p-2 bg-white rounded border">{incidencia.descripcion}</p>
+              <span className="text-sm text-on-surface-variant">Descripción:</span>
+              <p className="text-sm mt-1 p-2 bg-surface-container-lowest rounded border">{incidencia.descripcion}</p>
             </div>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+            <h4 className="text-sm font-semibold text-on-surface mb-2 flex items-center gap-2">
               <MessageSquare className="w-4 h-4" />
               Historial de Seguimientos
             </h4>
@@ -84,18 +84,18 @@ export function IncidenciaDetalleModal({
                 <RemeLoader size={24} />
               </div>
             ) : seguimientos.length === 0 ? (
-              <p className="text-sm text-slate-500 py-2">No hay seguimientos registrados.</p>
+              <p className="text-sm text-on-surface-variant py-2">No hay seguimientos registrados.</p>
             ) : (
               <div className="space-y-2 max-h-40 overflow-y-auto">
                 {seguimientos.map((seg) => (
-                  <div key={seg.id} className="bg-white border rounded-lg p-3">
+                  <div key={seg.id} className="bg-surface-container-lowest border rounded-lg p-3">
                     <div className="flex justify-between items-start mb-1">
                       <Badge className={`text-xs ${seg.accion === 'resuelto' ? 'bg-emerald-100 text-emerald-700' : seg.accion === 'escalado' ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700'}`}>
                         {getAccionLabel(seg.accion)}
                       </Badge>
-                      <span className="text-xs text-slate-400">{formatFecha(seg.created_at)}</span>
+                      <span className="text-xs text-outline">{formatFecha(seg.created_at)}</span>
                     </div>
-                    <p className="text-sm text-slate-700">{seg.nota}</p>
+                    <p className="text-sm text-on-surface">{seg.nota}</p>
                   </div>
                 ))}
               </div>
@@ -104,7 +104,7 @@ export function IncidenciaDetalleModal({
 
           {incidencia.estado_ticket !== 'resuelto' && (
             <div className="border-t pt-4">
-              <h4 className="text-sm font-semibold text-slate-700 mb-2">Agregar Seguimiento</h4>
+              <h4 className="text-sm font-semibold text-on-surface mb-2">Agregar Seguimiento</h4>
               <Textarea
                 value={notaSeguimiento}
                 onChange={(e) => onNotaChange(e.target.value)}
@@ -141,7 +141,7 @@ export function IncidenciaDetalleModal({
                 </Button>
                 <Button
                   size="sm"
-                  className="ml-auto bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed"
+                  className="ml-auto bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:text-on-surface-variant disabled:cursor-not-allowed"
                   onClick={onAgregarSeguimiento}
                   disabled={!notaSeguimiento.trim() || guardando}
                 >

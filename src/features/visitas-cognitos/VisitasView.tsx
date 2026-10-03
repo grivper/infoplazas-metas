@@ -67,13 +67,13 @@ export const VisitasView: React.FC = () => {
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Rendimiento Operativo (Meta 2)</h1>
-          <p className="text-slate-500 mt-1">Análisis cuatrimestral — Año {añoActual}</p>
+          <h1 className="text-3xl font-bold text-on-surface tracking-tight">Rendimiento Operativo (Meta 2)</h1>
+          <p className="text-on-surface-variant mt-1">Análisis cuatrimestral — Año {añoActual}</p>
         </div>
       </div>
 
       <Tabs defaultValue="C1" className="w-full">
-        <TabsList className="bg-slate-100 p-1 rounded-lg">
+        <TabsList className="bg-surface-container p-1 rounded-lg">
           <TabsTrigger value="C1" className="rounded-md text-sm">C1 (Ene–Abr)</TabsTrigger>
           <TabsTrigger value="C2" className="rounded-md text-sm">C2 (May–Ago)</TabsTrigger>
           <TabsTrigger value="C3" className="rounded-md text-sm">C3 (Sep–Dic)</TabsTrigger>
