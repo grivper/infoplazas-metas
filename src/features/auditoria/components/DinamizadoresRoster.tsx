@@ -129,10 +129,10 @@ export function DinamizadoresRoster() {
     <section className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">
+          <h2 className="text-xl font-semibold text-on-surface">
             Dinamizadores
           </h2>
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="mt-1 text-sm text-on-surface-variant">
             Administrá los datos de contacto de los dinamizadores.
           </p>
         </div>
@@ -153,7 +153,7 @@ export function DinamizadoresRoster() {
         disabled={cargando || Boolean(error)}
       />
       {cargando ? (
-        <p className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">
+        <p className="rounded-md border border-border bg-surface-container-lowest p-6 text-sm text-on-surface-variant">
           Cargando dinamizadores...
         </p>
       ) : error ? (
@@ -171,7 +171,7 @@ export function DinamizadoresRoster() {
           </Button>
         </div>
       ) : infoplazasActivas.length === 0 ? (
-        <p className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">
+        <p className="rounded-md border border-border bg-surface-container-lowest p-6 text-sm text-on-surface-variant">
           No hay infoplazas disponibles en el catálogo.
         </p>
       ) : (
@@ -209,7 +209,7 @@ export function DinamizadoresRoster() {
                       className={
                         dinamizador.estatus === "Activo"
                           ? "font-medium text-emerald-700"
-                          : "font-medium text-slate-500"
+                          : "font-medium text-on-surface-variant"
                       }
                     >
                       {dinamizador.estatus}

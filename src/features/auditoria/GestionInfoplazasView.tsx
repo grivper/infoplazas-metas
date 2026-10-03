@@ -90,7 +90,7 @@ export const GestionInfoplazasView: React.FC = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex justify-between items-center">
-        <div><h1 className="text-3xl font-bold">Gestión de Infoplazas</h1><p className="text-slate-500">Catálogo y rutas de enlaces</p></div>
+        <div><h1 className="text-3xl font-bold">Gestión de Infoplazas</h1><p className="text-on-surface-variant">Catálogo y rutas de enlaces</p></div>
       </div>
       <Dialog open={modalLimpiarOpen} onOpenChange={(open) => { setModalLimpiarOpen(open); if (!open) setConfirmLimpiar(''); }}>
         <DialogContent>
@@ -103,7 +103,7 @@ export const GestionInfoplazasView: React.FC = () => {
               <p className="text-sm text-amber-800"><strong>{infoplazas.length}</strong> registros serán eliminados permanentemente.</p>
             </div>
             <div>
-              <label className="text-sm font-medium">Escribí <code className="bg-slate-100 px-1 rounded">ELIMINAR</code> para confirmar:</label>
+              <label className="text-sm font-medium">Escribí <code className="bg-surface-container px-1 rounded">ELIMINAR</code> para confirmar:</label>
               <Input value={confirmLimpiar} onChange={e => setConfirmLimpiar(e.target.value)} placeholder="ELIMINAR" className="mt-1" />
             </div>
           </div>
@@ -119,17 +119,17 @@ export const GestionInfoplazasView: React.FC = () => {
         <StatCard title="Cerradas" value={stats.cerradas} color="rose" />
       </div>
 
-      <div className="flex gap-2 border-b border-slate-200">
-        <button onClick={() => setActiveTab('catalogo')} className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === 'catalogo' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500'}`}><MapPin className="w-4 h-4 inline mr-2" />Catálogo</button>
-        <button onClick={() => setActiveTab('rutas')} className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === 'rutas' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500'}`}><Route className="w-4 h-4 inline mr-2" />Rutas</button>
-        <button onClick={() => setActiveTab('dinamizadores')} className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === 'dinamizadores' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500'}`}><Users className="w-4 h-4 inline mr-2" />Dinamizadores</button>
+      <div className="flex gap-2 border-b border-border">
+        <button onClick={() => setActiveTab('catalogo')} className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === 'catalogo' ? 'border-blue-600 text-blue-600' : 'border-transparent text-on-surface-variant'}`}><MapPin className="w-4 h-4 inline mr-2" />Catálogo</button>
+        <button onClick={() => setActiveTab('rutas')} className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === 'rutas' ? 'border-blue-600 text-blue-600' : 'border-transparent text-on-surface-variant'}`}><Route className="w-4 h-4 inline mr-2" />Rutas</button>
+        <button onClick={() => setActiveTab('dinamizadores')} className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === 'dinamizadores' ? 'border-blue-600 text-blue-600' : 'border-transparent text-on-surface-variant'}`}><Users className="w-4 h-4 inline mr-2" />Dinamizadores</button>
       </div>
 
       {activeTab === 'catalogo' && (
         <div className="space-y-4">
           <div className="flex justify-between">
             <div className="flex gap-2">
-              <div className="relative"><Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" /><Input placeholder="Buscar..." className="pl-9 w-64" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} /></div>
+              <div className="relative"><Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-outline" /><Input placeholder="Buscar..." className="pl-9 w-64" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} /></div>
               <Select value={filtroEstado} onValueChange={v => setFiltroEstado(v as FiltroEstado)}><SelectTrigger className="w-40"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="todas">Todas</SelectItem><SelectItem value="abiertas">Abiertas</SelectItem><SelectItem value="cerradas">Cerradas</SelectItem></SelectContent></Select>
             </div>
             <div className="flex flex-wrap items-center gap-3">
@@ -166,25 +166,25 @@ export const GestionInfoplazasView: React.FC = () => {
               return numA - numB;
             });
             return (
-            <div key={enlace} className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-              <div className="bg-slate-100 px-4 py-3 border-b border-slate-200">
-                <h3 className="font-semibold text-slate-700">{enlace}</h3>
-                <p className="text-xs text-slate-500">{rutasEnlace.length} {rutasEnlace.length === 1 ? 'infoplaza' : 'infoplazas'}</p>
+            <div key={enlace} className="rounded-xl border border-border bg-surface-container-lowest shadow-sm overflow-hidden">
+              <div className="bg-surface-container px-4 py-3 border-b border-border">
+                <h3 className="font-semibold text-on-surface">{enlace}</h3>
+                <p className="text-xs text-on-surface-variant">{rutasEnlace.length} {rutasEnlace.length === 1 ? 'infoplaza' : 'infoplazas'}</p>
               </div>
               <Table>
                 <TableHeader>
-                  <TableRow className="hover:bg-slate-50">
-                    <TableHead className="text-xs font-bold text-slate-600 uppercase tracking-wider py-3 px-4">Día Semana</TableHead>
-                    <TableHead className="text-xs font-bold text-slate-600 uppercase tracking-wider py-3 px-4">Día Ruta</TableHead>
-                    <TableHead className="text-xs font-bold text-slate-600 uppercase tracking-wider py-3 px-4">Infoplaza</TableHead>
-                    <TableHead className="text-xs font-bold text-slate-600 uppercase tracking-wider py-3 px-4 w-20">Acciones</TableHead>
+                  <TableRow className="hover:bg-surface-container-low">
+                    <TableHead className="text-xs font-bold text-on-surface-variant uppercase tracking-wider py-3 px-4">Día Semana</TableHead>
+                    <TableHead className="text-xs font-bold text-on-surface-variant uppercase tracking-wider py-3 px-4">Día Ruta</TableHead>
+                    <TableHead className="text-xs font-bold text-on-surface-variant uppercase tracking-wider py-3 px-4">Infoplaza</TableHead>
+                    <TableHead className="text-xs font-bold text-on-surface-variant uppercase tracking-wider py-3 px-4 w-20">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {rutasOrdenadas.map(r => (
-                    <TableRow key={r.id} className="hover:bg-indigo-50 transition-colors cursor-pointer group border-b border-slate-100 last:border-b-0">
-                      <TableCell className="py-3 px-4 text-sm text-slate-500">{r.dia_semana || '-'}</TableCell>
-                      <TableCell className="py-3 px-4 text-sm text-slate-500">{r.dia_ruta || '-'}</TableCell>
+                    <TableRow key={r.id} className="hover:bg-indigo-50 transition-colors cursor-pointer group border-b border-border/50 last:border-b-0">
+                      <TableCell className="py-3 px-4 text-sm text-on-surface-variant">{r.dia_semana || '-'}</TableCell>
+                      <TableCell className="py-3 px-4 text-sm text-on-surface-variant">{r.dia_ruta || '-'}</TableCell>
                       <TableCell className="py-3 px-4"><Badge variant="secondary">{r.infoplaza_nombre}</Badge></TableCell>
                       <TableCell className="py-3 px-4">
                         <div className="flex justify-end gap-1">
@@ -200,7 +200,7 @@ export const GestionInfoplazasView: React.FC = () => {
           );
           })}
           {rutas.length === 0 && (
-            <div className="text-center py-12 text-slate-500">No hay rutas cargadas. Subí un CSV o agregá manualmente.</div>
+            <div className="text-center py-12 text-on-surface-variant">No hay rutas cargadas. Subí un CSV o agregá manualmente.</div>
           )}
         </div>
       )}

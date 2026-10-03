@@ -29,10 +29,10 @@ export function RosterTable({
   const cantidadColumnas = columnas.length + 1;
 
   return (
-    <div className="rounded-md border border-slate-200 bg-white">
-      <div className="border-b border-slate-200 px-4 py-3">
-        <h3 className="font-semibold text-slate-900">{titulo}</h3>
-        <p className="mt-1 text-sm text-slate-600">{descripcion}</p>
+    <div className="rounded-md border border-border bg-surface-container-lowest">
+      <div className="border-b border-border px-4 py-3">
+        <h3 className="font-semibold text-on-surface">{titulo}</h3>
+        <p className="mt-1 text-sm text-on-surface-variant">{descripcion}</p>
       </div>
       <Table>
         <TableHeader>
@@ -50,7 +50,7 @@ export function RosterTable({
             <TableRow>
               <TableCell
                 colSpan={cantidadColumnas}
-                className="text-center text-slate-600"
+                className="text-center text-on-surface-variant"
               >
                 {vacio}
               </TableCell>
