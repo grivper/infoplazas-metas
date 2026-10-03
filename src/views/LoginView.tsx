@@ -3,11 +3,15 @@ import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import LogoReme from '../assets/logo-reme.png';
 
+// Clases compartidas por los dos inputs para mantenerlos idénticos
+const inputClasses =
+  'w-full py-3 bg-surface-container-low border border-border rounded-xl text-on-surface font-medium placeholder:text-outline outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-50';
+
 export const LoginView: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+
   // Estados de carga y error (Seguridad y UX)
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -36,51 +40,59 @@ export const LoginView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row w-full font-sans bg-white">
-      {/* Columna Izquierda - Branding */}
-      <div className="lg:w-1/2 w-full bg-blue-900 flex flex-col items-center justify-center p-12 text-center order-2 lg:order-1">
-        <div className="max-w-md w-full flex flex-col items-center justify-center animate-in fade-in zoom-in duration-700 pt-12 lg:pt-0">
-          {/* Logo */}
-          <img 
-            src={LogoReme} 
-            alt="Logo Reme" 
-            className="w-60 h-auto mb-8 drop-shadow-xl"
+    <div className="min-h-screen w-full flex items-center justify-center px-4 py-10 font-sans bg-gradient-to-br from-slate-900 via-slate-900 to-primary">
+      <div className="w-full max-w-md animate-in fade-in zoom-in duration-700">
+        {/* Branding sobre el fondo oscuro: el logo es blanco, no puede ir sobre la tarjeta */}
+        <div className="flex flex-col items-center text-center mb-8">
+          <img
+            src={LogoReme}
+            alt="Logo Reme"
+            className="w-32 h-auto mb-4 drop-shadow-xl"
           />
-          <h1 className="text-4xl text-white font-bold mb-4 tracking-tight">Metas enlaces<br/>Regional de los Santos</h1>
-          <p className="text-blue-200 text-lg font-light max-w-sm">
-            Sistema Gerencial Integral para el Monitoreo y Evaluación de Metas Institucionales.
-          </p>
+          <h1 className="text-3xl font-black font-headline text-white tracking-tight">
+            Metas enlaces
+          </h1>
+          <p className="text-slate-300 mt-1">Regional de los Santos</p>
         </div>
-      </div>
 
-      {/* Columna Derecha - Formulario */}
-      <div className="lg:w-1/2 w-full flex items-center justify-center p-8 lg:p-24 order-1 lg:order-2 bg-white">
-        <div className="max-w-md w-full animate-in slide-in-from-right-8 duration-500">
-          <div className="mb-10">
-            <h2 className="text-3xl font-bold text-slate-800 tracking-tight">Iniciar sesión</h2>
-            <p className="text-slate-500 mt-2">Ingresa tus credenciales para acceder al portal.</p>
+        {/* Tarjeta del formulario */}
+        <div className="bg-surface-container-lowest rounded-2xl shadow-2xl p-6 sm:p-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold font-headline text-on-surface tracking-tight">
+              Iniciar sesión
+            </h2>
+            <p className="text-on-surface-variant mt-1">
+              Ingresa tus credenciales para acceder al portal.
+            </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Mensaje de error genérico (Anti-Enumeración) */}
             {errorMsg && (
-              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium border border-red-100 animate-in fade-in">
+              <div
+                role="alert"
+                className="bg-destructive/10 text-destructive p-3 rounded-lg text-sm font-medium border border-destructive/20 animate-in fade-in"
+              >
                 {errorMsg}
               </div>
             )}
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Correo electrónico</label>
+              <label htmlFor="login-email" className="text-sm font-semibold text-on-surface">
+                Correo electrónico
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-slate-400" />
+                  <Mail className="h-5 w-5 text-outline" />
                 </div>
                 <input
+                  id="login-email"
                   type="email"
+                  autoComplete="username"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
-                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400 font-medium text-slate-700 disabled:opacity-50"
+                  className={`${inputClasses} pl-10 pr-4`}
                   placeholder="usuario@infoplazas.org.pa"
                   required
                 />
@@ -88,17 +100,21 @@ export const LoginView: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Contraseña</label>
+              <label htmlFor="login-password" className="text-sm font-semibold text-on-surface">
+                Contraseña
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-slate-400" />
+                  <Lock className="h-5 w-5 text-outline" />
                 </div>
                 <input
-                  type={showPassword ? "text" : "password"}
+                  id="login-password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
-                  className="w-full pl-10 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400 font-medium text-slate-700 disabled:opacity-50"
+                  className={`${inputClasses} pl-10 pr-12`}
                   placeholder="••••••••"
                   required
                 />
@@ -106,7 +122,9 @@ export const LoginView: React.FC = () => {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isLoading}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none disabled:opacity-50"
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  aria-pressed={showPassword}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface focus:outline-none focus-visible:text-primary disabled:opacity-50"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -117,7 +135,7 @@ export const LoginView: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold flex items-center justify-center py-3 px-4 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold flex items-center justify-center py-3 px-4 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>
@@ -130,6 +148,10 @@ export const LoginView: React.FC = () => {
             </button>
           </form>
         </div>
+
+        <p className="mt-6 text-center text-sm text-slate-400">
+          Sistema Gerencial Integral para el Monitoreo y Evaluación de Metas Institucionales.
+        </p>
       </div>
     </div>
   );
