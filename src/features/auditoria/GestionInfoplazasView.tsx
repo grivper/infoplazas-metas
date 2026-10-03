@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { StatCard } from '@/components/ui/bento-card';
+import { MenuSecciones, type ItemMenu } from '@/components/MenuSecciones';
 import { getAllInfoplazas, getInfoplazasAbiertas, toggleEstadoInfoplaza, type Infoplaza } from './services/infoplazasService';
 import { getItinerarioEnlaces, deleteItinerarioEnlace, type ItinerarioEnlace } from './services/itinerarioService';
 import { truncateCatalogoInfoplazas } from './services/catalogoService';
@@ -19,6 +20,13 @@ import { InfoplazasCatalogTable } from './components/InfoplazasCatalogTable';
 
 type TabType = 'catalogo' | 'rutas' | 'dinamizadores';
 type FiltroEstado = 'todas' | 'abiertas' | 'cerradas';
+
+// Secciones de la vista, dibujadas por el menú compartido
+const TABS: ItemMenu<TabType>[] = [
+  { id: 'catalogo', label: 'Catálogo', icon: MapPin },
+  { id: 'rutas', label: 'Rutas', icon: Route },
+  { id: 'dinamizadores', label: 'Dinamizadores', icon: Users },
+];
 
 /**
  * Vista de gestión de infoplazas y rutas del sistema de auditoría.
@@ -119,11 +127,7 @@ export const GestionInfoplazasView: React.FC = () => {
         <StatCard title="Cerradas" value={stats.cerradas} color="rose" />
       </div>
 
-      <div className="flex gap-2 overflow-x-auto border-b border-border">
-        <button onClick={() => setActiveTab('catalogo')} className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === 'catalogo' ? 'border-blue-600 text-blue-600' : 'border-transparent text-on-surface-variant'}`}><MapPin className="w-4 h-4 inline mr-2" />Catálogo</button>
-        <button onClick={() => setActiveTab('rutas')} className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === 'rutas' ? 'border-blue-600 text-blue-600' : 'border-transparent text-on-surface-variant'}`}><Route className="w-4 h-4 inline mr-2" />Rutas</button>
-        <button onClick={() => setActiveTab('dinamizadores')} className={`px-4 py-2 text-sm font-medium border-b-2 ${activeTab === 'dinamizadores' ? 'border-blue-600 text-blue-600' : 'border-transparent text-on-surface-variant'}`}><Users className="w-4 h-4 inline mr-2" />Dinamizadores</button>
-      </div>
+      <MenuSecciones items={TABS} activo={activeTab} onChange={setActiveTab} ariaLabel="Secciones de gestión" />
 
       {activeTab === 'catalogo' && (
         <div className="space-y-4">
@@ -145,7 +149,7 @@ export const GestionInfoplazasView: React.FC = () => {
 
       {activeTab === 'rutas' && (
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-xl font-semibold">Rutas por Enlace</h2>
             <div className="flex flex-wrap items-center gap-3">
               <RutaUploader onProcessComplete={loadData} badgeCount={rutas.length} />
@@ -175,7 +179,7 @@ export const GestionInfoplazasView: React.FC = () => {
                 <TableHeader>
                   <TableRow className="hover:bg-surface-container-low">
                     <TableHead className="text-xs font-bold text-on-surface-variant uppercase tracking-wider py-3 px-4">Día Semana</TableHead>
-                    <TableHead className="text-xs font-bold text-on-surface-variant uppercase tracking-wider py-3 px-4">Día Ruta</TableHead>
+                    <TableHead className="hidden sm:table-cell text-xs font-bold text-on-surface-variant uppercase tracking-wider py-3 px-4">Día Ruta</TableHead>
                     <TableHead className="text-xs font-bold text-on-surface-variant uppercase tracking-wider py-3 px-4">Infoplaza</TableHead>
                     <TableHead className="text-xs font-bold text-on-surface-variant uppercase tracking-wider py-3 px-4 w-20">Acciones</TableHead>
                   </TableRow>
@@ -184,7 +188,7 @@ export const GestionInfoplazasView: React.FC = () => {
                   {rutasOrdenadas.map(r => (
                     <TableRow key={r.id} className="hover:bg-indigo-50 transition-colors cursor-pointer group border-b border-border/50 last:border-b-0">
                       <TableCell className="py-3 px-4 text-sm text-on-surface-variant">{r.dia_semana || '-'}</TableCell>
-                      <TableCell className="py-3 px-4 text-sm text-on-surface-variant">{r.dia_ruta || '-'}</TableCell>
+                      <TableCell className="hidden sm:table-cell py-3 px-4 text-sm text-on-surface-variant">{r.dia_ruta || '-'}</TableCell>
                       <TableCell className="py-3 px-4"><Badge variant="secondary">{r.infoplaza_nombre}</Badge></TableCell>
                       <TableCell className="py-3 px-4">
                         <div className="flex justify-end gap-1">

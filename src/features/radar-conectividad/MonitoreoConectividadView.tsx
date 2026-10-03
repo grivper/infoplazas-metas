@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Activity, History, Server, TrendingUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { StatCard } from '@/components/ui/bento-card';
+import { MenuSecciones, type ItemMenu } from '@/components/MenuSecciones';
 
 import {
   fetchHistorialFallas,
@@ -13,8 +14,8 @@ import { RadarEvolucionView } from './components/RadarEvolucionView';
 
 type TabId = 'kpax' | 'agentes' | 'historial' | 'evolucion';
 
-// Pestañas de la vista: se dibujan con un solo botón en lugar de uno copiado por pestaña
-const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
+// Secciones de la vista, dibujadas por el menú compartido
+const TABS: ItemMenu<TabId>[] = [
   { id: 'kpax', label: 'KPAX', icon: Activity },
   { id: 'agentes', label: 'Reporte', icon: Server },
   { id: 'historial', label: 'Historial', icon: History },
@@ -146,26 +147,8 @@ const MonitoreoConectividadView: React.FC = () => {
           <p className="text-on-surface-variant mt-1">Monitoreo de impresoras y agentes KPAX.</p>
         </div>
 
-        {/* Menú: en móvil una grilla de 2×2 con el ícono arriba (las 4 secciones siempre visibles);
-            desde lg, una fila de botones redondeados a la derecha */}
-        <div role="tablist" aria-label="Secciones del radar" className="grid grid-cols-2 gap-2 w-full lg:flex lg:w-auto">
-          {TABS.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              role="tab"
-              aria-selected={activeTab === id}
-              onClick={() => setActiveTab(id)}
-              className={`flex flex-col items-center justify-center gap-1 whitespace-nowrap rounded-xl border px-3 py-3 text-sm font-medium transition-all lg:shrink-0 lg:flex-row lg:gap-2 lg:rounded-full lg:px-4 lg:py-2 ${
-                activeTab === id
-                  ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                  : 'bg-surface-container-lowest text-on-surface-variant border-border hover:bg-surface-container-low hover:text-on-surface'
-              }`}
-            >
-              <Icon className="w-5 h-5 lg:w-4 lg:h-4" />
-              {label}
-            </button>
-          ))}
-        </div>
+        {/* Menú de secciones: grilla en móvil, fila a la derecha desde lg */}
+        <MenuSecciones items={TABS} activo={activeTab} onChange={setActiveTab} ariaLabel="Secciones del radar" />
       </div>
 
       {renderContenido()}

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
-import { Loader2 } from 'lucide-react';
+import { ClipboardCheck, ListChecks, Loader2, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -37,6 +37,11 @@ const estados: Array<{ estado: EstadoEnvio; titulo: string; vacio: string; conAc
     whatsapp: 'Reenviar WhatsApp',
   },
 ];
+
+// Mismo aspecto que el menú compartido MenuSecciones: grilla con el ícono arriba en móvil
+// y fila de botones redondeados desde lg (las pestañas siguen siendo las de Radix)
+const LISTA_PESTANAS = 'grid h-auto w-full grid-cols-3 gap-2 bg-transparent p-0 lg:inline-flex lg:w-auto';
+const PESTANA = 'flex-col gap-1 whitespace-normal rounded-xl border border-border bg-surface-container-lowest px-2 py-3 text-center text-xs text-on-surface-variant sm:text-sm lg:flex-row lg:gap-2 lg:whitespace-nowrap lg:rounded-full lg:px-4 lg:py-2 data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm';
 
 const formatFecha = (fecha: string): string => new Intl.DateTimeFormat('es-PA', {
   day: 'numeric',
@@ -178,10 +183,20 @@ export function ConfirmacionesDashboard() {
       {error && <p className="text-sm text-destructive" role="alert">{error}</p>}
 
       <Tabs defaultValue="seguimiento">
-        <TabsList aria-label="Secciones de confirmaciones">
-          <TabsTrigger value="seguimiento">Seguimiento</TabsTrigger>
-          <TabsTrigger value="respuestas">Respuestas</TabsTrigger>
-          <TabsTrigger value="mensaje">Mensaje de confirmación</TabsTrigger>
+        <TabsList aria-label="Secciones de confirmaciones" className={LISTA_PESTANAS}>
+          <TabsTrigger value="seguimiento" className={PESTANA}>
+            <ListChecks className="h-5 w-5 lg:h-4 lg:w-4" />
+            Seguimiento
+          </TabsTrigger>
+          <TabsTrigger value="respuestas" className={PESTANA}>
+            <ClipboardCheck className="h-5 w-5 lg:h-4 lg:w-4" />
+            Respuestas
+          </TabsTrigger>
+          <TabsTrigger value="mensaje" className={PESTANA}>
+            <MessageSquare className="h-5 w-5 lg:h-4 lg:w-4" />
+            <span className="sm:hidden">Mensaje</span>
+            <span className="hidden sm:inline">Mensaje de confirmación</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="seguimiento" className="mt-6">
