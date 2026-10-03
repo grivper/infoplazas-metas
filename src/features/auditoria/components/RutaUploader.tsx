@@ -117,7 +117,7 @@ export const RutaUploader: React.FC<{ onProcessComplete: () => void, badgeCount?
         <Button 
           size="sm"
           variant="outline" 
-          className="h-10 border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium shadow-sm transition-all"
+          className="h-10 border-border bg-surface-container-lowest hover:bg-surface-container-low text-on-surface font-medium shadow-sm transition-all"
           onClick={() => fileInputRef.current?.click()} 
           disabled={loading}
         >
@@ -156,7 +156,7 @@ export const RutaUploader: React.FC<{ onProcessComplete: () => void, badgeCount?
           </h4>
           <div className="max-h-32 overflow-y-auto space-y-1 pr-2">
             {failures.map((f, i) => (
-              <div key={i} className="text-xs text-amber-700 flex justify-between bg-white/50 p-1 rounded border border-amber-100">
+              <div key={i} className="text-xs text-amber-700 flex justify-between bg-surface-container-lowest/50 p-1 rounded border border-amber-100">
                 <span className="font-medium">{f.original}</span>
                 <span className="opacity-70 italic">{f.enlace}</span>
               </div>

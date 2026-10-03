@@ -23,7 +23,7 @@ export function BarraFiltrosRoster({
   return (
     <div className="flex flex-col gap-3 sm:flex-row">
       <div className="relative w-full max-w-md">
-        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-outline" />
         <Input
           value={busqueda}
           onChange={(event) => onBusquedaChange(event.target.value)}
