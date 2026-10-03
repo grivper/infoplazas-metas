@@ -1,24 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Calendar, TrendingUp, Users, AlertTriangle } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { StatCard } from '@/components/ui/bento-card';
 import {
   fetchSnapshots,
   fetchUltimoSnapshot,
   fetchSnapshotAnterior,
   guardarSnapshot,
   calcularPromedioAnual,
-  formatMes,
   type RadarMensualSnapshot,
 } from '../services/radarSnapshotsDb';
+import { EvolucionResumen } from './EvolucionResumen';
+import { SnapshotsHistorialTable } from './SnapshotsHistorialTable';
 
 // Tiempo en ms para ocultar mensaje de feedback
 const FEEDBACK_DURATION_MS = 3000;
 
+/** Mensaje de feedback: el tipo decide el color, no el texto. */
+interface Feedback {
+  tipo: 'exito' | 'error';
+  texto: string;
+}
+
 /**
- * Vista de Evolución Mensual del Radar
+ * Vista de Evolución Mensual del Radar.
+ * Mantiene el estado y los handlers; el resumen y la tabla viven en sus propios componentes.
  */
 export const RadarEvolucionView: React.FC = () => {
   const [snapshots, setSnapshots] = useState<RadarMensualSnapshot[]>([]);
@@ -26,17 +31,17 @@ export const RadarEvolucionView: React.FC = () => {
   const [snapshotAnterior, setSnapshotAnterior] = useState<RadarMensualSnapshot | null>(null);
   const [promedioAnual, setPromedioAnual] = useState<number>(0);
   const [guardando, setGuardando] = useState(false);
-  const [mensaje, setMensaje] = useState<string | null>(null);
+  const [mensaje, setMensaje] = useState<Feedback | null>(null);
 
   // Cargar datos
   const cargarDatos = async () => {
     try {
-      const [snapshotsData, ultimo, promedio, anterior] = await Promise.all([
+      // El último snapshot se pide una sola vez: el anterior depende de su mes
+      const ultimo = await fetchUltimoSnapshot();
+      const [snapshotsData, promedio, anterior] = await Promise.all([
         fetchSnapshots(),
-        fetchUltimoSnapshot(),
         calcularPromedioAnual(),
-        // Snapshot anterior se carga en paralelo
-        fetchUltimoSnapshot().then(u => u ? fetchSnapshotAnterior(u.mes) : null)
+        ultimo ? fetchSnapshotAnterior(ultimo.mes) : null,
       ]);
 
       setSnapshots(snapshotsData);
@@ -59,21 +64,15 @@ export const RadarEvolucionView: React.FC = () => {
 
     try {
       await guardarSnapshot();
-      setMensaje('Snapshot guardado correctamente');
+      setMensaje({ tipo: 'exito', texto: 'Snapshot guardado correctamente' });
       await cargarDatos();
-      
+
       setTimeout(() => setMensaje(null), FEEDBACK_DURATION_MS);
-    } catch (e) {
-      setMensaje('Error al guardar snapshot');
+    } catch {
+      setMensaje({ tipo: 'error', texto: 'Error al guardar snapshot' });
     } finally {
       setGuardando(false);
     }
-  };
-
-  // Calcular diferencia con mes anterior
-  const getDiferencia = (actual: number, anterior: number | null | undefined) => {
-    if (anterior === null || anterior === undefined) return null;
-    return actual - anterior;
   };
 
   return (
@@ -98,109 +97,18 @@ export const RadarEvolucionView: React.FC = () => {
       {/* Mensaje de confirmación */}
       {mensaje && (
         <div className={`px-4 py-2 rounded-lg text-sm ${
-          mensaje.includes('Error') 
-            ? 'bg-rose-100 text-rose-700' 
+          mensaje.tipo === 'error'
+            ? 'bg-rose-100 text-rose-700'
             : 'bg-emerald-100 text-emerald-700'
         }`}>
-          {mensaje}
+          {mensaje.texto}
         </div>
       )}
 
-      {/* Resumen del último mes */}
-      {snapshotActual ? (
-        <div className="grid grid-cols-4 gap-4">
-          <StatCard 
-            title="Mes" 
-            value={formatMes(snapshotActual.mes)}
-            icon={<Calendar className="w-4 h-4" />}
-            color="slate" 
-          />
-          <StatCard 
-            title="Total Dispositivos" 
-            value={snapshotActual.total_dispositivos}
-            description={getDiferencia(snapshotActual.total_dispositivos, snapshotAnterior?.total_dispositivos) !== null ? 
-              `(${getDiferencia(snapshotActual.total_dispositivos, snapshotAnterior?.total_dispositivos)! > 0 ? '+' : ''}${getDiferencia(snapshotActual.total_dispositivos, snapshotAnterior?.total_dispositivos)} vs mes anterior)` : undefined}
-            icon={<Users className="w-4 h-4" />}
-            color="indigo" 
-          />
-          <StatCard 
-            title="Activos" 
-            value={snapshotActual.online}
-            description={getDiferencia(snapshotActual.online, snapshotAnterior?.online) !== null ?
-              `(${getDiferencia(snapshotActual.online, snapshotAnterior?.online)! > 0 ? '+' : ''}${getDiferencia(snapshotActual.online, snapshotAnterior?.online)} vs mes anterior)` : undefined}
-            icon={<TrendingUp className="w-4 h-4" />}
-            color="emerald" 
-          />
-          <StatCard 
-            title="Inactivos" 
-            value={snapshotActual.critico}
-            description={getDiferencia(snapshotActual.critico, snapshotAnterior?.critico) !== null ?
-              `(${getDiferencia(snapshotActual.critico, snapshotAnterior?.critico)! > 0 ? '+' : ''}${getDiferencia(snapshotActual.critico, snapshotAnterior?.critico)} vs mes anterior)` : undefined}
-            icon={<AlertTriangle className="w-4 h-4" />}
-            color="rose" 
-          />
-        </div>
-      ) : (
-        <div className="rounded-xl bg-surface-container-lowest shadow-card py-8 text-center">
-          <Calendar className="w-8 h-8 text-outline-variant mx-auto mb-2" />
-          <p className="text-on-surface-variant font-medium">No hay snapshots registrados</p>
-          <p className="text-sm text-outline mt-1">
-            Guarda el primer snapshot para comenzar el seguimiento
-          </p>
-        </div>
-      )}
+      <EvolucionResumen actual={snapshotActual} anterior={snapshotAnterior} />
 
-      {/* Tabla de historial */}
       {snapshots.length > 0 && (
-        <div>
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold text-on-surface">Historial de Snapshots</h3>
-            <p className="text-sm text-on-surface-variant">
-              Promedio anual: <span className="font-semibold">{promedioAnual}%</span>
-            </p>
-          </div>
-          <Card className="border-none shadow-sm">
-            <CardContent className="p-0">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border/50 bg-surface-container-low">
-                    <th className="text-left py-3 px-4 font-semibold text-on-surface-variant">Mes</th>
-                    <th className="text-right py-3 px-4 font-semibold text-on-surface-variant">Total</th>
-                    <th className="text-right py-3 px-4 font-semibold text-on-surface-variant">Online</th>
-                    <th className="text-right py-3 px-4 font-semibold text-on-surface-variant">Crítico</th>
-                    <th className="text-right py-3 px-4 font-semibold text-on-surface-variant">Efectividad</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50">
-                  {snapshots.map((s) => (
-                    <tr key={s.id} className="hover:bg-surface-container-low">
-                      <td className="py-3 px-4 font-medium text-on-surface">
-                        {formatMes(s.mes)}
-                      </td>
-                      <td className="py-3 px-4 text-right text-on-surface-variant">{s.total_dispositivos}</td>
-                      <td className="py-3 px-4 text-right text-emerald-600 font-medium">{s.online}</td>
-                      <td className="py-3 px-4 text-right text-rose-600 font-medium">{s.critico}</td>
-                      <td className="py-3 px-4 text-right">
-                        <Badge
-                          variant="outline"
-                          className={
-                            s.tasa_disponibilidad >= 95
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                              : s.tasa_disponibilidad >= 85
-                              ? 'bg-amber-50 text-amber-700 border-amber-200'
-                              : 'bg-rose-50 text-rose-700 border-rose-200'
-                          }
-                        >
-                          {s.tasa_disponibilidad}%
-                        </Badge>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </CardContent>
-          </Card>
-        </div>
+        <SnapshotsHistorialTable snapshots={snapshots} promedioAnual={promedioAnual} />
       )}
     </div>
   );
