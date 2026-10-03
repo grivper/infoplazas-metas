@@ -80,6 +80,10 @@ export default {
         tertiary: token("tertiary"),
         error: token("error"),
       },
+      // Soft elevation shared by cards and panels (same value as the dashboard cards)
+      boxShadow: {
+        card: "0 12px 40px rgba(44, 47, 48, 0.06)",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

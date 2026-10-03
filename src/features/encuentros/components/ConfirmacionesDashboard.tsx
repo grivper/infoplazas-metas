@@ -160,7 +160,7 @@ export function ConfirmacionesDashboard() {
 
   if (!encuentro) {
     return (
-      <p className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">
+      <p className="rounded-xl bg-surface-container-lowest shadow-card p-6 text-sm text-on-surface-variant">
         No se encontró el Encuentro Regional de Dinamizadores 2026.
       </p>
     );
@@ -169,8 +169,8 @@ export function ConfirmacionesDashboard() {
   return (
     <section className="space-y-6" aria-labelledby="confirmaciones-title">
       <div>
-        <h1 id="confirmaciones-title" className="text-2xl font-bold text-slate-900">{encuentro.nombre}</h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <h1 id="confirmaciones-title" className="text-3xl font-black font-headline tracking-tight text-on-surface">{encuentro.nombre}</h1>
+        <p className="mt-1 text-sm text-on-surface-variant">
           {formatRangoFechas(encuentro)} · {encuentro.sede}
         </p>
       </div>
@@ -205,10 +205,10 @@ export function ConfirmacionesDashboard() {
         </TabsContent>
 
         <TabsContent value="mensaje" className="mt-6">
-          <form className="space-y-3 rounded-md border border-slate-200 bg-white p-4" onSubmit={guardarMensaje}>
+          <form className="space-y-3 rounded-xl bg-surface-container-lowest shadow-card p-4" onSubmit={guardarMensaje}>
             <div>
               <Label htmlFor="mensaje-template">Mensaje de confirmación</Label>
-              <p id="mensaje-template-help" className="mt-1 text-sm text-slate-600">
+              <p id="mensaje-template-help" className="mt-1 text-sm text-on-surface-variant">
                 Usá {'{nombre}'} para el nombre del dinamizador y {'{link}'} para el enlace de confirmación.
               </p>
             </div>
@@ -223,7 +223,7 @@ export function ConfirmacionesDashboard() {
               disabled={guardando}
               rows={6}
             />
-            {guardado && <p className="text-sm text-emerald-700" role="status">Mensaje guardado correctamente.</p>}
+            {guardado && <p className="text-sm text-tertiary" role="status">Mensaje guardado correctamente.</p>}
             <Button type="submit" disabled={guardando}>
               {guardando && <Loader2 className="animate-spin" />}
               {guardando ? 'Guardando...' : 'Guardar mensaje'}
@@ -242,7 +242,7 @@ export function ConfirmacionesDashboard() {
 }
 
 function EstadoCarga({ texto }: { texto: string }) {
-  return <p className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">{texto}</p>;
+  return <p className="rounded-xl bg-surface-container-lowest shadow-card p-6 text-sm text-on-surface-variant">{texto}</p>;
 }
 
 function EstadoError({ error, onReintentar }: { error: string; onReintentar: () => Promise<void> }) {
