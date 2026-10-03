@@ -8,10 +8,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+/** Columna de la tabla; `className` permite ocultarla en pantallas pequeñas. */
+export interface ColumnaRoster {
+  label: string;
+  className?: string;
+}
+
 interface RosterTableProps {
   titulo: string;
   descripcion: string;
-  columnas: string[];
+  columnas: ColumnaRoster[];
   vacio: string;
   /** Sin filas que mostrar: se muestra el mensaje `vacio`. */
   sinFilas: boolean;
@@ -38,7 +44,9 @@ export function RosterTable({
         <TableHeader>
           <TableRow>
             {columnas.map((columna) => (
-              <TableHead key={columna}>{columna}</TableHead>
+              <TableHead key={columna.label} className={columna.className}>
+                {columna.label}
+              </TableHead>
             ))}
             <TableHead>
               <span className="sr-only">Acciones</span>

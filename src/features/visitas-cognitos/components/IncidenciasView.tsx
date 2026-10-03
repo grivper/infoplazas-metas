@@ -145,38 +145,38 @@ export const IncidenciasView: React.FC = () => {
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-on-surface-variant uppercase bg-surface-container-low border-b border-border/50">
                   <tr>
-                    <th className="px-6 py-3 font-medium">Fecha</th>
-                    <th className="px-6 py-3 font-medium">Infoplaza</th>
-                    <th className="px-6 py-3 font-medium">Categoría</th>
-                    <th className="px-6 py-3 font-medium">Urgencia</th>
-                    <th className="px-6 py-3 font-medium">Descripción</th>
-                    <th className="px-6 py-3 font-medium text-center">Seguimientos</th>
-                    <th className="px-6 py-3 font-medium text-right">Estado</th>
+                    <th className="hidden md:table-cell px-3 sm:px-6 py-3 font-medium">Fecha</th>
+                    <th className="px-3 sm:px-6 py-3 font-medium">Infoplaza</th>
+                    <th className="hidden md:table-cell px-3 sm:px-6 py-3 font-medium">Categoría</th>
+                    <th className="px-3 sm:px-6 py-3 font-medium">Urgencia</th>
+                    <th className="hidden lg:table-cell px-3 sm:px-6 py-3 font-medium">Descripción</th>
+                    <th className="px-3 sm:px-6 py-3 font-medium text-center">Seguimientos</th>
+                    <th className="hidden sm:table-cell px-3 sm:px-6 py-3 font-medium text-right">Estado</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50">
                   {incidencias.map(inc => (
                     <tr key={inc.id} className="hover:bg-surface-container-low/50 transition-colors">
-                      <td className="px-6 py-3 text-on-surface-variant text-xs">
+                      <td className="hidden md:table-cell px-3 sm:px-6 py-3 text-on-surface-variant text-xs">
                         {formatFecha(inc.created_at)}
                       </td>
-                      <td className="px-6 py-3 font-medium text-on-surface">
+                      <td className="px-3 sm:px-6 py-3 font-medium text-on-surface">
                         {inc.infoplaza_nombre}
                       </td>
-                      <td className="px-6 py-3">
+                      <td className="hidden md:table-cell px-3 sm:px-6 py-3">
                         <Badge variant="outline" className="text-xs font-normal border-border capitalize">
                           {inc.categoria}
                         </Badge>
                       </td>
-                      <td className="px-6 py-3">
+                      <td className="px-3 sm:px-6 py-3">
                         <Badge className={`text-xs font-medium capitalize ${getUrgenciaColor(inc.urgencia)}`}>
                           {inc.urgencia}
                         </Badge>
                       </td>
-                      <td className="px-6 py-3 text-on-surface-variant max-w-xs truncate" title={inc.descripcion}>
+                      <td className="hidden lg:table-cell px-3 sm:px-6 py-3 text-on-surface-variant max-w-xs truncate" title={inc.descripcion}>
                         {inc.descripcion}
                       </td>
-                      <td className="px-6 py-3">
+                      <td className="px-3 sm:px-6 py-3">
                         <div className="flex items-center gap-2">
                           <Button 
                             variant="ghost" 
@@ -194,7 +194,7 @@ export const IncidenciasView: React.FC = () => {
                           ) : null}
                         </div>
                       </td>
-                      <td className="px-6 py-3 text-right">
+                      <td className="hidden sm:table-cell px-3 sm:px-6 py-3 text-right">
                         <Badge className={`text-xs font-medium capitalize ${getEstadoColor(inc.estado_ticket)}`}>
                           {getEstadoLabel(inc.estado_ticket)}
                         </Badge>

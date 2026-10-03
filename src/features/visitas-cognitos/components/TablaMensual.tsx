@@ -25,7 +25,7 @@ export const TablaMensual: React.FC<{ datos: FilaMensual[]; mesesCuat: number[];
           <thead className="text-[11px] text-on-surface-variant uppercase bg-surface-container-low/80 border-b border-border/50">
             <tr>
               <th className="px-4 py-3 text-left font-semibold">{col}</th>
-              {mesesCuat.map(m => <th key={m} className="px-2 py-3 text-center font-semibold">{MES_NOMBRE[m].substring(0, 3)}</th>)}
+              {mesesCuat.map((m, i) => <th key={m} className={`${i < mesesCuat.length - 1 ? 'hidden sm:table-cell ' : ''}px-2 py-3 text-center font-semibold`}>{MES_NOMBRE[m].substring(0, 3)}</th>)}
               <th className="px-3 py-3 text-center font-bold text-indigo-600 bg-indigo-50/30">Total</th>
             </tr>
           </thead>
@@ -33,8 +33,8 @@ export const TablaMensual: React.FC<{ datos: FilaMensual[]; mesesCuat: number[];
             {datos.map(r => (
               <tr key={r.nombre} className="hover:bg-surface-container-low/50 transition-colors">
                 <td className="px-4 py-3 font-medium text-on-surface">{r.nombre}</td>
-                {mesesCuat.map(m => (
-                  <td key={m} className={`px-2 py-3 text-center ${r.meses[m] ? 'text-on-surface font-medium' : 'text-outline-variant'}`}>
+                {mesesCuat.map((m, i) => (
+                  <td key={m} className={`${i < mesesCuat.length - 1 ? 'hidden sm:table-cell ' : ''}px-2 py-3 text-center ${r.meses[m] ? 'text-on-surface font-medium' : 'text-outline-variant'}`}>
                     {r.meses[m] || 0}
                   </td>
                 ))}

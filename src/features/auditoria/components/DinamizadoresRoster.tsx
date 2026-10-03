@@ -180,11 +180,11 @@ export function DinamizadoresRoster() {
             titulo="Con dinamizador asignado"
             descripcion={`Mostrando ${filasAsignadas.length} dinamizadores`}
             columnas={[
-              "Infoplaza",
-              "Dinamizador",
-              "Cédula",
-              "Celular",
-              "Estatus",
+              { label: "Infoplaza" },
+              { label: "Dinamizador" },
+              { label: "Cédula", className: "hidden md:table-cell" },
+              { label: "Celular", className: "hidden md:table-cell" },
+              { label: "Estatus", className: "hidden sm:table-cell" },
             ]}
             vacio="No hay dinamizadores asignados que coincidan con la búsqueda."
             sinFilas={filasAsignadas.length === 0}
@@ -202,9 +202,9 @@ export function DinamizadoresRoster() {
                     {infoplaza.nombre}
                   </TableCell>
                   <TableCell>{dinamizador.nombre}</TableCell>
-                  <TableCell>{dinamizador.cedula || "—"}</TableCell>
-                  <TableCell>{dinamizador.celular || "—"}</TableCell>
-                  <TableCell>
+                  <TableCell className="hidden md:table-cell">{dinamizador.cedula || "—"}</TableCell>
+                  <TableCell className="hidden md:table-cell">{dinamizador.celular || "—"}</TableCell>
+                  <TableCell className="hidden sm:table-cell">
                     <span
                       className={
                         dinamizador.estatus === "Activo"
@@ -232,7 +232,7 @@ export function DinamizadoresRoster() {
           <RosterTable
             titulo="Sin dinamizador asignado"
             descripcion={`Mostrando ${filasSinAsignar.length} infoplazas`}
-            columnas={["Infoplaza", "Estatus"]}
+            columnas={[{ label: "Infoplaza" }, { label: "Estatus", className: "hidden sm:table-cell" }]}
             vacio="No hay infoplazas sin dinamizador que coincidan con la búsqueda."
             sinFilas={filasSinAsignar.length === 0}
           >
@@ -248,7 +248,7 @@ export function DinamizadoresRoster() {
                   <TableCell className="font-medium">
                     {infoplaza.nombre}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden sm:table-cell">
                     <span className="font-semibold text-amber-700">
                       Sin dinamizador asignado
                     </span>
