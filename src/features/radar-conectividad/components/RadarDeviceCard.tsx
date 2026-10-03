@@ -56,7 +56,7 @@ export const RadarDeviceCard: React.FC<RadarDeviceCardProps> = ({
       border rounded-xl p-4 shadow-sm hover:shadow-md transition-all
       ${isCritico 
         ? 'border-rose-200 bg-rose-50/30' 
-        : 'border-slate-200 bg-white'
+        : 'border-border bg-surface-container-lowest'
       }
     `}>
       {/* Header: Estado + Nombre */}
@@ -72,7 +72,7 @@ export const RadarDeviceCard: React.FC<RadarDeviceCardProps> = ({
             }
           </div>
           <div>
-            <h3 className="text-sm font-bold text-slate-800 line-clamp-1">
+            <h3 className="text-sm font-bold text-on-surface line-clamp-1">
               {infoplazaNombre || dispositivo.nombre_agente || dispositivo.ubicacion || 'Sin asignar'}
             </h3>
             <Badge 
@@ -90,12 +90,12 @@ export const RadarDeviceCard: React.FC<RadarDeviceCardProps> = ({
 
       {/* Info de la Impresora */}
       <div className="space-y-1 mb-3">
-        <p className="text-xs text-slate-600 flex items-center gap-1.5">
-          <Printer className="w-3.5 h-3.5 text-slate-400" />
+        <p className="text-xs text-on-surface-variant flex items-center gap-1.5">
+          <Printer className="w-3.5 h-3.5 text-outline" />
           <span className="font-medium">{dispositivo.fabricante}</span>
-          <span className="text-slate-400">{dispositivo.modelo}</span>
+          <span className="text-outline">{dispositivo.modelo}</span>
         </p>
-        <p className="text-[11px] text-slate-400 font-mono">
+        <p className="text-[11px] text-outline font-mono">
           {dispositivo.ip || 'Sin IP'} • {dispositivo.numero_serie}
         </p>
       </div>
@@ -104,13 +104,13 @@ export const RadarDeviceCard: React.FC<RadarDeviceCardProps> = ({
       <div className="space-y-1.5">
         {/* Inactividad de la Impresora */}
         <div className="flex items-center justify-between">
-          <span className="text-[11px] text-slate-500 flex items-center gap-1">
+          <span className="text-[11px] text-on-surface-variant flex items-center gap-1">
             <Clock className="w-3 h-3" />
             Impresora:
           </span>
           <span className={`
             text-xs font-semibold
-            ${isCritico ? 'text-rose-600' : 'text-slate-600'}
+            ${isCritico ? 'text-rose-600' : 'text-on-surface-variant'}
           `}>
             {dispositivo.inactividad_impresora || 'Reciente'}
           </span>
@@ -118,13 +118,13 @@ export const RadarDeviceCard: React.FC<RadarDeviceCardProps> = ({
 
         {/* Inactividad del Agente */}
         <div className="flex items-center justify-between">
-          <span className="text-[11px] text-slate-500 flex items-center gap-1">
+          <span className="text-[11px] text-on-surface-variant flex items-center gap-1">
             <Server className="w-3 h-3" />
             Agente:
           </span>
           <span className={`
             text-xs font-semibold
-            ${agenteCaido ? 'text-rose-600' : 'text-slate-600'}
+            ${agenteCaido ? 'text-rose-600' : 'text-on-surface-variant'}
           `}>
             {dispositivo.inactividad_agente || 'OK'}
             {agenteCaido && ' ⚠️'}
@@ -134,15 +134,15 @@ export const RadarDeviceCard: React.FC<RadarDeviceCardProps> = ({
 
       {/* Hostname del Agente */}
       {dispositivo.hostname_agente && (
-        <p className="text-[10px] text-slate-400 mt-2 pt-2 border-t border-slate-100">
+        <p className="text-[10px] text-outline mt-2 pt-2 border-t border-border/50">
           Server: {dispositivo.hostname_agente}
         </p>
       )}
 
       {/* Motivo de Falla (si existe) - visible en KPAX y Reporte */}
       {isCritico && dispositivo.motivo_falla && (
-        <div className="mt-3 pt-2 border-t border-slate-100">
-          <p className="text-[10px] text-slate-500 mb-1">Motivo:</p>
+        <div className="mt-3 pt-2 border-t border-border/50">
+          <p className="text-[10px] text-on-surface-variant mb-1">Motivo:</p>
           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">
             {dispositivo.motivo_falla}
           </span>
@@ -151,14 +151,14 @@ export const RadarDeviceCard: React.FC<RadarDeviceCardProps> = ({
 
       {/* Selector de Motivo de Falla (solo en Reporte - cuando no tiene motivo) */}
       {isCritico && onMotivoChange && !dispositivo.motivo_falla && (
-        <div className="mt-3 pt-2 border-t border-slate-100">
-          <label className="text-[10px] text-slate-500 mb-1 block">
+        <div className="mt-3 pt-2 border-t border-border/50">
+          <label className="text-[10px] text-on-surface-variant mb-1 block">
             Asignar motivo:
           </label>
           <select 
             value=""
             onChange={handleMotivoChange}
-            className="w-full text-xs border border-slate-200 rounded-lg px-2 py-1.5 bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-500/20"
+            className="w-full text-xs border border-border rounded-lg px-2 py-1.5 bg-surface-container-low text-on-surface focus:outline-none focus:ring-2 focus:ring-rose-500/20"
           >
             <option value="">Seleccionar motivo...</option>
             {MOTIVOS_FALLA.map(m => (

@@ -81,8 +81,8 @@ export const RadarEvolucionView: React.FC = () => {
       {/* Header con botón para guardar */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-bold text-slate-900">Evolución Mensual</h2>
-          <p className="text-sm text-slate-500">Seguimiento de efectividad y comparativas</p>
+          <h2 className="text-xl font-bold font-headline text-on-surface">Evolución Mensual</h2>
+          <p className="text-sm text-on-surface-variant">Seguimiento de efectividad y comparativas</p>
         </div>
         <Button
           size="sm"
@@ -141,10 +141,10 @@ export const RadarEvolucionView: React.FC = () => {
           />
         </div>
       ) : (
-        <div className="rounded-xl border-none shadow-sm bg-white py-8 text-center">
-          <Calendar className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-          <p className="text-slate-600 font-medium">No hay snapshots registrados</p>
-          <p className="text-sm text-slate-400 mt-1">
+        <div className="rounded-xl bg-surface-container-lowest shadow-card py-8 text-center">
+          <Calendar className="w-8 h-8 text-outline-variant mx-auto mb-2" />
+          <p className="text-on-surface-variant font-medium">No hay snapshots registrados</p>
+          <p className="text-sm text-outline mt-1">
             Guarda el primer snapshot para comenzar el seguimiento
           </p>
         </div>
@@ -154,8 +154,8 @@ export const RadarEvolucionView: React.FC = () => {
       {snapshots.length > 0 && (
         <div>
           <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold text-slate-900">Historial de Snapshots</h3>
-            <p className="text-sm text-slate-500">
+            <h3 className="font-semibold text-on-surface">Historial de Snapshots</h3>
+            <p className="text-sm text-on-surface-variant">
               Promedio anual: <span className="font-semibold">{promedioAnual}%</span>
             </p>
           </div>
@@ -163,21 +163,21 @@ export const RadarEvolucionView: React.FC = () => {
             <CardContent className="p-0">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-100 bg-slate-50">
-                    <th className="text-left py-3 px-4 font-semibold text-slate-600">Mes</th>
-                    <th className="text-right py-3 px-4 font-semibold text-slate-600">Total</th>
-                    <th className="text-right py-3 px-4 font-semibold text-slate-600">Online</th>
-                    <th className="text-right py-3 px-4 font-semibold text-slate-600">Crítico</th>
-                    <th className="text-right py-3 px-4 font-semibold text-slate-600">Efectividad</th>
+                  <tr className="border-b border-border/50 bg-surface-container-low">
+                    <th className="text-left py-3 px-4 font-semibold text-on-surface-variant">Mes</th>
+                    <th className="text-right py-3 px-4 font-semibold text-on-surface-variant">Total</th>
+                    <th className="text-right py-3 px-4 font-semibold text-on-surface-variant">Online</th>
+                    <th className="text-right py-3 px-4 font-semibold text-on-surface-variant">Crítico</th>
+                    <th className="text-right py-3 px-4 font-semibold text-on-surface-variant">Efectividad</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
+                <tbody className="divide-y divide-border/50">
                   {snapshots.map((s) => (
-                    <tr key={s.id} className="hover:bg-slate-50">
-                      <td className="py-3 px-4 font-medium text-slate-900">
+                    <tr key={s.id} className="hover:bg-surface-container-low">
+                      <td className="py-3 px-4 font-medium text-on-surface">
                         {formatMes(s.mes)}
                       </td>
-                      <td className="py-3 px-4 text-right text-slate-600">{s.total_dispositivos}</td>
+                      <td className="py-3 px-4 text-right text-on-surface-variant">{s.total_dispositivos}</td>
                       <td className="py-3 px-4 text-right text-emerald-600 font-medium">{s.online}</td>
                       <td className="py-3 px-4 text-right text-rose-600 font-medium">{s.critico}</td>
                       <td className="py-3 px-4 text-right">

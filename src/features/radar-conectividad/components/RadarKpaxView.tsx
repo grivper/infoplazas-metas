@@ -117,9 +117,9 @@ export const RadarKpaxView: React.FC = () => {
 
       {/* Lista de Dispositivos */}
       {dispositivos.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
-          <p className="text-slate-500">No hay dispositivos cargados</p>
-          <p className="text-sm text-slate-400 mt-1">
+        <div className="text-center py-12 rounded-xl bg-surface-container-lowest shadow-card">
+          <p className="text-on-surface-variant">No hay dispositivos cargados</p>
+          <p className="text-sm text-outline mt-1">
             Subí el archivo CSV de KPAX para comenzar
           </p>
         </div>

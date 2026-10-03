@@ -81,15 +81,15 @@ export const ReporteView: React.FC = () => {
 
       {/* Lista de dispositivos pendientes */}
       {dispositivos.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
+        <div className="text-center py-12 rounded-xl bg-surface-container-lowest shadow-card">
           <CheckCircle className="w-12 h-12 text-emerald-400 mx-auto mb-4" />
-          <p className="text-slate-700 font-medium">¡No hay pendientes!</p>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-on-surface font-medium">¡No hay pendientes!</p>
+          <p className="text-sm text-outline mt-1">
             Todos los dispositivos críticos tienen motivo registrado
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div className="rounded-xl bg-surface-container-lowest shadow-card overflow-hidden">
           <div className="px-4 py-3 bg-rose-50 border-b border-rose-100">
             <p className="text-sm text-rose-700 font-medium">
               ⚠️ {dispositivos.length} dispositivo{dispositivos.length !== 1 ? 's' : ''} sin motivo de falla
