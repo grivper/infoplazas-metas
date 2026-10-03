@@ -26,7 +26,7 @@ export const Meta1Card: React.FC<Meta1CardProps> = ({ meta }) => {
           </div>
           <span 
             className="text-xs font-bold px-2 py-0.5 rounded-full" 
-            style={{ backgroundColor: `${color}20`, color }}
+            style={{ backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`, color }}
           >
             Meta 1
           </span>

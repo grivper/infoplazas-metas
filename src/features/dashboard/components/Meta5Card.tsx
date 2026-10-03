@@ -8,18 +8,19 @@ interface Meta5CardProps {
   meta: MetaItem;
 }
 
-/**
- * Meta5Card - Card para KPAX
- * Usa tokens CSS de shadcn/ui para colores
- */
-
-// Colores semánticos - centralizados para fácil mantenimiento
+// Colores semánticos - centralizados para fácil mantenimiento.
+// `success` es un hex fijo a propósito (mismo verde que --tertiary);
+// `warning` reutiliza el rosa del acento de la tarjeta.
 const COLORES = {
   principal: 'var(--secondary)', // rosa - KPAX
   success: '#00694c',          // verde - conectividad
-  warning: 'var(--secondary)', // rojo - crítico
+  warning: 'var(--secondary)', // rosa (igual que principal) - equipos críticos
 };
 
+/**
+ * Meta5Card - Card para KPAX
+ * Usa tokens CSS para el color principal; ver COLORES para los demás
+ */
 export const Meta5Card: React.FC<Meta5CardProps> = ({ meta }) => {
   const color = COLORES.principal;
   const successColor = COLORES.success;
@@ -36,7 +37,7 @@ export const Meta5Card: React.FC<Meta5CardProps> = ({ meta }) => {
           </div>
           <span 
             className="text-xs font-bold px-2 py-0.5 rounded-full" 
-            style={{ backgroundColor: `${color}20`, color }}
+            style={{ backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`, color }}
           >
             Meta 5
           </span>

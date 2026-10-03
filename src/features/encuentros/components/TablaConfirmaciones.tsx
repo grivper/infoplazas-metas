@@ -69,10 +69,10 @@ export function TablaConfirmaciones({
   const columnas = conAcciones ? 4 : 3;
 
   return (
-    <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
-      <div className="border-b border-slate-200 px-4 py-3">
-        <h2 className="font-semibold text-slate-900">{titulo}</h2>
-        <p className="mt-1 text-sm text-slate-600">
+    <div className="overflow-hidden rounded-xl bg-surface-container-lowest shadow-card">
+      <div className="border-b border-border px-4 py-3">
+        <h2 className="font-semibold text-on-surface">{titulo}</h2>
+        <p className="mt-1 text-sm text-on-surface-variant">
           {busqueda.trim() || provincia !== TODAS_LAS_PROVINCIAS
             ? `${visibles.length} de ${confirmaciones.length}`
             : `${confirmaciones.length} en total`}
@@ -109,7 +109,7 @@ export function TablaConfirmaciones({
         <TableBody>
           {visibles.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={columnas} className="text-center text-slate-600">
+              <TableCell colSpan={columnas} className="text-center text-on-surface-variant">
                 {confirmaciones.length === 0 ? vacio : 'Sin resultados para la búsqueda.'}
               </TableCell>
             </TableRow>

@@ -14,8 +14,7 @@ import { agruparPorProvincia, obtenerProvincias } from '@/lib/provincias';
 import type { Confirmacion } from '../services/confirmacionesService';
 import { DescargarConfirmacionesButton } from './DescargarConfirmacionesButton';
 import { ModalEditarRespuesta } from './ModalEditarRespuesta';
-import { LIMITE_CENA_EXTRA, LIMITE_HOSPEDAJE, totalCenasACobrar } from '../utils/cuposCena';
-import { contarHospedadosPorSexo } from '../utils/hospedadosPorSexo';
+import { ResumenRespuestas } from './ResumenRespuestas';
 
 interface RespuestasTabProps {
   confirmaciones: Confirmacion[];
@@ -56,42 +55,9 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
     [visibles],
   );
 
-  const contadores = useMemo(() => {
-    const seHospedan = respondidas.filter((confirmacion) => confirmacion.se_hospeda === true).length;
-    // Cenas extra: solo cuentan las de quienes asisten pero NO se hospedan.
-    // La cena de un hospedado es automática y no forma parte de este cupo de 10.
-    const cenanExtra = respondidas.filter(
-      (confirmacion) => confirmacion.se_hospeda === false && confirmacion.cena === true,
-    ).length;
-    const hospedadosPorSexo = contarHospedadosPorSexo(respondidas);
-    return {
-      asisten: respondidas.filter((confirmacion) => confirmacion.asiste === true).length,
-      noAsisten: respondidas.filter((confirmacion) => confirmacion.asiste === false).length,
-      sinResponder: confirmaciones.length - respondidas.length,
-      seHospedan,
-      cenanExtra,
-      cenasACobrar: totalCenasACobrar(seHospedan, cenanExtra),
-      hospedadosPorSexo,
-    };
-  }, [confirmaciones, respondidas]);
-
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8">
-        <Contador titulo="Asisten" valor={`${contadores.asisten} / ${confirmaciones.length}`} />
-        <Contador titulo="No asisten" valor={contadores.noAsisten} />
-        <Contador titulo="Sin responder" valor={contadores.sinResponder} />
-        <Contador titulo="Se hospedan" valor={`${contadores.seHospedan} / ${LIMITE_HOSPEDAJE}`} alerta={contadores.seHospedan >= LIMITE_HOSPEDAJE} />
-        <Contador titulo="Hospedadas (mujeres)" valor={contadores.hospedadosPorSexo.mujeres} />
-        <Contador titulo="Hospedados (hombres)" valor={contadores.hospedadosPorSexo.hombres} />
-        <Contador titulo="Cenas extra (no hospedados)" valor={`${contadores.cenanExtra} / ${LIMITE_CENA_EXTRA}`} alerta={contadores.cenanExtra >= LIMITE_CENA_EXTRA} />
-        <Contador titulo="Cenas a cobrar" valor={contadores.cenasACobrar} />
-      </div>
-      {contadores.hospedadosPorSexo.sinDato > 0 && (
-        <p className="text-sm text-slate-600">
-          {contadores.hospedadosPorSexo.sinDato} hospedado(s) sin dato de sexo registrado.
-        </p>
-      )}
+      <ResumenRespuestas confirmaciones={confirmaciones} respondidas={respondidas} />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <FiltroProvincia
@@ -103,7 +69,7 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
         <DescargarConfirmacionesButton />
       </div>
 
-      <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
+      <div className="overflow-hidden rounded-xl bg-surface-container-lowest shadow-card">
         <Table>
           <TableHeader>
             <TableRow>
@@ -120,7 +86,7 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
           <TableBody>
             {visibles.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center text-slate-600">
+                <TableCell colSpan={8} className="text-center text-on-surface-variant">
                   {respondidas.length === 0
                     ? 'Todavía no hay respuestas registradas.'
                     : 'No hay respuestas en esta provincia.'}
@@ -167,15 +133,6 @@ export function RespuestasTab({ confirmaciones, onActualizada }: RespuestasTabPr
         onCerrar={() => setConfirmacionEnEdicion(null)}
         onGuardado={onActualizada}
       />
-    </div>
-  );
-}
-
-function Contador({ titulo, valor, alerta = false }: { titulo: string; valor: number | string; alerta?: boolean }) {
-  return (
-    <div className={`rounded-md border p-4 ${alerta ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-white'}`}>
-      <p className="text-sm text-slate-600">{titulo}</p>
-      <p className={`mt-1 text-2xl font-bold ${alerta ? 'text-amber-900' : 'text-slate-900'}`}>{valor}</p>
     </div>
   );
 }
