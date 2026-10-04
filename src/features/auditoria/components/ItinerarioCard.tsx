@@ -15,7 +15,7 @@ interface ItinerarioCardProps {
  */
 export const ItinerarioCard: React.FC<ItinerarioCardProps> = ({ it, onEliminar }) => {
   return (
-    <Card className="border border-border/80 shadow-sm break-inside-avoid bg-surface-container-lowest hover:border-indigo-200 transition-colors">
+    <Card className="border border-border/80 shadow-sm break-inside-avoid bg-surface-container-lowest hover:border-primary/20 transition-colors">
 
       {/* NIVEL 1: TARJETA DEL ENLACE + PROGRESS BAR */}
       <CardHeader className="bg-surface-container-low/50 border-b border-border/50 py-4 px-5">

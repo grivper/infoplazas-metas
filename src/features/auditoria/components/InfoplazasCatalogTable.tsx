@@ -78,8 +78,8 @@ function CatalogGroup({ infoplazas, abierta, onToggle }: CatalogGroupProps) {
           </TableHeader>
           <TableBody>
             {infoplazas.map((infoplaza) => (
-              <TableRow key={infoplaza.id} className="hover:bg-indigo-50 transition-colors cursor-pointer group border-b border-border/50 last:border-b-0">
-                <TableCell className="py-3 px-4 font-medium text-sm text-on-surface group-hover:text-indigo-800">{infoplaza.nombre}</TableCell>
+              <TableRow key={infoplaza.id} className="hover:bg-primary/10 transition-colors cursor-pointer group border-b border-border/50 last:border-b-0">
+                <TableCell className="py-3 px-4 font-medium text-sm text-on-surface group-hover:text-primary">{infoplaza.nombre}</TableCell>
                 <TableCell className="hidden sm:table-cell py-3 px-4 text-sm text-on-surface-variant group-hover:text-on-surface">{infoplaza.region}</TableCell>
                 <TableCell className="hidden md:table-cell py-3 px-4 text-sm text-on-surface-variant">{infoplaza.distrito || 'Sin distrito'}</TableCell>
                 <TableCell className="hidden lg:table-cell py-3 px-4 text-sm text-on-surface-variant">{infoplaza.corregimiento || 'Sin corregimiento'}</TableCell>
