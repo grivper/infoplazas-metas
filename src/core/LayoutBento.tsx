@@ -16,15 +16,16 @@ const LayoutBento: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar oscura */}
+      {/* Sidebar oscura: h-dvh = altura realmente visible en móvil; solo la lista de navegación hace scroll,
+          así el bloque de usuario (Cerrar sesión) queda siempre a la vista */}
       <aside
-        className={`bg-slate-900 h-screen w-64 fixed left-0 top-0 overflow-y-auto z-50 flex flex-col py-6 shadow-2xl transition-transform duration-300 lg:translate-x-0 ${
+        className={`bg-slate-900 h-dvh w-64 fixed left-0 top-0 z-50 flex flex-col py-6 shadow-2xl transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         aria-label="Menú principal"
       >
         {/* Logo */}
-        <div className="px-6 mb-10">
+        <div className="px-6 mb-6 lg:mb-10 shrink-0">
           <div className="flex items-center gap-3">
             <img src={LogoReme} alt="Metas Enlace" className="w-10 h-10" />
             <div>
@@ -34,7 +35,7 @@ const LayoutBento: React.FC = () => {
         </div>
         
         {/* Navegación */}
-        <nav className="flex-1 space-y-1 px-2">
+        <nav className="flex-1 min-h-0 overflow-y-auto space-y-1 px-2">
           {navigation.map((item) => {
             const active = isRouteActive(location.pathname, item.href);
             return (
@@ -59,7 +60,7 @@ const LayoutBento: React.FC = () => {
         </nav>
         
         {/* User section */}
-        <div className="mt-auto px-4 py-4 border-t border-slate-800/50">
+        <div className="mt-auto shrink-0 px-4 py-4 border-t border-slate-800/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 ml-[15px]">
               <div className="flex flex-col">
