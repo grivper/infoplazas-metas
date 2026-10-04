@@ -162,6 +162,10 @@ export const IncidenciasView: React.FC = () => {
                       </td>
                       <td className="px-3 sm:px-6 py-3 font-medium text-on-surface">
                         {inc.infoplaza_nombre}
+                        {/* En móvil la columna Estado está oculta: se muestra aquí debajo del nombre */}
+                        <Badge className={`sm:hidden mt-1 block w-fit text-[10px] font-medium capitalize ${getEstadoColor(inc.estado_ticket)}`}>
+                          {getEstadoLabel(inc.estado_ticket)}
+                        </Badge>
                       </td>
                       <td className="hidden md:table-cell px-3 sm:px-6 py-3">
                         <Badge variant="outline" className="text-xs font-normal border-border capitalize">
