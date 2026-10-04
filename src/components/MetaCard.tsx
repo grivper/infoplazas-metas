@@ -154,7 +154,7 @@ export const MetaCard: React.FC<MetaCardProps> = ({ meta }) => {
         {/* Link a la vista */}
         <Link
           to={meta.link}
-          className="flex items-center justify-end gap-1 mt-4 text-sm text-indigo-600 hover:text-indigo-700"
+          className="flex items-center justify-end gap-1 mt-4 text-sm text-primary hover:text-primary/80"
         >
           Ver más
           <ArrowRight className="w-4 h-4" />
