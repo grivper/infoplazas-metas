@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -23,27 +23,25 @@ interface ModalEditarRutaProps {
   onSuccess: () => void;
 }
 
-export const ModalEditarRuta: React.FC<ModalEditarRutaProps> = ({ open, onOpenChange, ruta, infoplazas, onSuccess }) => {
+/** Props del formulario interno (se monta solo mientras el modal está abierto). */
+interface RutaFormProps {
+  ruta?: ItinerarioEnlace;
+  infoplazas: Infoplaza[];
+  onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
+}
+
+/**
+ * Formulario de ruta. Vive dentro del DialogContent, que se desmonta al cerrar:
+ * por eso el estado se inicializa una sola vez desde `ruta` y cada apertura parte limpia.
+ */
+const RutaForm: React.FC<RutaFormProps> = ({ ruta, infoplazas, onOpenChange, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [enlace, setEnlace] = useState('');
-  const [infoplazaId, setInfoplazaId] = useState('');
-  const [diaSemana, setDiaSemana] = useState('');
-  const [diaRuta, setDiaRuta] = useState('');
-
-  // Sincroniza el estado del formulario con los datos de la ruta seleccionada.
-  // Se ejecuta cada vez que cambia la ruta o se abre/cierra el modal.
-  useEffect(() => {
-    if (ruta) {
-      setEnlace(ruta.enlace_nombre);
-      setInfoplazaId(ruta.infoplaza_id);
-      setDiaSemana(ruta.dia_semana || '');
-      setDiaRuta(ruta.dia_ruta || '');
-    } else {
-      setEnlace(''); setInfoplazaId(''); setDiaSemana(''); setDiaRuta('');
-    }
-    setError(null); // Limpiar errores al abrir/cerrar
-  }, [ruta, open]);
+  const [enlace, setEnlace] = useState(ruta?.enlace_nombre ?? '');
+  const [infoplazaId, setInfoplazaId] = useState(ruta?.infoplaza_id ?? '');
+  const [diaSemana, setDiaSemana] = useState(ruta?.dia_semana || '');
+  const [diaRuta, setDiaRuta] = useState(ruta?.dia_ruta || '');
 
   // Maneja el envío del formulario.
   // Determina si es creación o actualización según si existe ruta,
@@ -61,7 +59,6 @@ export const ModalEditarRuta: React.FC<ModalEditarRutaProps> = ({ open, onOpenCh
     }
     setLoading(false);
     if (result.success) {
-      setEnlace(''); setInfoplazaId(''); setDiaSemana(''); setDiaRuta('');
       onOpenChange(false);
       onSuccess();
     } else {
@@ -73,56 +70,60 @@ export const ModalEditarRuta: React.FC<ModalEditarRutaProps> = ({ open, onOpenCh
   const diasRuta = Array.from({ length: 20 }, (_, i) => `Día ${i + 1}`);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{ruta ? 'Editar Ruta' : 'Agregar Ruta'}</DialogTitle>
-          <DialogDescription>Asigna una infoplaza a un enlace.</DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-          {error && (
-            <div className="bg-red-50 text-red-600 text-sm p-3 rounded-md border border-red-200">
-              {error}
-            </div>
-          )}
-          <div className="space-y-2">
-            <Label htmlFor="enlace">Enlace</Label>
-            <Input id="enlace" value={enlace} onChange={(e) => setEnlace(e.target.value)} placeholder="Ej: Rogelio" required />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="infoplaza">Infoplaza</Label>
-            <Select value={infoplazaId} onValueChange={setInfoplazaId}>
-              <SelectTrigger id="infoplaza"><SelectValue placeholder="Selecciona..." /></SelectTrigger>
-              <SelectContent>
-                {infoplazas.map((ip) => (<SelectItem key={ip.id} value={ip.id!}>{ip.nombre}</SelectItem>))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Día Semana</Label>
-              <Select value={diaSemana} onValueChange={setDiaSemana}>
-                <SelectTrigger><SelectValue placeholder="Selecciona..." /></SelectTrigger>
-                <SelectContent>
-                  {diasSemana.map(d => (<SelectItem key={d} value={d}>{d}</SelectItem>))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Número Día</Label>
-              <Select value={diaRuta} onValueChange={setDiaRuta}>
-                <SelectTrigger><SelectValue placeholder="Selecciona..." /></SelectTrigger>
-                <SelectContent>
-                  {diasRuta.map(d => (<SelectItem key={d} value={d}>{d}</SelectItem>))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter className="pt-4">
-            <Button type="submit" className="w-full" disabled={loading}>{loading ? 'Guardando...' : ruta ? 'Actualizar' : 'Crear'}</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+      {error && (
+        <div className="bg-red-50 text-red-600 text-sm p-3 rounded-md border border-red-200">
+          {error}
+        </div>
+      )}
+      <div className="space-y-2">
+        <Label htmlFor="enlace">Enlace</Label>
+        <Input id="enlace" value={enlace} onChange={(e) => setEnlace(e.target.value)} placeholder="Ej: Rogelio" required />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="infoplaza">Infoplaza</Label>
+        <Select value={infoplazaId} onValueChange={setInfoplazaId}>
+          <SelectTrigger id="infoplaza"><SelectValue placeholder="Selecciona..." /></SelectTrigger>
+          <SelectContent>
+            {infoplazas.map((ip) => (<SelectItem key={ip.id} value={ip.id!}>{ip.nombre}</SelectItem>))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>Día Semana</Label>
+          <Select value={diaSemana} onValueChange={setDiaSemana}>
+            <SelectTrigger><SelectValue placeholder="Selecciona..." /></SelectTrigger>
+            <SelectContent>
+              {diasSemana.map(d => (<SelectItem key={d} value={d}>{d}</SelectItem>))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>Número Día</Label>
+          <Select value={diaRuta} onValueChange={setDiaRuta}>
+            <SelectTrigger><SelectValue placeholder="Selecciona..." /></SelectTrigger>
+            <SelectContent>
+              {diasRuta.map(d => (<SelectItem key={d} value={d}>{d}</SelectItem>))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <DialogFooter className="pt-4">
+        <Button type="submit" className="w-full" disabled={loading}>{loading ? 'Guardando...' : ruta ? 'Actualizar' : 'Crear'}</Button>
+      </DialogFooter>
+    </form>
   );
 };
+
+export const ModalEditarRuta: React.FC<ModalEditarRutaProps> = ({ open, onOpenChange, ruta, infoplazas, onSuccess }) => (
+  <Dialog open={open} onOpenChange={onOpenChange}>
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>{ruta ? 'Editar Ruta' : 'Agregar Ruta'}</DialogTitle>
+        <DialogDescription>Asigna una infoplaza a un enlace.</DialogDescription>
+      </DialogHeader>
+      <RutaForm key={ruta?.id ?? 'nueva'} ruta={ruta} infoplazas={infoplazas} onOpenChange={onOpenChange} onSuccess={onSuccess} />
+    </DialogContent>
+  </Dialog>
+);
