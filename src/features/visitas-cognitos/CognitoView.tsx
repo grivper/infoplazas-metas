@@ -1,9 +1,10 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Papa from 'papaparse';
-import { Upload, FileText, AlertCircle, Database, CheckCircle2, Loader2, XCircle, Info, Map } from 'lucide-react';
+import { Upload, FileText, AlertCircle, Database, CheckCircle2, Loader2, XCircle, Info, Map, CalendarDays } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LISTA_PESTANAS, PESTANA } from '@/components/estiloPestanas';
 import { Badge } from '@/components/ui/badge';
 
 // Utilidades y Servicios
@@ -25,6 +26,13 @@ interface ErrorRegistro {
 const CUATRIMESTRES: Record<string, number[]> = {
   C1: [1, 2, 3, 4], C2: [5, 6, 7, 8], C3: [9, 10, 11, 12],
 };
+
+// Botones de cuatrimestre: id coincide con las claves de CUATRIMESTRES; `meses` es solo el texto visible
+const CUATRIMESTRES_TABS = [
+  { id: 'C1', meses: 'Ene–Abr' },
+  { id: 'C2', meses: 'May–Ago' },
+  { id: 'C3', meses: 'Sep–Dic' },
+];
 
 // --- Utilidad: Extrae el mes ---
 const extraerMes = (fecha: string): number | null => {
@@ -265,10 +273,13 @@ export const CognitoView: React.FC = () => {
           </div>
           
           <Tabs defaultValue="C1" className="w-full">
-            <TabsList className="bg-surface-container/50 p-1 rounded-full mb-6 w-full md:w-auto inline-flex shadow-inner border border-border/50">
-              <TabsTrigger value="C1" className="px-8 py-2 rounded-full text-xs font-black uppercase data-[state=active]:bg-surface-container-lowest data-[state=active]:shadow-sm data-[state=active]:text-primary transition-all">C1 (Ene–Abr)</TabsTrigger>
-              <TabsTrigger value="C2" className="px-8 py-2 rounded-full text-xs font-black uppercase data-[state=active]:bg-surface-container-lowest data-[state=active]:shadow-sm data-[state=active]:text-primary transition-all">C2 (May–Ago)</TabsTrigger>
-              <TabsTrigger value="C3" className="px-8 py-2 rounded-full text-xs font-black uppercase data-[state=active]:bg-surface-container-lowest data-[state=active]:shadow-sm data-[state=active]:text-primary transition-all">C3 (Sep–Dic)</TabsTrigger>
+            <TabsList aria-label="Cuatrimestres" className={`${LISTA_PESTANAS} mb-6`}>
+              {CUATRIMESTRES_TABS.map(({ id, meses }) => (
+                <TabsTrigger key={id} value={id} className={PESTANA}>
+                  <CalendarDays className="h-5 w-5 lg:h-4 lg:w-4" />
+                  <span>{id} <span className="block lg:inline">({meses})</span></span>
+                </TabsTrigger>
+              ))}
             </TabsList>
             {(Object.entries(CUATRIMESTRES) as [string, number[]][]).map(([key, meses]) => (
               <TabsContent key={key} value={key} className="space-y-8 animate-in slide-in-from-bottom-2 duration-400">
