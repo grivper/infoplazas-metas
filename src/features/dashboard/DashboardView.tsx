@@ -33,7 +33,7 @@ export const DashboardView: React.FC = () => {
         setLoading(true);
         const datos = await getDatosDashboard();
         setMetas(datos);
-      } catch (err) {
+      } catch {
         // En producción usar sistema de toast en vez de console
         setError('Error al cargar los datos');
       } finally {

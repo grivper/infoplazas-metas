@@ -1,6 +1,15 @@
 import { supabase } from '@/lib/supabase';
 import type { MetaItem, MetaMetrica } from '@/components/MetaCard';
 
+/** Fila que se guarda en meta_4_snapshots: la "foto" del mes actual de un enlace. */
+interface Meta4SnapshotRow {
+  enlace_nombre: string;
+  mes_num: number;
+  año: number;
+  total_ip: number;
+  infoplazas_json: string[];
+}
+
 export interface EnlaceRutaData {
   enlace: string;
   totalIp: number;
@@ -96,7 +105,7 @@ export const getMeta4Rutas = async (): Promise<MetaItem> => {
   });
 
   const datosEnlaces: EnlaceRutaData[] = [];
-  const snapshotsToUpsert: any[] = [];
+  const snapshotsToUpsert: Meta4SnapshotRow[] = [];
 
   progMap.forEach((progSet, enlace) => {
     const totalIpActual = progSet.size;
