@@ -162,7 +162,7 @@ export const ModalTaller: React.FC<ModalTallerProps> = ({ children, onSuccess })
           </div>
 
           <DialogFooter className="pt-4">
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" disabled={loading}>
               {loading ? 'Guardando...' : 'Guardar Taller'}
             </Button>
           </DialogFooter>

@@ -9,7 +9,7 @@ export function RemeLoader({ size }: RemeLoaderProps) {
   const defaultSize = size ? size : 24;
   return (
     <Loader2 
-      className="animate-spin text-indigo-600" 
+      className="animate-spin text-primary" 
       style={{ width: defaultSize, height: defaultSize }} 
     />
   );

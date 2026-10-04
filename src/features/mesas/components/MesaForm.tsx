@@ -60,7 +60,7 @@ export const MesaForm: React.FC<MesaFormProps> = ({ registro, catalogo, onSave, 
     onSave({ ...form, mesa_id } as MesaRecord);
   };
 
-  const inputCls = 'w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300';
+  const inputCls = 'w-full px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30';
   const labelCls = 'block text-xs font-medium text-on-surface-variant mb-1';
 
   return (
@@ -137,7 +137,7 @@ export const MesaForm: React.FC<MesaFormProps> = ({ registro, catalogo, onSave, 
       </div>
       <div className="flex gap-2 justify-end">
         <Button type="button" variant="ghost" size="sm" onClick={onCancel}>Cancelar</Button>
-        <Button type="submit" size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white">{registro.mesa_id ? 'Actualizar' : 'Crear Mesa'}</Button>
+        <Button type="submit" size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">{registro.mesa_id ? 'Actualizar' : 'Crear Mesa'}</Button>
       </div>
     </form>
   );

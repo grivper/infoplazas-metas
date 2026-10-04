@@ -122,15 +122,15 @@ export const RutaUploader: React.FC<{ onProcessComplete: () => void, badgeCount?
           disabled={loading}
         >
           {loading ? (
-            <Loader2 className="w-4 h-4 mr-2 text-indigo-600 animate-spin" />
+            <Loader2 className="w-4 h-4 mr-2 text-primary animate-spin" />
           ) : (
-            <MapPin className="w-4 h-4 mr-2 text-indigo-600" />
+            <MapPin className="w-4 h-4 mr-2 text-primary" />
           )}
           
           {loading ? 'Procesando...' : 'Cargar Itinerarios de Enlaces'}
           
           {badgeCount !== undefined && badgeCount > 0 && !loading && (
-            <Badge variant="secondary" className="ml-3 bg-indigo-100/80 text-indigo-700 hover:bg-indigo-100 border-none font-semibold px-2">
+            <Badge variant="secondary" className="ml-3 bg-primary/10 text-primary hover:bg-primary/10 border-none font-semibold px-2">
               <CheckCircle2 className="w-3 h-3 mr-1" />
               {badgeCount} en Nube
             </Badge>

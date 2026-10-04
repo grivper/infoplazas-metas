@@ -138,7 +138,7 @@ const MesasView: React.FC = () => {
           <h1 className="text-3xl font-bold text-on-surface tracking-tight">Mesas de Transformación</h1>
           <p className="text-on-surface-variant mt-1">Seguimiento de 21 Infoplazas • 3 Mesas × 10 Sesiones</p>
         </div>
-        <Button className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2" onClick={handleNewMesa}>
+        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2" onClick={handleNewMesa}>
           <Plus className="w-4 h-4" /> Nueva Mesa
         </Button>
       </div>

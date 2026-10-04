@@ -93,7 +93,7 @@ export const GestionInfoplazasView: React.FC = () => {
 
   const stats = { total: infoplazas.length, abiertas: infoplazas.filter(i => !i.cerrada).length, cerradas: infoplazas.filter(i => i.cerrada).length };
 
-  if (loading) return <div className="flex items-center justify-center min-h-[400px]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>;
+  if (loading) return <div className="flex items-center justify-center min-h-[400px]"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -138,7 +138,7 @@ export const GestionInfoplazasView: React.FC = () => {
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <CatalogoUploader onProcessComplete={loadData} badgeCount={infoplazas.length} />
-              <Dialog open={modalAgregarOpen} onOpenChange={setModalAgregarOpen}><DialogTrigger asChild><Button className="border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100"><Plus className="w-4 h-4 mr-2" />Agregar</Button></DialogTrigger><ModalAgregarInfoplaza open={modalAgregarOpen} onOpenChange={setModalAgregarOpen} onSuccess={loadData} /></Dialog>
+              <Dialog open={modalAgregarOpen} onOpenChange={setModalAgregarOpen}><DialogTrigger asChild><Button className="border-primary/20 text-primary bg-primary/10 hover:bg-primary/10"><Plus className="w-4 h-4 mr-2" />Agregar</Button></DialogTrigger><ModalAgregarInfoplaza open={modalAgregarOpen} onOpenChange={setModalAgregarOpen} onSuccess={loadData} /></Dialog>
               <Button variant="outline" className="border-rose-200 text-rose-700 bg-rose-50 hover:bg-rose-100" onClick={() => setModalLimpiarOpen(true)} disabled={infoplazas.length === 0}><Trash2 className="w-4 h-4 mr-2" />Limpiar</Button>
             </div>
           </div>
@@ -186,7 +186,7 @@ export const GestionInfoplazasView: React.FC = () => {
                 </TableHeader>
                 <TableBody>
                   {rutasOrdenadas.map(r => (
-                    <TableRow key={r.id} className="hover:bg-indigo-50 transition-colors cursor-pointer group border-b border-border/50 last:border-b-0">
+                    <TableRow key={r.id} className="hover:bg-primary/10 transition-colors cursor-pointer group border-b border-border/50 last:border-b-0">
                       <TableCell className="py-3 px-4 text-sm text-on-surface-variant">{r.dia_semana || '-'}</TableCell>
                       <TableCell className="hidden sm:table-cell py-3 px-4 text-sm text-on-surface-variant">{r.dia_ruta || '-'}</TableCell>
                       <TableCell className="py-3 px-4"><Badge variant="secondary">{r.infoplaza_nombre}</Badge></TableCell>

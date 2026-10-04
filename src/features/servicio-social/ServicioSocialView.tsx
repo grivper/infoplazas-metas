@@ -236,7 +236,7 @@ export const ServicioSocialView: React.FC = () => {
             </Button>
           </ModalReclutamiento>
           <ModalTaller onSuccess={cargarDatos}>
-            <Button variant="outline" className="flex items-center gap-2 border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100">
+            <Button variant="outline" className="flex items-center gap-2 border-primary/20 text-primary bg-primary/10 hover:bg-primary/10">
               <BookOpen className="w-4 h-4" />
               Reportar Taller
             </Button>

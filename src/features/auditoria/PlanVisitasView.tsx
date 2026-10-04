@@ -95,7 +95,7 @@ const PlanVisitasView: React.FC = () => {
             <div className="flex items-center gap-2 bg-surface-container-lowest px-4 py-2 rounded-xl border border-border shadow-sm shrink-0">
               <Search className="w-4 h-4 text-outline" />
               <span className="text-sm font-medium text-on-surface">Mes a Evaluar:</span>
-              <select className="border-none text-sm font-semibold text-indigo-600 focus:ring-0 cursor-pointer bg-transparent"
+              <select className="border-none text-sm font-semibold text-primary focus:ring-0 cursor-pointer bg-transparent"
                 value={mesEval} onChange={e => setMesEval(+e.target.value)}>
                 {Object.entries(MESES).map(([num, nombre]) => <option key={num} value={num}>{nombre}</option>)}
               </select>
