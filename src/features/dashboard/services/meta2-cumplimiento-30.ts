@@ -87,7 +87,6 @@ export const getMeta2Cumplimiento = async (): Promise<MetaItem> => {
     mes_nombre: s.mes_nombre,
     ip_sobre_30: s.ip_sobre_30,
     meta_acumulada: s.meta_acumulada,
-    meta_base: (s as any).meta_base || 0,
     progreso_pct: s.progreso_pct,
   }));
 
