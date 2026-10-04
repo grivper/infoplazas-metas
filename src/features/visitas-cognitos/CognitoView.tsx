@@ -190,11 +190,11 @@ export const CognitoView: React.FC = () => {
       </div>
 
       {/* Area de Carga */}
-      <Card className="border-2 border-dashed border-border bg-surface-container-lowest/50 hover:bg-surface-container-lowest hover:border-indigo-400 transition-all duration-300 shadow-sm relative overflow-hidden group">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      <Card className="border-2 border-dashed border-border bg-surface-container-lowest/50 hover:bg-surface-container-lowest hover:border-primary/40 transition-all duration-300 shadow-sm relative overflow-hidden group">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         <CardContent className="flex flex-col items-center justify-center py-10 gap-4 relative z-10">
-          <div className={`p-4 rounded-full ${loading ? 'bg-indigo-100' : 'bg-surface-container'} transition-colors`}>
-            <Upload className={`w-10 h-10 ${loading ? 'text-indigo-600 animate-bounce' : 'text-outline'}`} />
+          <div className={`p-4 rounded-full ${loading ? 'bg-primary/10' : 'bg-surface-container'} transition-colors`}>
+            <Upload className={`w-10 h-10 ${loading ? 'text-primary animate-bounce' : 'text-outline'}`} />
           </div>
           <div className="text-center space-y-1">
             <h3 className="text-lg font-bold text-on-surface">Actualizar Registros Mensuales</h3>
@@ -203,7 +203,7 @@ export const CognitoView: React.FC = () => {
           
           <input id="cognito-upload" type="file" accept=".csv" className="hidden" ref={fileInputRef} onChange={handleFileUpload} />
           
-          <Button variant="default" size="lg" className="bg-slate-900 hover:bg-indigo-600 text-white shadow-xl px-10 rounded-full font-bold transition-all hover:scale-105 active:scale-95 gap-2" onClick={() => fileInputRef.current?.click()} disabled={loading}>
+          <Button variant="default" size="lg" className="bg-slate-900 hover:bg-primary text-white shadow-xl px-10 rounded-full font-bold transition-all hover:scale-105 active:scale-95 gap-2" onClick={() => fileInputRef.current?.click()} disabled={loading}>
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <FileText className="w-5 h-5" />}
             {loading ? 'Procesando...' : 'Cargar Archivo'}
           </Button>
@@ -266,9 +266,9 @@ export const CognitoView: React.FC = () => {
           
           <Tabs defaultValue="C1" className="w-full">
             <TabsList className="bg-surface-container/50 p-1 rounded-full mb-6 w-full md:w-auto inline-flex shadow-inner border border-border/50">
-              <TabsTrigger value="C1" className="px-8 py-2 rounded-full text-xs font-black uppercase data-[state=active]:bg-surface-container-lowest data-[state=active]:shadow-sm data-[state=active]:text-indigo-600 transition-all">C1 (Ene–Abr)</TabsTrigger>
-              <TabsTrigger value="C2" className="px-8 py-2 rounded-full text-xs font-black uppercase data-[state=active]:bg-surface-container-lowest data-[state=active]:shadow-sm data-[state=active]:text-indigo-600 transition-all">C2 (May–Ago)</TabsTrigger>
-              <TabsTrigger value="C3" className="px-8 py-2 rounded-full text-xs font-black uppercase data-[state=active]:bg-surface-container-lowest data-[state=active]:shadow-sm data-[state=active]:text-indigo-600 transition-all">C3 (Sep–Dic)</TabsTrigger>
+              <TabsTrigger value="C1" className="px-8 py-2 rounded-full text-xs font-black uppercase data-[state=active]:bg-surface-container-lowest data-[state=active]:shadow-sm data-[state=active]:text-primary transition-all">C1 (Ene–Abr)</TabsTrigger>
+              <TabsTrigger value="C2" className="px-8 py-2 rounded-full text-xs font-black uppercase data-[state=active]:bg-surface-container-lowest data-[state=active]:shadow-sm data-[state=active]:text-primary transition-all">C2 (May–Ago)</TabsTrigger>
+              <TabsTrigger value="C3" className="px-8 py-2 rounded-full text-xs font-black uppercase data-[state=active]:bg-surface-container-lowest data-[state=active]:shadow-sm data-[state=active]:text-primary transition-all">C3 (Sep–Dic)</TabsTrigger>
             </TabsList>
             {(Object.entries(CUATRIMESTRES) as [string, number[]][]).map(([key, meses]) => (
               <TabsContent key={key} value={key} className="space-y-8 animate-in slide-in-from-bottom-2 duration-400">

@@ -134,7 +134,7 @@ export function IncidenciaDetalleModal({
                   size="sm"
                   variant={accionSeguimiento === 'escalado' ? 'default' : 'outline'}
                   onClick={() => onAccionChange('escalado')}
-                  className={accionSeguimiento === 'escalado' ? 'bg-indigo-600 hover:bg-indigo-700' : ''}
+                  className={accionSeguimiento === 'escalado' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : ''}
                 >
                   <AlertTriangle className="w-3 h-3 mr-1" />
                   Escalar

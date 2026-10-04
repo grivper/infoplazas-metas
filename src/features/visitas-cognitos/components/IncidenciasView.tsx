@@ -186,7 +186,7 @@ export const IncidenciasView: React.FC = () => {
                             variant="ghost" 
                             size="sm"
                             onClick={() => handleVerDetalle(inc)}
-                            className="h-7 px-2 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50"
+                            className="h-7 px-2 text-primary hover:bg-primary/10"
                           >
                             <Eye className="w-4 h-4 mr-1" />
                             Ver
