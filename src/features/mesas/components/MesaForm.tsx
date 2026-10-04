@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/ui/combobox';
 import { generarMesaId, type MesaRecord, type InfoplazaCatalogo } from '../services/mesasDb';
@@ -15,25 +15,11 @@ interface MesaFormProps {
  * Maneja todos los campos: infoplaza, mesa, sesión, participantes, fechas, etc.
  */
 export const MesaForm: React.FC<MesaFormProps> = ({ registro, catalogo, onSave, onCancel }) => {
-  const defaultInfoplaza = catalogo[0] || { nombre: '', region: '' };
-  
-  const [form, setForm] = useState({
-    infoplaza: '',
-    region: '',
-    mesa: 1,
-    sesionActual: 1,
-    participantes: 0,
-    dinamizador: '',
-    email: '',
-    fechaInicio: '',
-    fechaFin: '',
-    fechaGraduacion: '',
-    estado: 'pendiente' as MesaRecord['estado'],
-  });
-
-  // Inicializa el formulario con los valores del registro o valores por defecto
-  useEffect(() => {
-    setForm({
+  // Valores iniciales: se calculan una sola vez al montar. El formulario vive dentro de un
+  // Dialog que se desmonta al cerrar, así que cada apertura parte de los datos del registro.
+  const [form, setForm] = useState(() => {
+    const defaultInfoplaza = catalogo[0] || { nombre: '', region: '' };
+    return {
       infoplaza: registro.infoplaza || defaultInfoplaza.nombre,
       region: registro.region || defaultInfoplaza.region,
       mesa: registro.mesa || 1,
@@ -44,9 +30,9 @@ export const MesaForm: React.FC<MesaFormProps> = ({ registro, catalogo, onSave, 
       fechaInicio: registro.fechaInicio || '',
       fechaFin: registro.fechaFin || '',
       fechaGraduacion: registro.fechaGraduacion || '',
-      estado: registro.estado || 'pendiente',
-    });
-  }, [registro, defaultInfoplaza]);
+      estado: (registro.estado || 'pendiente') as MesaRecord['estado'],
+    };
+  });
 
   // Sincroniza la región al cambiar infoplaza
   const handleInfoplazaChange = (nombre: string) => {

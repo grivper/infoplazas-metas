@@ -159,8 +159,9 @@ const MesasView: React.FC = () => {
           <DialogHeader>
             <DialogTitle>{editing ? 'Editar Mesa' : 'Nueva Mesa de Transformación'}</DialogTitle>
           </DialogHeader>
-          <MesaForm 
-            registro={editing || {}} 
+          <MesaForm
+            key={catalogo.length} // remonta el formulario si el catálogo llega con el diálogo ya abierto
+            registro={editing || {}}
             catalogo={catalogo}
             onSave={handleSave} 
             onCancel={() => { setOpenDialog(false); setEditing(null); }} 
