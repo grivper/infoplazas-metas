@@ -22,13 +22,17 @@ interface ModalReclutamientoProps {
  * El formulario se desmonta al cerrar para que cada apertura inicialice sus datos.
  */
 export const ModalReclutamiento: React.FC<ModalReclutamientoProps> = ({ children, onSuccess, estudiante }) => {
-  const [open, setOpen] = useState(false);
+  // Si el componente se monta con un estudiante ya seleccionado, nace abierto.
+  const [open, setOpen] = useState(!!estudiante);
   const [prevEstudiante, setPrevEstudiante] = useState(estudiante);
+  // Sube cada vez que llega un objeto `estudiante` nuevo, para remontar el formulario con sus datos.
+  const [formVersion, setFormVersion] = useState(0);
   const isEditing = !!estudiante;
 
   // Abre el modal si cambia el estudiante seleccionado para edición.
   if (estudiante !== prevEstudiante) {
     setPrevEstudiante(estudiante);
+    setFormVersion((v) => v + 1);
     if (estudiante) {
       setOpen(true);
     }
@@ -49,7 +53,7 @@ export const ModalReclutamiento: React.FC<ModalReclutamientoProps> = ({ children
           </DialogDescription>
         </DialogHeader>
         <ReclutamientoForm
-          key={estudiante?.id ?? 'nuevo'}
+          key={`${estudiante?.id ?? 'nuevo'}-${formVersion}`}
           estudiante={estudiante}
           onClose={() => setOpen(false)}
           onSuccess={onSuccess}
