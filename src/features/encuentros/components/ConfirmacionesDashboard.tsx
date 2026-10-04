@@ -3,6 +3,7 @@ import { ClipboardCheck, ListChecks, Loader2, MessageSquare } from 'lucide-react
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LISTA_PESTANAS, PESTANA } from '@/components/estiloPestanas';
 import { Textarea } from '@/components/ui/textarea';
 import {
   getConfirmacionesByEncuentro,
@@ -38,10 +39,6 @@ const estados: Array<{ estado: EstadoEnvio; titulo: string; vacio: string; conAc
   },
 ];
 
-// Mismo aspecto que el menú compartido MenuSecciones: grilla con el ícono arriba en móvil
-// y fila de botones redondeados desde lg (las pestañas siguen siendo las de Radix)
-const LISTA_PESTANAS = 'grid h-auto w-full grid-cols-3 gap-2 bg-transparent p-0 lg:inline-flex lg:w-auto';
-const PESTANA = 'flex-col gap-1 whitespace-normal rounded-xl border border-border bg-surface-container-lowest px-2 py-3 text-center text-xs text-on-surface-variant sm:text-sm lg:flex-row lg:gap-2 lg:whitespace-nowrap lg:rounded-full lg:px-4 lg:py-2 data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm';
 
 const formatFecha = (fecha: string): string => new Intl.DateTimeFormat('es-PA', {
   day: 'numeric',
