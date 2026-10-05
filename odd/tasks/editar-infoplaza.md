@@ -10,7 +10,7 @@ Editar nombre, código, provincia, distrito y corregimiento de cada infoplaza de
 
 ## Tareas
 - [x] DB: migración `ON UPDATE CASCADE` en FKs hacia `catalogo_infoplazas(codigo)` (Notion `3f064f42-ddd3-8177-b36f-c84cf15f1ee1`). Aplicada en SQL Editor (proyecto xaawdamsgpfcqklviseh); verificado `dinamizadores_infoplaza_codigo_fkey` = CASCADE. Las demás FKs usan `infoplaza_id`, no el código.
-- [ ] Servicio: `updateInfoplaza` en `infoplazasService.ts` (Notion `3f064f42-ddd3-81fd-ac01-f328e21c6303`).
+- [x] Servicio: `updateInfoplaza` en `infoplazaUpdateService.ts` (archivo aparte: `infoplazasService.ts` ya tenía 278 líneas y el límite es 300). 3 tests pasan; tsc y eslint limpios (Notion `3f064f42-ddd3-81fd-ac01-f328e21c6303`).
 - [ ] UI: `ModalEditarInfoplaza`, columna Acciones y conexión en la vista (Notion `3f064f42-ddd3-8155-b375-e15cd4805e03`).
 
 ## Criterios
