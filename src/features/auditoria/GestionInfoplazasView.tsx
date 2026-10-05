@@ -12,6 +12,7 @@ import { getAllInfoplazas, getInfoplazasAbiertas, toggleEstadoInfoplaza, type In
 import { getItinerarioEnlaces, deleteItinerarioEnlace, type ItinerarioEnlace } from './services/itinerarioService';
 import { truncateCatalogoInfoplazas } from './services/catalogoService';
 import { ModalAgregarInfoplaza } from './components/ModalAgregarInfoplaza';
+import { ModalEditarInfoplaza } from './components/ModalEditarInfoplaza';
 import { ModalEditarRuta } from './components/ModalEditarRuta';
 import { RutaUploader } from './components/RutaUploader';
 import { CatalogoUploader } from './components/CatalogoUploader';
@@ -42,6 +43,7 @@ export const GestionInfoplazasView: React.FC = () => {
   const [filtroEstado, setFiltroEstado] = useState<FiltroEstado>('todas');
   const [searchTerm, setSearchTerm] = useState('');
   const [modalAgregarOpen, setModalAgregarOpen] = useState(false);
+  const [infoplazaEditando, setInfoplazaEditando] = useState<Infoplaza | undefined>();
   const [modalRutaOpen, setModalRutaOpen] = useState(false);
   const [modalLimpiarOpen, setModalLimpiarOpen] = useState(false);
   const [confirmLimpiar, setConfirmLimpiar] = useState('');
@@ -143,7 +145,8 @@ export const GestionInfoplazasView: React.FC = () => {
             </div>
           </div>
           
-          <InfoplazasCatalogTable infoplazas={filtradas} onToggle={handleToggle} />
+          <InfoplazasCatalogTable infoplazas={filtradas} onToggle={handleToggle} onEdit={setInfoplazaEditando} />
+          <ModalEditarInfoplaza infoplaza={infoplazaEditando} onClose={() => setInfoplazaEditando(undefined)} onSuccess={loadData} />
         </div>
       )}
 

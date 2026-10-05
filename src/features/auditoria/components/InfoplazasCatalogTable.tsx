@@ -1,4 +1,5 @@
-import { ToggleLeft, ToggleRight } from 'lucide-react';
+import { Pencil, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -12,12 +13,13 @@ import type { Infoplaza } from '../services/infoplazasService';
 interface InfoplazasCatalogTableProps {
   infoplazas: Infoplaza[];
   onToggle: (infoplaza: Infoplaza) => void;
+  onEdit: (infoplaza: Infoplaza) => void;
 }
 
 const tableHeadClassName = 'text-xs font-bold text-on-surface-variant uppercase tracking-wider py-3 px-4';
 
 /** Renders catalog entries grouped by their open or closed status. */
-export function InfoplazasCatalogTable({ infoplazas, onToggle }: InfoplazasCatalogTableProps) {
+export function InfoplazasCatalogTable({ infoplazas, onToggle, onEdit }: InfoplazasCatalogTableProps) {
   const abiertas = infoplazas.filter((infoplaza) => !infoplaza.cerrada);
   const cerradas = infoplazas.filter((infoplaza) => infoplaza.cerrada);
 
@@ -27,8 +29,8 @@ export function InfoplazasCatalogTable({ infoplazas, onToggle }: InfoplazasCatal
 
   return (
     <>
-      {abiertas.length > 0 && <CatalogGroup infoplazas={abiertas} abierta onToggle={onToggle} />}
-      {cerradas.length > 0 && <CatalogGroup infoplazas={cerradas} abierta={false} onToggle={onToggle} />}
+      {abiertas.length > 0 && <CatalogGroup infoplazas={abiertas} abierta onToggle={onToggle} onEdit={onEdit} />}
+      {cerradas.length > 0 && <CatalogGroup infoplazas={cerradas} abierta={false} onToggle={onToggle} onEdit={onEdit} />}
     </>
   );
 }
@@ -37,9 +39,10 @@ interface CatalogGroupProps {
   infoplazas: Infoplaza[];
   abierta: boolean;
   onToggle: (infoplaza: Infoplaza) => void;
+  onEdit: (infoplaza: Infoplaza) => void;
 }
 
-function CatalogGroup({ infoplazas, abierta, onToggle }: CatalogGroupProps) {
+function CatalogGroup({ infoplazas, abierta, onToggle, onEdit }: CatalogGroupProps) {
   const status = abierta
     ? {
         title: 'Infoplazas Abiertas',
@@ -74,6 +77,7 @@ function CatalogGroup({ infoplazas, abierta, onToggle }: CatalogGroupProps) {
               <TableHead className={`hidden lg:table-cell ${tableHeadClassName}`}>Corregimiento</TableHead>
               <TableHead className={tableHeadClassName}>Estado</TableHead>
               <TableHead className={`hidden md:table-cell ${tableHeadClassName}`}>Fecha Cierre</TableHead>
+              <TableHead className={`w-16 ${tableHeadClassName}`}>Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -90,6 +94,11 @@ function CatalogGroup({ infoplazas, abierta, onToggle }: CatalogGroupProps) {
                   </button>
                 </TableCell>
                 <TableCell className="hidden md:table-cell py-3 px-4 text-sm text-on-surface-variant">{infoplaza.fecha_cierre || '-'}</TableCell>
+                <TableCell className="py-3 px-4">
+                  <Button variant="ghost" size="icon" aria-label={`Editar ${infoplaza.nombre}`} onClick={() => onEdit(infoplaza)}>
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
