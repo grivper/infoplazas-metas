@@ -9,7 +9,7 @@
 Editar nombre, código, provincia, distrito y corregimiento de cada infoplaza desde Gestión de Infoplazas → Catálogo. Caso inmediato: intercambiar `667-chupa` y `668-santa-ana` en tres ediciones (con código temporal), verificando que los dinamizadores sigan a su infoplaza.
 
 ## Tareas
-- [ ] DB: migración `ON UPDATE CASCADE` en FKs hacia `catalogo_infoplazas(codigo)` (Notion `3f064f42-ddd3-8177-b36f-c84cf15f1ee1`). Aplicación manual en SQL Editor.
+- [x] DB: migración `ON UPDATE CASCADE` en FKs hacia `catalogo_infoplazas(codigo)` (Notion `3f064f42-ddd3-8177-b36f-c84cf15f1ee1`). Aplicada en SQL Editor (proyecto xaawdamsgpfcqklviseh); verificado `dinamizadores_infoplaza_codigo_fkey` = CASCADE. Las demás FKs usan `infoplaza_id`, no el código.
 - [ ] Servicio: `updateInfoplaza` en `infoplazasService.ts` (Notion `3f064f42-ddd3-81fd-ac01-f328e21c6303`).
 - [ ] UI: `ModalEditarInfoplaza`, columna Acciones y conexión en la vista (Notion `3f064f42-ddd3-8155-b375-e15cd4805e03`).
 
