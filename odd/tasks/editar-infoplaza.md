@@ -2,7 +2,7 @@
 
 ## Ticket
 - Épica Notion: `3f064f42-ddd3-810e-847e-df4373015fb8`
-- Estado: En progreso
+- Estado: Completada
 - Rama: `feat/editar-infoplaza`
 
 ## Objetivo
@@ -19,4 +19,4 @@ Editar nombre, código, provincia, distrito y corregimiento de cada infoplaza de
 - Ningún archivo supera 300 líneas.
 
 ## Evidencia
-- Pendiente.
+- Migración aplicada y verificada; servicio con 3 tests; UI aprobada por el usuario (commit cab293b).
