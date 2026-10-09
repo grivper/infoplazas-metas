@@ -89,6 +89,6 @@ export const createWorkbook = (encuentroNombre: string, rows: ConfirmacionWorkbo
 
   addDataRows(worksheet, rows);
 
-  worksheet.autoFilter = `A1:L${worksheet.rowCount}`;
+  worksheet.autoFilter = `A1:M${worksheet.rowCount}`;
   return workbook;
 };
