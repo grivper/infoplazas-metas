@@ -14,6 +14,7 @@ const HEADERS = [
   'Distrito',
   'Corregimiento',
   'Cedula',
+  'Nombre del dinamizador',
   'Asistencia',
   'Hospedaje',
   'Cena',
@@ -24,7 +25,7 @@ const HEADERS = [
 
 const COLUMN_WIDTHS = [
   { width: 7 }, { width: 32 }, { width: 20 }, { width: 20 },
-  { width: 24 }, { width: 18 }, { width: 15 }, { width: 15 },
+  { width: 24 }, { width: 18 }, { width: 32 }, { width: 15 }, { width: 15 },
   { width: 12 }, { width: 26 }, { width: 15 }, { width: 30 },
 ];
 
@@ -54,6 +55,7 @@ const addDataRows = (worksheet: ExcelJS.Worksheet, rows: ConfirmacionWorkbookRow
       row.distrito,
       row.corregimiento,
       row.cedula,
+      row.dinamizador,
       row.asistencia,
       row.hospedaje,
       row.cena,
